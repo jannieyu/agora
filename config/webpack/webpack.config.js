@@ -1,4 +1,5 @@
 const path = require("path")
+const MiniCssExtractPlugin = require("mini-css-extract-plugin")
 
 module.exports = {
   entry: {
@@ -13,8 +14,8 @@ module.exports = {
         exclude: /node_modules/,
       },
       {
-        test: /\.css$/,
-        use: ["css-loader"],
+        test: /\.css$/i,
+        use: [MiniCssExtractPlugin.loader, "css-loader"],
       },
     ],
   },
@@ -25,7 +26,11 @@ module.exports = {
       react: path.resolve(__dirname, "../../node_modules", "react"),
     },
   },
-  plugins: [],
+  plugins: [
+    new MiniCssExtractPlugin({
+      filename: "[name].bundle.css",
+    }),
+  ],
   devServer: {
     contentBase: "../../public/",
   },
