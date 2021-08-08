@@ -3,3 +3,6 @@ build-frontend:
 
 run-frontend:
   npm run start
+
+validate-repo:
+   npx eslint . --ext .jsx --ext .js --ext .ts --ext .tsx
