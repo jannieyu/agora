@@ -1,10 +1,10 @@
 import React from "react"
 import { render } from "react-dom"
-import "./styles.css"
+import "./styles.scss"
 
 const HelloWorld = () => (
   <div className="app">
-    <h1> Hello, World!</h1>
+    <h1 className="title"> Hello, World!</h1>
   </div>
 )
 
