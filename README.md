@@ -1,5 +1,15 @@
 # React Web Server
 
+## Installation for macOS
+
+1. Install Node.js (ideally version 16.6.1 or later)
+2. Install npm (ideally version 7.20.3 or later)
+3. Install homebrew (ideally version 3.6.2 or later)
+4. Run `brew install just`
+5. From the main directory run `just build-frontend`
+
+## Resources
+
 Webpack, Babel, and React boilterplate setup: [https://medium.com/@tomaskoutsky/hey-webpack-can-you-bust-my-cache-21350f951220](https://medium.com/@tomaskoutsky/hey-webpack-can-you-bust-my-cache-21350f951220)
 
 ##
