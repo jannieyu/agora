@@ -7,6 +7,7 @@
 3. Install homebrew (ideally version 3.6.2 or later)
 4. Run `brew install just`
 5. From the main directory run `just build-frontend`
+6. Configure your editor to use eslint, stylelint, and prettier
 
 ## Resources
 

@@ -6,3 +6,4 @@ run-frontend:
 
 validate-repo:
    npx eslint . --ext .jsx --ext .js --ext .ts --ext .tsx
+   npx stylelint "**/*.{css,scss,sass}" --config .stylelintrc.json
