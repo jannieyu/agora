@@ -17,12 +17,12 @@ Migration to Webpack Dev Server 4: [https://github.com/webpack/webpack-dev-serve
 
 ##
 
-Linting: (https://www.digitalocean.com/community/tutorials/code-formatting-with-prettier-in-visual-studio-code)[https://www.digitalocean.com/community/tutorials/code-formatting-with-prettier-in-visual-studio-code]
+Linting: [https://www.digitalocean.com/community/tutorials/code-formatting-with-prettier-in-visual-studio-code](https://www.digitalocean.com/community/tutorials/code-formatting-with-prettier-in-visual-studio-code)
 
 ##
 
-CSS: (https://github.com/webpack-contrib/mini-css-extract-plugin)[https://github.com/webpack-contrib/mini-css-extract-plugin]
+CSS: [https://github.com/webpack-contrib/mini-css-extract-plugin](https://github.com/webpack-contrib/mini-css-extract-plugin)
 
 ##
 
-SASS: (https://webpack.js.org/loaders/sass-loader/)[https://webpack.js.org/loaders/sass-loader/]
+SASS: [https://webpack.js.org/loaders/sass-loader/](https://webpack.js.org/loaders/sass-loader/)
