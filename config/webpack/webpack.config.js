@@ -43,10 +43,12 @@ module.exports = {
     }),
   ],
   devServer: {
-    contentBase: "../../public/",
+    static: {
+      directory: "../../static/",
+    },
   },
   output: {
-    path: path.resolve(__dirname, "../../public/bundles"),
+    path: path.resolve(__dirname, "../../static/bundles"),
     filename: "[name].bundle.js",
     chunkFilename: "[name].js",
     publicPath: "/bundles/",
