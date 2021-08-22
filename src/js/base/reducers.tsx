@@ -1,23 +1,23 @@
 const initialState = {
-  header: "Hello, World!" as string,
+  title: "World" as string,
 }
 
-type AppState = typeof initialState
+export type AppState = typeof initialState
 
-type SetDataPayload = Partial<AppState>
-
-export enum ActionTypes {
+export enum ActionType {
   SET_DATA = "SET_DATA",
 }
 
+export type ActionPayload = Partial<AppState>
+
 export interface Action {
-  type: ActionTypes
-  payload: SetDataPayload
+  type: ActionType
+  payload: ActionPayload
 }
 
 export const rootReducer = (state: AppState = initialState, action: Action) => {
   switch (action.type) {
-    case ActionTypes.SET_DATA: {
+    case ActionType.SET_DATA: {
       return { ...state, ...action.payload }
     }
     default: {
