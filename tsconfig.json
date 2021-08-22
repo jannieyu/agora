@@ -1,0 +1,7 @@
+{
+  "compilerOptions": {
+    "jsx": "react"
+  },
+  "include": ["src/**/*", "config/webpack/*"],
+  "exclude": ["node_modules"]
+}
