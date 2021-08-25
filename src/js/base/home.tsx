@@ -21,6 +21,8 @@ const Home = () => {
       <button onClick={onToggle} type="button">
         Toggle
       </button>
+      &nbsp;
+      <a href="./about">About this site</a>
     </div>
   )
 }

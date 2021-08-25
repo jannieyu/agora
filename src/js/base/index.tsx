@@ -9,7 +9,7 @@ ReactDOM.render(
   <Router>
     <Switch>
       <Route path="/" exact component={Home} />
-      <Route component={About} />
+      <Route path="/about" component={About} />
     </Switch>
   </Router>,
   document.getElementById("root"),
