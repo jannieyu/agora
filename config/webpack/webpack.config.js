@@ -48,6 +48,7 @@ module.exports = {
     static: {
       directory: "../../static/",
     },
+    historyApiFallback: true,
   },
   output: {
     path: path.resolve(__dirname, "../../static/bundles"),
