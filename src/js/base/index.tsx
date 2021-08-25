@@ -1,6 +1,16 @@
 import * as React from "react"
-import { render } from "./react_base"
+import * as ReactDOM from "react-dom"
+import { BrowserRouter as Router, Route, Switch } from "react-router-dom"
 import Home from "./home"
+import About from "./about"
 import "./styles.scss"
 
-render(<Home />, document.getElementById("app"))
+ReactDOM.render(
+  <Router>
+    <Switch>
+      <Route path="/" exact component={Home} />
+      <Route component={About} />
+    </Switch>
+  </Router>,
+  document.getElementById("root"),
+)
