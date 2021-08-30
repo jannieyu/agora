@@ -14,7 +14,10 @@ export interface Action {
   payload: unknown
 }
 
-export const makeApp = (App, reducer: (state: AppState, action: Action) => AppState) => {
+export const makeApp = (
+  App: React.ComponentType,
+  reducer: (state: AppState, action: Action) => AppState,
+) => {
   const store = createStore(reducer)
   return function Wrapped() {
     return (
