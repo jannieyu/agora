@@ -1,5 +1,5 @@
 const initialState = {
-  title: "World" as string,
+  numClicks: 0 as number,
 }
 
 export type AppState = typeof initialState
