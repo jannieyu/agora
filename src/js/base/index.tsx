@@ -25,7 +25,9 @@ const Base = (props: BaseProps) => {
           </Nav>
         </Container>
       </Navbar>
-      <Container>{children}</Container>
+      <Container>
+        <div className="content-base">{children}</div>
+      </Container>
     </>
   )
 }

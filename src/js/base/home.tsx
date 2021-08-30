@@ -28,7 +28,7 @@ const Home = () => {
       </Grid>
       <Grid item xs={6}>
         <Button onClick={onToggle} variant="contained">
-          {t("Toggle")}
+          {t("Click Button")}
         </Button>
       </Grid>
     </Grid>
