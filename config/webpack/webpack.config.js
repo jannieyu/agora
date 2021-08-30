@@ -28,6 +28,15 @@ module.exports = {
           "css-loader",
           // Compiles Sass to CSS
           "sass-loader",
+          // Helps with browser compatability
+          {
+            loader: "postcss-loader",
+            options: {
+              postcssOptions: {
+                plugins: ["autoprefixer"],
+              },
+            },
+          },
         ],
       },
     ],
