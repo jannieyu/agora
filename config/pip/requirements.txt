@@ -1,3 +1,4 @@
+aiofiles==0.7.0
 asgiref==3.4.1
 black==21.8b0
 click==8.0.1
