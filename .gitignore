@@ -1,7 +1,7 @@
 # JS / TS
 node_modules
 build
-dist
+static/bundles
 npm-debug.log
 .env
 .DS_Store
