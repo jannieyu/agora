@@ -2,12 +2,13 @@
 
 ## Installation for macOS
 
-1. Install Node.js (ideally version 16.7.0 or later)
-2. Install npm (ideally version 7.20.3 or later)
-3. Install homebrew (ideally version 3.6.2 or later)
-4. Run `brew install just`
-5. From the main directory run `just build-frontend`
-6. Configure your editor to use eslint, stylelint, and prettier
+1. Install Node.js >= 12.13.0 (ideally version 16.8.0 or later)
+2. Install npm >= 7.20.x
+3. Install Python >= 3.9.x
+4. Install homebrew
+5. Run `brew install just`
+6. From the main directory run `just setup-frontend` and `just setup-backend`
+7. Configure your editor to use eslint, stylelint, prettier, mypy, and black (python autoformatter)
 
 ## Resources
 
