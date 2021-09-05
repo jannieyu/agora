@@ -1,6 +1,5 @@
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI
 from dataclasses import dataclass
-from dataclasses_json import dataclass_json, LetterCase
 from .decorators import get
 from .spa import SPA
 
@@ -19,10 +18,16 @@ class _Animal:
     animal_type: _AnimalType
 
 
-@get(app, "/api", _Animal)
-def read_main(args: _Animal) -> dict[str, str]:
+@dataclass
+class _Response:
+    he_llo: str
+
+
+@get(app, "/api", _Animal, _Response)
+def read_main(args: _Animal) -> _Response:
     print(args)
-    return {"Hello": "World!"}
+    response = _Response(he_llo="wor_ld")
+    return response
 
 
 app.mount(path="/", app=SPA(directory="./static"), name="SPA")
