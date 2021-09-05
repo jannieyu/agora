@@ -41,4 +41,4 @@ async def read_main():
     return {"Hello": "World!"}
 
 
-app.mount(path="/", app=SinglePageApplication(directory="../../static"), name="SPA")
+app.mount(path="/", app=SinglePageApplication(directory="./static"), name="SPA")

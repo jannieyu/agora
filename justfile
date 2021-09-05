@@ -10,7 +10,7 @@ run-frontend:
   cd config/webpack && npx webpack -w
 
 run-backend:
-  cd src/app && uvicorn main:app --reload
+  uvicorn src.app.main:app --reload --reload-dir src/app
 
 validate-repo:
    npx eslint . --ext .jsx --ext .js --ext .ts --ext .tsx
