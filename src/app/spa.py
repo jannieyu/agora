@@ -15,7 +15,7 @@ class SPA(StaticFiles):
         full_path, stat_result = await super().lookup_path(path)
 
         # if a file cannot be found
-        if stat_result is None:
+        if stat_result is None and not path.startswith("api/"):
             return await super().lookup_path(self.index)
 
         return (full_path, stat_result)
