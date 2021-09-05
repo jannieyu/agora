@@ -1,9 +1,17 @@
-import { stringify } from "qs"
+interface APIError {
+  body: unknown
+  status: number
+  statusText: string
+}
 
-export default function buildWrappedGet<Args, OnLoad, OnError>(url: string) {
+type OnError = (err: APIError) => unknown
+
+type APICallback = (responseJson: unknown) => unknown
+
+export default function buildWrappedGet<Args, OnLoad extends APICallback>(url: string) {
   return (args: Args, onLoad: OnLoad, onError: OnError) => {
-    const serializedArgs = stringify(args)
-    const location = `${url}?${serializedArgs}`
+    const serializedArgs = JSON.stringify(args)
+    const location = `${url}?data=${serializedArgs}`
 
     const headers = new Headers({
       "Content-Type": "text/json",
