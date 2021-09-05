@@ -8,12 +8,6 @@ app = FastAPI()
 
 
 @dataclass
-class _AnimalSubtype:
-    breed: str
-    weight: str
-
-
-@dataclass
 class _AnimalType:
     species: str
     color: str

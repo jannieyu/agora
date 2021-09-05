@@ -6,10 +6,8 @@ interface APIError {
 
 type OnError = (err: APIError) => unknown
 
-type APICallback = (responseJson: unknown) => unknown
-
-export default function buildWrappedGet<Args, OnLoad extends APICallback>(url: string) {
-  return (args: Args, onLoad: OnLoad, onError: OnError) => {
+export default function buildWrappedGet<Args, Response extends unknown>(url: string) {
+  return (args: Args, onLoad: (response: Response) => unknown, onError: OnError) => {
     const serializedArgs = JSON.stringify(args)
     const location = `${url}?data=${serializedArgs}`
 

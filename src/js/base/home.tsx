@@ -4,6 +4,7 @@ import { Grid } from "./ui/layout"
 import { useCallback, useDispatch, useSelector, useTranslation, makeApp } from "./react_base"
 import { rootReducer, AppState } from "./reducers"
 import setData from "./actions"
+import { apiCall, API_ARGS } from "../api/example"
 
 const Home = () => {
   const { t } = useTranslation()
@@ -15,6 +16,11 @@ const Home = () => {
       setData({
         numClicks: numClicks + 1,
       }),
+    )
+    apiCall(
+      API_ARGS,
+      () => {},
+      () => {},
     )
   }, [numClicks, dispatch])
 
