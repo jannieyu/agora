@@ -1,9 +1,11 @@
 from fastapi import FastAPI
+from fastapi_sqlalchemy import DBSessionMiddleware, db
 from dataclasses import dataclass
 from .decorators import get
 from .spa import SPA
 
 app = FastAPI()
+app.add_middleware(DBSessionMiddleware, db_url="postgresql://")
 
 
 @dataclass
