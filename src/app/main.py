@@ -1,8 +1,8 @@
 from fastapi import FastAPI
 from fastapi_sqlalchemy import DBSessionMiddleware, db
 from dataclasses import dataclass
-from .decorators import get
 from .spa import SPA
+from .decorators import CamelModel, get
 
 app = FastAPI()
 app.add_middleware(DBSessionMiddleware, db_url="postgresql://")
@@ -20,8 +20,7 @@ class _Animal:
     animal_type: _AnimalType
 
 
-@dataclass
-class _Response:
+class _Response(CamelModel):
     he_llo: str
 
 
