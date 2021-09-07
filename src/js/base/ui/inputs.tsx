@@ -1,3 +1,3 @@
-import { Button, TextField } from "@material-ui/core"
+import { Button, Input } from "semantic-ui-react"
 
-export { Button, TextField }
+export { Button, Input }

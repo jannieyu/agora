@@ -1,6 +1,6 @@
 import * as React from "react"
 import { Button } from "./ui/inputs"
-import { Grid } from "./ui/layout"
+import { Row, Col } from "./ui/layout"
 import { useCallback, useDispatch, useSelector, useTranslation, makeApp } from "./react_base"
 import { rootReducer, AppState } from "./reducers"
 import setData from "./actions"
@@ -28,16 +28,16 @@ const Home = () => {
   const headerSuffix = t("times")
 
   return (
-    <Grid container>
-      <Grid item xs={12}>
+    <Row>
+      <Col xs={12}>
         <h1 className="title">{`${headerPrefix} ${numClicks} ${headerSuffix}`}</h1>
-      </Grid>
-      <Grid item xs={6}>
+      </Col>
+      <Col xs={6}>
         <Button onClick={onToggle} variant="contained">
           {t("Click Button")}
         </Button>
-      </Grid>
-    </Grid>
+      </Col>
+    </Row>
   )
 }
 
