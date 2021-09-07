@@ -1,8 +1,8 @@
 from fastapi import FastAPI
 from fastapi_sqlalchemy import DBSessionMiddleware, db
 from .spa import SPA
-from .decorators import get
-from .routes import ROUTES
+from .decorators import get, ROUTES
+from .routes import *
 
 
 app = FastAPI()

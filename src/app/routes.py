@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from .decorators import CamelModel
+from .decorators import CamelModel, route
 
 
 @dataclass
@@ -18,10 +18,8 @@ class _Response(CamelModel):
     he_llo: str
 
 
+@route("/api", _Animal, _Response)
 def read_main(args: _Animal) -> _Response:
     print(args)
     response = _Response(he_llo="wor_ld")
     return response
-
-
-ROUTES = [("/api", read_main, _Animal, _Response)]

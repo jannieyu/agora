@@ -21,6 +21,17 @@ A = TypeVar("A", bound=Any)
 R = TypeVar("R", bound=Any)
 
 
+ROUTES = []
+
+
+def route(url: str, arg_class: A, response_model: R) -> Callable[[F], F]:
+    def inner(func: F) -> F:
+        ROUTES.append((url, func, arg_class, response_model))
+        return func
+
+    return inner
+
+
 def get(app: FastAPI, url: str, arg_class: A, response_model: R) -> Callable[[F], F]:
     class _Arguments:
         def __init__(self, data: A):
