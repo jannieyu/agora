@@ -10,6 +10,7 @@ run-frontend:
   cd config/webpack && npx webpack -w
 
 run-backend:
+  source ./config/env/bin/activate
   uvicorn src.app.main:app --reload --reload-dir src/app
 
 validate-repo:
