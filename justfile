@@ -7,7 +7,7 @@ setup-backend:
   python3 -m pip install -r ./config/pip/requirements.txt
 
 run-frontend:
-  cd config/webpack && npx webpack -w
+  cd config/webpack && npx webpack serve
 
 run-backend:
   source ./config/env/bin/activate
