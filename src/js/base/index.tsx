@@ -41,7 +41,6 @@ ReactDOM.render(
     <Router>
       <Routes>
         <Route path="/" index element={<Home />} />
-        <Route path="/about" element={<About />} />
         {Object.keys(ROUTES).map((route) => {
           const Component = ROUTES[route]
           return <Route path={route} key={route} element={<Component />} />
