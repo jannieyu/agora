@@ -33,33 +33,21 @@ const Base = (props: BaseProps) => {
 }
 
 const ROUTES = {
-  "/": Home,
   "/about": About,
 }
 
-interface RoutedComponentProps {
-  route: string
-}
-
-const RoutedComponent = (props: RoutedComponentProps) => {
-  const { route } = props
-  const Component = ROUTES[route]
-  return (
-    <Base>
-      <Component />
-    </Base>
-  )
-}
-
 ReactDOM.render(
-  <Router>
-    <Routes>
-      {Object.keys(ROUTES).map((route: string) => (
-        <Route path={route} key={route}>
-          <RoutedComponent route={route} />
-        </Route>
-      ))}
-    </Routes>
-  </Router>,
+  <Base>
+    <Router>
+      <Routes>
+        <Route path="/" index element={<Home />} />
+        <Route path="/about" element={<About />} />
+        {Object.keys(ROUTES).map((route) => {
+          const Component = ROUTES[route]
+          return <Route path={route} key={route} element={<Component />} />
+        })}
+      </Routes>
+    </Router>
+  </Base>,
   document.getElementById("root"),
 )
