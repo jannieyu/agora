@@ -6,7 +6,7 @@ const About = () => {
   const { t } = useTranslation()
 
   const summary = `This site strives to be on the cutting edge of frontend technology,
-    utilizing the latest and greatest from React, Redux, Babel, Webpack, Material UI, and Bootstrap.
+    utilizing the latest and greatest from React, Redux, Babel, Webpack, Semantic UI, and Bootstrap.
     You can view the source code at `
 
   return (
