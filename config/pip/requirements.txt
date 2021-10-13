@@ -3,7 +3,7 @@ asgiref==3.4.1
 black==21.8b0
 click==8.0.1
 dataclasses-json==0.5.6
-fastapi==0.68.1
+fastapi==0.70.0
 FastAPI-SQLAlchemy==0.2.1
 greenlet==1.1.1
 h11==0.12.0
@@ -18,7 +18,7 @@ pydantic==1.8.2
 pyhumps==3.0.2
 regex==2021.8.28
 SQLAlchemy==1.4.23
-starlette==0.14.2
+starlette==0.16.0
 toml==0.10.2
 tomli==1.2.1
 typing-extensions==3.10.0.2
