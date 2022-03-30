@@ -11,7 +11,7 @@ interface BaseProps {
   children: React.ReactElement | React.ReactElement[]
 }
 
-const Base = (props: BaseProps) => {
+function Base(props: BaseProps) {
   const { children } = props
 
   return (

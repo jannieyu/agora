@@ -2,7 +2,7 @@ import * as React from "react"
 import { useTranslation } from "./react_base"
 import { Row, Col } from "./ui/layout"
 
-const About = () => {
+function About() {
   const { t } = useTranslation()
 
   const summary = `This site strives to be on the cutting edge of frontend technology,

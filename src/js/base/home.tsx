@@ -6,7 +6,7 @@ import { rootReducer, AppState } from "./reducers"
 import setData from "./actions"
 import { apiCall, API_ARGS } from "../api/example"
 
-const Home = () => {
+function Home() {
   const { t } = useTranslation()
   const dispatch = useDispatch()
   const numClicks = useSelector((state: AppState) => state.numClicks)
