@@ -1,13 +1,15 @@
-# React Web Server
+# React/Go Web Framework
 
-## Installation for macOS
+## Installation and usage for macOS
 
 1. Install Node.js >= 12.13.0 (16.x.x or later preferred)
-2. Install Python >= 3.9.x
+2. Install Go 1.18
 3. Install homebrew
 4. Run `brew install just`
-5. From the main directory run `just setup-frontend` and `just setup-backend`
-6. Configure your editor to use eslint, stylelint, prettier, mypy, and black (python autoformatter)
+5. From the main directory run `just setup-frontend` to install required npm packages
+6. Run the backend with `just run-backend`
+7. Run the frontend with `just run-frontend`
+8. Configure your editor to use eslint, stylelint, and prettier.
 
 ## Resources
 

@@ -58,7 +58,7 @@ module.exports = {
       directory: "../../static/",
     },
     proxy: {
-      context: ["/api", "/docs", "/redoc", "/openapi.json"],
+      context: ["/api"],
       target: "http://127.0.0.1:8000",
     },
     historyApiFallback: true,
