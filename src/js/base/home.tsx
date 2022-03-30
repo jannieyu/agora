@@ -34,7 +34,7 @@ function Home() {
       </Col>
       <Col xs={6}>
         <Button onClick={onToggle} variant="contained">
-          {t("Click Button")}
+          {t("Example API Trigger")}
         </Button>
       </Col>
     </Row>

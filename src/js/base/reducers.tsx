@@ -1,5 +1,6 @@
 const initialState = {
   numClicks: 0 as number,
+  loggedIn: false as boolean,
 }
 
 export type AppState = typeof initialState
