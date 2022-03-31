@@ -68,6 +68,8 @@ func logout(w http.ResponseWriter, r *http.Request) {
 	session.Values["first_name"] = ""
 	session.Values["last_name"] = ""
 	session.Save(r, w)
+
+	fmt.Fprint(w, "{}")
 }
 
 func getLoginStatus(w http.ResponseWriter, r *http.Request) {

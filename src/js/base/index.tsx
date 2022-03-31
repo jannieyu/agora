@@ -1,6 +1,11 @@
 import * as React from "react"
 import * as ReactDOM from "react-dom"
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { library } from "@fortawesome/fontawesome-svg-core"
+import { fas } from "@fortawesome/free-solid-svg-icons"
+import { far } from "@fortawesome/free-regular-svg-icons"
+import { Button, Dropdown } from "react-bootstrap"
 import { Container } from "./ui/layout"
 import { Nav, Navbar } from "./ui/navigation"
 import {
@@ -14,8 +19,8 @@ import {
 import Home from "./home"
 import About from "./about"
 import "./styles.scss"
-import { Button } from "./ui/inputs"
 import { apiCall as loginCall, API_ARGS as LOGIN_ARGS } from "../api/login"
+import { apiCall as logoutCall } from "../api/logout"
 import {
   apiCall as getLoginStatus,
   API_ARGS as LOGIN_STATUS_ARGS,
@@ -48,6 +53,20 @@ function Base(props: BaseProps) {
     )
   }, [dispatch])
 
+  const onLogout = useCallback(() => {
+    logoutCall(
+      null,
+      () => {
+        dispatch(
+          setData({
+            user: null,
+          }),
+        )
+      },
+      () => {},
+    )
+  }, [dispatch])
+
   useEffect(() => {
     getLoginStatus(
       LOGIN_STATUS_ARGS,
@@ -68,14 +87,28 @@ function Base(props: BaseProps) {
     <>
       <Navbar bg="primary" variant="dark">
         <Container>
-          <Navbar.Brand href="#home">Hello World!</Navbar.Brand>
+          <Navbar.Brand href="#home">Agora</Navbar.Brand>
           <Nav className="me-auto">
             <Nav.Link href="/">Home</Nav.Link>
             <Nav.Link href="/about">About</Nav.Link>
+            <Nav.Link href="/about">
+              <FontAwesomeIcon icon="fa-solid fa-bars" />
+            </Nav.Link>
             {user ? (
-              <Button className="login" onClick={onLogin}>
-                {`${user.firstName} ${user.lastName}`}
-              </Button>
+              <Dropdown className="login">
+                <Dropdown.Toggle variant="success" id="dropdown-basic">
+                  <span>
+                    <FontAwesomeIcon icon="fa-solid fa-bars" className="login-icon" />
+                    {`${user.firstName} ${user.lastName}`}
+                  </span>
+                </Dropdown.Toggle>
+                <Dropdown.Menu>
+                  <Dropdown.Item>Action</Dropdown.Item>
+                  <Dropdown.Item>Another action</Dropdown.Item>
+                  <Dropdown.Divider />
+                  <Dropdown.Item onClick={onLogout}>Log Out</Dropdown.Item>
+                </Dropdown.Menu>
+              </Dropdown>
             ) : (
               <Button className="login" onClick={onLogin}>
                 Log In
@@ -96,6 +129,8 @@ const ROUTES = {
 }
 
 const store = createStore(rootReducer)
+
+library.add(fas, far)
 
 ReactDOM.render(
   <Provider store={store}>

@@ -10,5 +10,9 @@
 
 .login {
     position: absolute;
-    right: 1%;
+    right: 5%;
+
+    .login-icon {
+        padding-right: 1rem;
+    }
 }
