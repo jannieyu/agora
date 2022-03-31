@@ -1,6 +1,12 @@
+export interface User {
+  firstName: string
+  lastName: string
+  email: string
+}
+
 const initialState = {
   numClicks: 0 as number,
-  loggedIn: false as boolean,
+  user: null as User | null,
 }
 
 export type AppState = typeof initialState

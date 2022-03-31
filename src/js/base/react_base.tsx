@@ -1,11 +1,20 @@
 import * as React from "react"
-import { useCallback } from "react"
+import { useCallback, useEffect } from "react"
 import { render } from "react-dom"
 import { createStore } from "redux"
 import { Provider, useDispatch, useSelector } from "react-redux"
 import { useTranslation } from "react-i18next"
 
-export { render, useCallback, useDispatch, useSelector, useTranslation, createStore, Provider }
+export {
+  render,
+  useCallback,
+  useDispatch,
+  useSelector,
+  useTranslation,
+  createStore,
+  useEffect,
+  Provider,
+}
 
 export type AppState = unknown
 

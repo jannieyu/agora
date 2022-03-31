@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 
@@ -35,10 +36,27 @@ func login(w http.ResponseWriter, r *http.Request) {
 
 	// Set user as authenticated
 	session.Values["authenticated"] = true
+	session.Values["user_email"] = "rclark@caltech.edu"
+	session.Values["first_name"] = "Ryan"
+	session.Values["last_name"] = "Clark"
 	session.Save(r, w)
 
 	fmt.Println("Authenticated!")
-	fmt.Fprintf(w, "{}")
+
+	var status = map[string]string{
+		"email":     "",
+		"firstName": "",
+		"lastName":  "",
+	}
+
+	if authenticated, ok := session.Values["authenticated"]; ok && authenticated.(bool) {
+		status["email"] = session.Values["user_email"].(string)
+		status["firstName"] = session.Values["first_name"].(string)
+		status["lastName"] = session.Values["last_name"].(string)
+	}
+
+	jsonString, _ := json.Marshal(status)
+	fmt.Fprint(w, string(jsonString))
 }
 
 func logout(w http.ResponseWriter, r *http.Request) {
@@ -46,7 +64,29 @@ func logout(w http.ResponseWriter, r *http.Request) {
 
 	// Revoke users authentication
 	session.Values["authenticated"] = false
+	session.Values["user_email"] = ""
+	session.Values["first_name"] = ""
+	session.Values["last_name"] = ""
 	session.Save(r, w)
+}
+
+func getLoginStatus(w http.ResponseWriter, r *http.Request) {
+	session, _ := store.Get(r, "cookie-name")
+
+	var status = map[string]string{
+		"email":     "",
+		"firstName": "",
+		"lastName":  "",
+	}
+
+	if authenticated, ok := session.Values["authenticated"]; ok && authenticated.(bool) {
+		status["email"] = session.Values["user_email"].(string)
+		status["firstName"] = session.Values["first_name"].(string)
+		status["lastName"] = session.Values["last_name"].(string)
+	}
+
+	jsonString, _ := json.Marshal(status)
+	fmt.Fprint(w, string(jsonString))
 }
 
 func main() {
@@ -84,6 +124,7 @@ func main() {
 
 	r.HandleFunc("/api/login", login)
 	r.HandleFunc("/api/logout", logout)
+	r.HandleFunc("/api/get_login_status", getLoginStatus)
 
 	port := 8000
 	fmt.Println("Server up and running on port " + fmt.Sprint(port))
