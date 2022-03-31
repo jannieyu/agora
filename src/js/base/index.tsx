@@ -91,9 +91,6 @@ function Base(props: BaseProps) {
           <Nav className="me-auto">
             <Nav.Link href="/">Home</Nav.Link>
             <Nav.Link href="/about">About</Nav.Link>
-            <Nav.Link href="/about">
-              <FontAwesomeIcon icon="fa-solid fa-bars" />
-            </Nav.Link>
             {user ? (
               <Dropdown className="login">
                 <Dropdown.Toggle variant="success" id="dropdown-basic">
