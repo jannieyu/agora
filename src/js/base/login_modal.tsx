@@ -17,11 +17,13 @@ export default function LoginModal(props: ModalProps) {
 
   const dispatch = useDispatch()
 
+  const [authenticating, setAuthenticating] = useState<boolean>(false)
   const [hasError, setHasError] = useState<boolean>(false)
   const [email, setEmail] = useState<string>("")
   const [password, setPassword] = useState<string>("")
 
   const onLogin = useCallback(() => {
+    setAuthenticating(true)
     loginCall(
       {
         email,
@@ -34,25 +36,31 @@ export default function LoginModal(props: ModalProps) {
             user: data,
           }),
         )
+        setEmail("")
+        setPassword("")
         onHide()
+        setAuthenticating(false)
       },
       () => {
         setHasError(true)
+        setAuthenticating(false)
       },
     )
   }, [dispatch, onHide, email, password])
 
   const handleChangeEmail = useCallback((e: React.FormEvent<HTMLInputElement>) => {
     setEmail(e.currentTarget.value)
+    setHasError(false)
   }, [])
 
   const handleChangePassword = useCallback((e: React.FormEvent<HTMLInputElement>) => {
     setPassword(e.currentTarget.value)
+    setHasError(false)
   }, [])
 
   return (
     <Modal {...props} size="lg" aria-labelledby="contained-modal-title-vcenter" centered>
-      <Form className="login-form" error={hasError}>
+      <Form className="login-form" error={hasError} loading={authenticating}>
         <Form.Field
           control={Input}
           label="Email"

@@ -7,6 +7,7 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
+	"golang.org/x/crypto/bcrypt"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -15,8 +16,10 @@ var (
 	// key must be 16, 24 or 32 bytes long (AES-128, AES-192 or AES-256)
 	// Should be something like:
 	// var store = sessions.NewCookieStore([]byte(os.Getenv("SESSION_KEY")))
-	key   = []byte("super-secret-key")
-	store = sessions.NewCookieStore(key)
+	key    = []byte("super-secret-key")
+	store  = sessions.NewCookieStore(key)
+	db     *gorm.DB
+	db_err error
 )
 
 type User struct {
@@ -27,21 +30,38 @@ type User struct {
 	Pword     string
 }
 
+type LoginCredentials struct {
+	Email    string
+	Password string
+}
+
+func HashPassword(password string) (string, error) {
+	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
+	return string(bytes), err
+}
+
+func CheckPasswordHash(password, hash string) bool {
+	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
+	return err == nil
+}
+
 func login(w http.ResponseWriter, r *http.Request) {
 	session, _ := store.Get(r, "cookie-name")
 	session.Options = &sessions.Options{SameSite: http.SameSiteStrictMode}
 
-	// Authentication goes here
-	// ...
+	urlParams := r.URL.Query()["data"][0]
+	var loginCredentials LoginCredentials
 
-	// Set user as authenticated
-	session.Values["authenticated"] = true
-	session.Values["user_email"] = "rclark@caltech.edu"
-	session.Values["first_name"] = "Ryan"
-	session.Values["last_name"] = "Clark"
-	session.Save(r, w)
+	err := json.Unmarshal([]byte(urlParams), &loginCredentials)
 
-	fmt.Println("Authenticated!")
+	if err != nil {
+		w.WriteHeader(400)
+		fmt.Fprint(w, "{}")
+	}
+
+	var user User
+	db.Where("email = ?", loginCredentials.Email).First(&user)
+	fmt.Println("User", user.FirstName, user.LastName, "has registered with email", user.Email)
 
 	var status = map[string]string{
 		"email":     "",
@@ -49,10 +69,23 @@ func login(w http.ResponseWriter, r *http.Request) {
 		"lastName":  "",
 	}
 
-	if authenticated, ok := session.Values["authenticated"]; ok && authenticated.(bool) {
-		status["email"] = session.Values["user_email"].(string)
-		status["firstName"] = session.Values["first_name"].(string)
-		status["lastName"] = session.Values["last_name"].(string)
+	if user.ID > 0 && CheckPasswordHash(loginCredentials.Password, user.Pword) {
+		// Authentication was successful!
+		session.Values["authenticated"] = true
+		session.Values["user_email"] = loginCredentials.Email
+		session.Values["first_name"] = user.FirstName
+		session.Values["last_name"] = user.LastName
+		session.Save(r, w)
+
+		status["email"] = user.Email
+		status["firstName"] = user.FirstName
+		status["lastName"] = user.LastName
+
+		fmt.Println("Authenticated!")
+
+	} else {
+		w.WriteHeader(401)
+		fmt.Fprint(w, "{}")
 	}
 
 	jsonString, _ := json.Marshal(status)
@@ -100,17 +133,10 @@ func getLoginStatus(w http.ResponseWriter, r *http.Request) {
 func main() {
 
 	dsn := "host=localhost user=postgres password=postgres dbname=web port=5432 sslmode=disable TimeZone=US/Pacific"
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	db, db_err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
 
-	if err != nil {
+	if db_err != nil {
 		panic("failed to connect to database")
-	}
-
-	var users []User
-	db.Model(&User{}).Select("*").Scan(&users)
-
-	for _, user := range users {
-		fmt.Println("User", user.FirstName, user.LastName, "has registered with email", user.Email)
 	}
 
 	r := mux.NewRouter()
