@@ -21,7 +21,6 @@ import Home from "./home"
 import LoginModal from "./login_modal"
 import About from "./about"
 import "./styles.scss"
-import { apiCall as loginCall, API_ARGS as LOGIN_ARGS } from "../api/login"
 import { apiCall as logoutCall } from "../api/logout"
 import {
   apiCall as getLoginStatus,
@@ -49,20 +48,7 @@ function Base(props: BaseProps) {
 
   const onLogin = useCallback(() => {
     setShowLoginModal(true)
-    /*
-    loginCall(
-      LOGIN_ARGS,
-      (data: LoginStatusResponse) => {
-        dispatch(
-          setData({
-            user: data,
-          }),
-        )
-      },
-      () => {},
-    )
-    */
-  }, [dispatch])
+  }, [])
 
   const onLogout = useCallback(() => {
     logoutCall(

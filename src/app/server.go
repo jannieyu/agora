@@ -29,7 +29,7 @@ type User struct {
 
 func login(w http.ResponseWriter, r *http.Request) {
 	session, _ := store.Get(r, "cookie-name")
-	session.Options = &sessions.Options{SameSite: http.SameSiteStrictMode, MaxAge: 0}
+	session.Options = &sessions.Options{SameSite: http.SameSiteStrictMode}
 
 	// Authentication goes here
 	// ...
@@ -61,6 +61,7 @@ func login(w http.ResponseWriter, r *http.Request) {
 
 func logout(w http.ResponseWriter, r *http.Request) {
 	session, _ := store.Get(r, "cookie-name")
+	session.Options = &sessions.Options{SameSite: http.SameSiteStrictMode}
 
 	// Revoke users authentication
 	session.Values["authenticated"] = false
@@ -68,6 +69,8 @@ func logout(w http.ResponseWriter, r *http.Request) {
 	session.Values["first_name"] = ""
 	session.Values["last_name"] = ""
 	session.Save(r, w)
+
+	fmt.Println(session.Values)
 
 	fmt.Fprint(w, "{}")
 }
