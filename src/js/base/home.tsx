@@ -1,6 +1,5 @@
 import * as React from "react"
-import { Button } from "./ui/inputs"
-import { Row, Col } from "./ui/layout"
+import { Button, Row, Col } from "react-bootstrap"
 import { useCallback, useDispatch, useSelector, useTranslation, makeApp } from "./react_base"
 import { rootReducer, AppState } from "./reducers"
 import setData from "./actions"

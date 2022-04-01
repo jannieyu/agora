@@ -1,6 +1,6 @@
 import * as React from "react"
+import { Row, Col } from "react-bootstrap"
 import { useTranslation } from "./react_base"
-import { Row, Col } from "./ui/layout"
 
 function About() {
   const { t } = useTranslation()

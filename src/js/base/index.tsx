@@ -4,10 +4,8 @@ import { BrowserRouter as Router, Route, Routes } from "react-router-dom"
 import { library } from "@fortawesome/fontawesome-svg-core"
 import { fas } from "@fortawesome/free-solid-svg-icons"
 import { far } from "@fortawesome/free-regular-svg-icons"
-import { Button } from "react-bootstrap"
+import { Button, Container, Nav, Navbar } from "react-bootstrap"
 import { Dropdown } from "semantic-ui-react"
-import { Container } from "./ui/layout"
-import { Nav, Navbar } from "./ui/navigation"
 import {
   useCallback,
   useDispatch,
