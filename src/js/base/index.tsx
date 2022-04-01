@@ -1,11 +1,11 @@
 import * as React from "react"
 import * as ReactDOM from "react-dom"
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom"
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { library } from "@fortawesome/fontawesome-svg-core"
 import { fas } from "@fortawesome/free-solid-svg-icons"
 import { far } from "@fortawesome/free-regular-svg-icons"
-import { Button, Dropdown } from "react-bootstrap"
+import { Button } from "react-bootstrap"
+import { Dropdown } from "semantic-ui-react"
 import { Container } from "./ui/layout"
 import { Nav, Navbar } from "./ui/navigation"
 import {
@@ -90,20 +90,23 @@ function Base(props: BaseProps) {
             <Nav.Link href="/">Home</Nav.Link>
             <Nav.Link href="/about">About</Nav.Link>
             {user ? (
-              <Dropdown className="login">
-                <Dropdown.Toggle variant="success" id="dropdown-basic">
-                  <span>
-                    <FontAwesomeIcon icon="fa-solid fa-bars" className="login-icon" />
-                    {`${user.firstName} ${user.lastName}`}
-                  </span>
-                </Dropdown.Toggle>
-                <Dropdown.Menu>
-                  <Dropdown.Item>Action</Dropdown.Item>
-                  <Dropdown.Item>Another action</Dropdown.Item>
-                  <Dropdown.Divider />
-                  <Dropdown.Item onClick={onLogout}>Log Out</Dropdown.Item>
-                </Dropdown.Menu>
-              </Dropdown>
+              <div className="login">
+                <Dropdown
+                  text={`${user.firstName} ${user.lastName}`}
+                  icon="bars"
+                  floating
+                  labeled
+                  button
+                  className="icon"
+                >
+                  <Dropdown.Menu>
+                    <Dropdown.Item text="Action" />
+                    <Dropdown.Item text="Another Action" />
+                    <Dropdown.Divider />
+                    <Dropdown.Item onClick={onLogout} text="Log Out" />
+                  </Dropdown.Menu>
+                </Dropdown>
+              </div>
             ) : (
               <Button className="login" onClick={onLogin}>
                 Log In
