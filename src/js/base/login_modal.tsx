@@ -1,6 +1,9 @@
+/* eslint-disable jsx-a11y/label-has-associated-control */
 /* eslint-disable react/jsx-props-no-spreading */
 import * as React from "react"
-import { Button, Modal } from "react-bootstrap"
+import { Modal } from "react-bootstrap"
+import { Button, Form, Message } from "semantic-ui-react"
+import { useState } from "./react_base"
 
 interface ModalProps {
   onHide: () => void
@@ -10,38 +13,30 @@ interface ModalProps {
 export default function LoginModal(props: ModalProps) {
   const { onHide } = props
 
+  const [hasError, setHasError] = useState<boolean>(true)
+  const [hasSuccess, setHasSuccess] = useState<boolean>(false)
+
   return (
     <Modal {...props} size="lg" aria-labelledby="contained-modal-title-vcenter" centered>
-      <Modal.Header closeButton>
-        <Modal.Title id="contained-modal-title-vcenter">Modal heading</Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        <h4>Centered Modal</h4>
-        <p>
-          Cras mattis consectetur purus sit amet fermentum. Cras justo odio, dapibus ac facilisis
-          in, egestas eget quam. Morbi leo risus, porta ac consectetur ac, vestibulum at eros.
-        </p>
-      </Modal.Body>
+      <Form className="login-form" error={hasError}>
+        <Form.Field>
+          <label>Email</label>
+          <input placeholder="janedoe@caltech.edu" />
+        </Form.Field>
+        <Form.Field>
+          <label>Password</label>
+          <input type="password" />
+        </Form.Field>
+        <Message
+          error
+          header="Error"
+          content="Email and/or password do not match a valid account"
+        />
+        <Button type="submit">Submit</Button>
+      </Form>
       <Modal.Footer>
         <Button onClick={onHide}>Close</Button>
       </Modal.Footer>
     </Modal>
   )
-}
-
-function App() {
-  const [modalShow, setModalShow] = React.useState(false);
-
-  return (
-    <>
-      <Button variant="primary" onClick={() => setModalShow(true)}>
-        Launch vertically centered modal
-      </Button>
-
-      <MyVerticallyCenteredModal
-        show={modalShow}
-        onHide={() => setModalShow(false)}
-      />
-    </>
-  );
 }

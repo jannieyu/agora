@@ -75,6 +75,8 @@ func logout(w http.ResponseWriter, r *http.Request) {
 func getLoginStatus(w http.ResponseWriter, r *http.Request) {
 	session, _ := store.Get(r, "cookie-name")
 
+	fmt.Println(session.Values)
+
 	var status = map[string]string{
 		"email":     "",
 		"firstName": "",
@@ -82,6 +84,7 @@ func getLoginStatus(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if authenticated, ok := session.Values["authenticated"]; ok && authenticated.(bool) {
+		fmt.Println("User is authenticated")
 		status["email"] = session.Values["user_email"].(string)
 		status["firstName"] = session.Values["first_name"].(string)
 		status["lastName"] = session.Values["last_name"].(string)

@@ -78,10 +78,13 @@ function Base(props: BaseProps) {
     )
   }, [dispatch])
 
+  console.log(user)
+
   useEffect(() => {
     getLoginStatus(
       LOGIN_STATUS_ARGS,
       (data: LoginStatusResponse) => {
+        console.log(data)
         if (data.email) {
           dispatch(
             setData({
