@@ -36,7 +36,7 @@ function Base(props: BaseProps) {
   const { children } = props
 
   const [showLoginModal, setShowLoginModal] = useState<boolean>(false)
-  const [isLogin, setIsLogin] = useState<boolean>(true)
+  const [isSignUp, setIsSignUp] = useState<boolean>(true)
 
   const dispatch = useDispatch()
   const user = useSelector((state: AppState) => state.user)
@@ -47,12 +47,12 @@ function Base(props: BaseProps) {
 
   const onLogin = useCallback(() => {
     setShowLoginModal(true)
-    setIsLogin(true)
+    setIsSignUp(false)
   }, [])
 
   const onSignUp = useCallback(() => {
     setShowLoginModal(true)
-    setIsLogin(false)
+    setIsSignUp(true)
   }, [])
 
   const onLogout = useCallback(() => {
@@ -87,7 +87,7 @@ function Base(props: BaseProps) {
 
   return (
     <>
-      <LoginModal show={showLoginModal} onHide={hideLoginModal} isLogin={isLogin} />
+      <LoginModal show={showLoginModal} onHide={hideLoginModal} isSignUp={isSignUp} />
       <Navbar bg="primary" variant="dark">
         <Container>
           <Navbar.Brand href="/">Agora</Navbar.Brand>

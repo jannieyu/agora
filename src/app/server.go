@@ -31,16 +31,19 @@ type User struct {
 }
 
 type LoginCredentials struct {
-	Email    string
-	Password string
+	Email     string
+	Password  string
+	IsSignUp  bool
+	FirstName string
+	LastName  string
 }
 
-func HashPassword(password string) (string, error) {
+func hashPassword(password string) (string, error) {
 	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
 	return string(bytes), err
 }
 
-func CheckPasswordHash(password, hash string) bool {
+func checkPasswordHash(password, hash string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
 	return err == nil
 }
@@ -60,8 +63,33 @@ func login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var user User
-	db.Where("email = ?", loginCredentials.Email).First(&user)
-	fmt.Println("User", user.FirstName, user.LastName, "has registered with email", user.Email)
+	db.Where("email = ?", loginCredentials.Email).Limit(1).Find(&user)
+
+	userExists := user.ID > 0
+	userAuthenticated := false
+
+	if loginCredentials.IsSignUp {
+		if userExists {
+			w.WriteHeader(http.StatusBadRequest)
+			fmt.Fprint(w, "{}")
+		} else {
+			hash, _ := hashPassword(loginCredentials.Password)
+
+			user = User{
+				FirstName: loginCredentials.FirstName,
+				LastName:  loginCredentials.LastName,
+				Email:     loginCredentials.Email,
+				Pword:     hash,
+			}
+
+			db.Create(&user)
+			userAuthenticated = true
+		}
+	} else {
+		if userExists {
+			userAuthenticated = checkPasswordHash(loginCredentials.Password, user.Pword)
+		}
+	}
 
 	var status = map[string]string{
 		"email":     "",
@@ -69,7 +97,7 @@ func login(w http.ResponseWriter, r *http.Request) {
 		"lastName":  "",
 	}
 
-	if user.ID > 0 && CheckPasswordHash(loginCredentials.Password, user.Pword) {
+	if userAuthenticated {
 		// Authentication was successful!
 		session.Values["authenticated"] = true
 		session.Values["user_email"] = loginCredentials.Email
@@ -99,8 +127,6 @@ func logout(w http.ResponseWriter, r *http.Request) {
 	// Revoke users authentication
 	session.Values["authenticated"] = false
 	session.Values["user_email"] = ""
-	session.Values["first_name"] = ""
-	session.Values["last_name"] = ""
 	session.Save(r, w)
 
 	fmt.Println(session.Values)
@@ -111,8 +137,6 @@ func logout(w http.ResponseWriter, r *http.Request) {
 func getLoginStatus(w http.ResponseWriter, r *http.Request) {
 	session, _ := store.Get(r, "cookie-name")
 
-	fmt.Println(session.Values)
-
 	var status = map[string]string{
 		"email":     "",
 		"firstName": "",
@@ -121,9 +145,12 @@ func getLoginStatus(w http.ResponseWriter, r *http.Request) {
 
 	if authenticated, ok := session.Values["authenticated"]; ok && authenticated.(bool) {
 		fmt.Println("User is authenticated")
-		status["email"] = session.Values["user_email"].(string)
-		status["firstName"] = session.Values["first_name"].(string)
-		status["lastName"] = session.Values["last_name"].(string)
+		user_email := session.Values["user_email"].(string)
+		var user User
+		db.Where("email = ?", user_email).Limit(1).Find(&user)
+		status["email"] = user_email
+		status["firstName"] = user.FirstName
+		status["lastName"] = user.LastName
 	}
 
 	jsonString, _ := json.Marshal(status)
