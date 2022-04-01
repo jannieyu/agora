@@ -14,9 +14,11 @@ import {
   Provider,
   createStore,
   useSelector,
+  useState,
   useEffect,
 } from "./react_base"
 import Home from "./home"
+import LoginModal from "./login_modal"
 import About from "./about"
 import "./styles.scss"
 import { apiCall as loginCall, API_ARGS as LOGIN_ARGS } from "../api/login"
@@ -36,10 +38,18 @@ interface BaseProps {
 function Base(props: BaseProps) {
   const { children } = props
 
+  const [showLoginModal, setShowLoginModal] = useState<boolean>(false)
+
   const dispatch = useDispatch()
   const user = useSelector((state: AppState) => state.user)
 
+  const hideLoginModal = useCallback(() => {
+    setShowLoginModal(false)
+  }, [setShowLoginModal])
+
   const onLogin = useCallback(() => {
+    setShowLoginModal(true)
+    /*
     loginCall(
       LOGIN_ARGS,
       (data: LoginStatusResponse) => {
@@ -51,6 +61,7 @@ function Base(props: BaseProps) {
       },
       () => {},
     )
+    */
   }, [dispatch])
 
   const onLogout = useCallback(() => {
@@ -85,6 +96,7 @@ function Base(props: BaseProps) {
 
   return (
     <>
+      <LoginModal show={showLoginModal} onHide={hideLoginModal} />
       <Navbar bg="primary" variant="dark">
         <Container>
           <Navbar.Brand href="#home">Agora</Navbar.Brand>
