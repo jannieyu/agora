@@ -55,7 +55,7 @@ func login(w http.ResponseWriter, r *http.Request) {
 	err := json.Unmarshal([]byte(urlParams), &loginCredentials)
 
 	if err != nil {
-		w.WriteHeader(400)
+		w.WriteHeader(http.StatusBadRequest)
 		fmt.Fprint(w, "{}")
 	}
 
@@ -84,7 +84,7 @@ func login(w http.ResponseWriter, r *http.Request) {
 		fmt.Println("Authenticated!")
 
 	} else {
-		w.WriteHeader(401)
+		w.WriteHeader(http.StatusUnauthorized)
 		fmt.Fprint(w, "{}")
 	}
 

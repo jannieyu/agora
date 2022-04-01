@@ -4,8 +4,8 @@ import { BrowserRouter as Router, Route, Routes } from "react-router-dom"
 import { library } from "@fortawesome/fontawesome-svg-core"
 import { fas } from "@fortawesome/free-solid-svg-icons"
 import { far } from "@fortawesome/free-regular-svg-icons"
-import { Button, Container, Nav, Navbar } from "react-bootstrap"
-import { Dropdown } from "semantic-ui-react"
+import { Container, Nav, Navbar } from "react-bootstrap"
+import { Button, Dropdown } from "semantic-ui-react"
 import {
   useCallback,
   useDispatch,
@@ -36,6 +36,7 @@ function Base(props: BaseProps) {
   const { children } = props
 
   const [showLoginModal, setShowLoginModal] = useState<boolean>(false)
+  const [isLogin, setIsLogin] = useState<boolean>(true)
 
   const dispatch = useDispatch()
   const user = useSelector((state: AppState) => state.user)
@@ -46,6 +47,12 @@ function Base(props: BaseProps) {
 
   const onLogin = useCallback(() => {
     setShowLoginModal(true)
+    setIsLogin(true)
+  }, [])
+
+  const onSignUp = useCallback(() => {
+    setShowLoginModal(true)
+    setIsLogin(false)
   }, [])
 
   const onLogout = useCallback(() => {
@@ -80,12 +87,11 @@ function Base(props: BaseProps) {
 
   return (
     <>
-      <LoginModal show={showLoginModal} onHide={hideLoginModal} />
+      <LoginModal show={showLoginModal} onHide={hideLoginModal} isLogin={isLogin} />
       <Navbar bg="primary" variant="dark">
         <Container>
-          <Navbar.Brand href="#home">Agora</Navbar.Brand>
+          <Navbar.Brand href="/">Agora</Navbar.Brand>
           <Nav className="me-auto">
-            <Nav.Link href="/">Home</Nav.Link>
             <Nav.Link href="/about">About</Nav.Link>
             {user ? (
               <div className="login">
@@ -106,9 +112,14 @@ function Base(props: BaseProps) {
                 </Dropdown>
               </div>
             ) : (
-              <Button className="login" onClick={onLogin}>
-                Log In
-              </Button>
+              <span className="login">
+                <Button onClick={onLogin} color="green">
+                  Log In
+                </Button>
+                <Button onClick={onSignUp} color="orange">
+                  Sign Up
+                </Button>
+              </span>
             )}
           </Nav>
         </Container>

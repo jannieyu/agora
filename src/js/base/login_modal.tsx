@@ -10,10 +10,11 @@ import { Response as LoginStatusResponse } from "../api/get_login_status"
 interface ModalProps {
   onHide: () => void
   show: boolean
+  isLogin: boolean
 }
 
 export default function LoginModal(props: ModalProps) {
-  const { onHide } = props
+  const { onHide, isLogin } = props
 
   const dispatch = useDispatch()
 
@@ -60,6 +61,11 @@ export default function LoginModal(props: ModalProps) {
 
   return (
     <Modal {...props} size="lg" aria-labelledby="contained-modal-title-vcenter" centered>
+      <Modal.Header closeButton>
+        <Modal.Title id="contained-modal-title-vcenter">
+          {isLogin ? "Log In" : "Sign Up"}
+        </Modal.Title>
+      </Modal.Header>
       <Form className="login-form" error={hasError} loading={authenticating}>
         <Form.Field
           control={Input}
@@ -82,9 +88,6 @@ export default function LoginModal(props: ModalProps) {
           Submit
         </Button>
       </Form>
-      <Modal.Footer>
-        <Button onClick={onHide}>Close</Button>
-      </Modal.Footer>
     </Modal>
   )
 }
