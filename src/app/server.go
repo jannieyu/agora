@@ -49,7 +49,7 @@ func checkPasswordHash(password, hash string) bool {
 }
 
 func login(w http.ResponseWriter, r *http.Request) {
-	session, _ := store.Get(r, "cookie-name")
+	session, _ := store.Get(r, "user-auth")
 	session.Options = &sessions.Options{SameSite: http.SameSiteStrictMode}
 
 	urlParams := r.URL.Query()["data"][0]
@@ -121,7 +121,7 @@ func login(w http.ResponseWriter, r *http.Request) {
 }
 
 func logout(w http.ResponseWriter, r *http.Request) {
-	session, _ := store.Get(r, "cookie-name")
+	session, _ := store.Get(r, "user-auth")
 	session.Options = &sessions.Options{SameSite: http.SameSiteStrictMode}
 
 	// Revoke users authentication
@@ -135,7 +135,7 @@ func logout(w http.ResponseWriter, r *http.Request) {
 }
 
 func getLoginStatus(w http.ResponseWriter, r *http.Request) {
-	session, _ := store.Get(r, "cookie-name")
+	session, _ := store.Get(r, "user-auth")
 
 	var status = map[string]string{
 		"email":     "",
@@ -170,7 +170,7 @@ func main() {
 
 	r.HandleFunc("/api/example", func(w http.ResponseWriter, r *http.Request) {
 
-		session, _ := store.Get(r, "cookie-name")
+		session, _ := store.Get(r, "user-auth")
 
 		// Check if user is authenticated
 		if auth, ok := session.Values["authenticated"].(bool); !ok || !auth {
