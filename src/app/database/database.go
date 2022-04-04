@@ -7,6 +7,7 @@ import (
 )
 
 func Init() *gorm.DB {
+	// Password should be set as EVN variable rather than hardcoded value
 	dsn := "host=localhost user=postgres password=postgres dbname=web port=5432 sslmode=disable TimeZone=US/Pacific"
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
