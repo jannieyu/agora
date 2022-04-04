@@ -5,7 +5,7 @@ run-frontend:
   cd config/webpack && npx webpack serve
 
 run-backend:
-  cd src/app && go run server.go
+  cd src/app/cmd && go run server.go
 
 validate-repo:
    npx eslint . --ext .jsx --ext .js --ext .ts --ext .tsx

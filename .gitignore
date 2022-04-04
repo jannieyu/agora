@@ -6,6 +6,9 @@ npm-debug.log
 .env
 .DS_Store
 
+# Go / Goland
+.idea
+
 # Python
 # Byte-compiled / optimized / DLL files
 __pycache__/
