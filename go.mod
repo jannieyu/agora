@@ -1,4 +1,4 @@
-module web
+module agora
 
 go 1.18
 
