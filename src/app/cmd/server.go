@@ -1,13 +1,13 @@
 package main
 
 import (
+	"agora/src/app/database"
+	"agora/src/app/handler"
 	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
 	log "github.com/sirupsen/logrus"
 	"net/http"
-	"web/src/app/database"
-	"web/src/app/handler"
 )
 
 var (
