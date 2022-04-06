@@ -3,17 +3,18 @@ package handler
 import (
 	"agora/src/app/database"
 	"encoding/json"
+	"io/ioutil"
+	"mime/multipart"
+	"net/http"
+	"strconv"
+	"strings"
+
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
 	"github.com/shopspring/decimal"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
-	"io/ioutil"
-	"mime/multipart"
-	"net/http"
-	"strconv"
-	"strings"
 )
 
 func hashPassword(password string) (string, error) {

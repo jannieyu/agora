@@ -20,3 +20,54 @@
 .login-form {
     padding: 3% 5% 5% 5%;
 }
+
+.column-heading-centered {
+    text-align: center;
+}
+
+.droparea {
+    border-width: 2px;
+    border-radius: 10px;
+    border-color: #ccc;
+    border-style: dashed;
+    padding: 11%;
+    text-align: center;
+
+    .droparea-text {
+        font-size: 20px;
+    }
+}
+
+.listing {
+    border-width: 2px;
+    border-radius: 10px;
+    border-color: #ccc;
+    border-style: solid;
+    width: 95%;
+    padding: 3%;
+    margin-top: 0%;
+    margin-left: 5%;
+    margin-right: 0%;
+    margin-bottom: 0%;
+    overflow: auto;
+}
+
+.image-preview {
+    width: 50%;
+    border-radius: 10px;
+    padding-top: 5px;
+    padding-right: 15px;
+    float: left;
+}
+
+.footer {
+    padding-top: 50px;
+}
+
+.major-metadata {
+    font-size: 16px;
+}
+
+.unstyled-link {
+    color: inherit;
+}
