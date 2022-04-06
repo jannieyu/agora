@@ -18,7 +18,11 @@ var (
 )
 
 func main() {
-	db := database.Init()
+	db, err := database.Init()
+	if err != nil {
+		log.WithError(err).Fatal("Cannot start database.")
+		panic(err)
+	}
 	h := handler.New(db, sessions.NewCookieStore(key))
 
 	r := mux.NewRouter()
@@ -26,8 +30,12 @@ func main() {
 	r.HandleFunc("/api/login", h.Login)
 	r.HandleFunc("/api/logout", h.Logout)
 	r.HandleFunc("/api/get_login_status", h.GetLoginStatus)
-
+	r.HandleFunc("/api/add_item", h.AddItem)
+	r.HandleFunc("/api/update_item/{id}", h.UpdateItem)
+	r.HandleFunc("/api/delete_item/{id}", h.DeleteItem)
 	port := 8000
 	log.Info("Server up and running on port " + fmt.Sprint(port))
+
 	http.ListenAndServe(":"+fmt.Sprint(port), r)
+
 }
