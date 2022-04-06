@@ -3,10 +3,11 @@ package handler
 import (
 	"agora/src/app/database"
 	"encoding/json"
+	"net/http"
+
 	"github.com/gorilla/sessions"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/crypto/bcrypt"
-	"net/http"
 )
 
 func hashPassword(password string) (string, error) {

@@ -103,10 +103,10 @@ function ListingForm() {
   const [category, setCategory] = useState<string>("")
   const [condition, setCondition] = useState<string>("")
   const [description, setDescription] = useState<string>("")
-  const [imageURL, setImageURL] = useState<string>()
-  const [imageName, setImageName] = useState<string>()
+  const [imageURL, setImageURL] = useState<string>("")
+  const [image, setImage] = useState<File | null>(null)
 
-  const canSubmit = name && price && category && condition && description && imageName
+  const canSubmit = name && price && category && condition && description && image
 
   const handleChangeName = useCallback((e: React.FormEvent<HTMLInputElement>) => {
     setName(e.currentTarget.value)
@@ -143,8 +143,25 @@ function ListingForm() {
       setImageURL(e.target.result as string)
     }
     reader.readAsDataURL(files[0])
-    setImageName(files[0].name)
+    setImage(files[0])
   }, [])
+
+  const onSubmit = useCallback(async () => {
+    const formData = new FormData()
+    formData.append("name", name)
+    formData.append("category", category)
+    formData.append("condition", condition)
+    formData.append("price", price)
+    formData.append("description", description)
+    formData.append("photo", image, image.name)
+
+    const response = await fetch("/article/formdata/post/image-form", {
+      method: "POST",
+      body: formData,
+    })
+    const result = await response.json()
+    console.log(result)
+  }, [name, category, condition, price, description, image])
 
   return (
     <>
@@ -202,7 +219,7 @@ function ListingForm() {
                     <div className="droparea">
                       <input {...getInputProps()} />
                       <b className="droparea-text">
-                        {imageName ||
+                        {image?.name ||
                           "Drag and drop an image of the listed item, or click to upload"}
                       </b>
                     </div>
@@ -221,7 +238,7 @@ function ListingForm() {
             <br />
             <Row>
               <Col xs="6">
-                <Button type="submit" disabled={!canSubmit}>
+                <Button type="submit" disabled={!canSubmit} onClick={onSubmit}>
                   Finish and List
                 </Button>
               </Col>
