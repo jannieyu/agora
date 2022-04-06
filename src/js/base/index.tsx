@@ -111,6 +111,10 @@ function Base(props: BaseProps) {
     )
   }, [dispatch, navigate, requiresAuth])
 
+  const onCreateListing = useCallback(() => {
+    navigate("/create_listing")
+  }, [navigate])
+
   useEffect(() => {
     getLoginStatus(
       LOGIN_STATUS_ARGS,
@@ -154,11 +158,7 @@ function Base(props: BaseProps) {
                   className="icon"
                 >
                   <Dropdown.Menu>
-                    <Dropdown.Item>
-                      <Link to="/create_listing" className="unstyled-link">
-                        Create Listing
-                      </Link>
-                    </Dropdown.Item>
+                    <Dropdown.Item text="Create Listing" onClick={onCreateListing} />
                     <Dropdown.Item text="Another Action" />
                     <Dropdown.Divider />
                     <Dropdown.Item onClick={onLogout} text="Log Out" />
