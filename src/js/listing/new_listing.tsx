@@ -153,9 +153,9 @@ function ListingForm() {
     formData.append("condition", condition)
     formData.append("price", price)
     formData.append("description", description)
-    formData.append("photo", image, image.name)
+    formData.append("image", image, image.name)
 
-    const response = await fetch("/article/formdata/post/image-form", {
+    const response = await fetch("/api/add_item", {
       method: "POST",
       body: formData,
     })

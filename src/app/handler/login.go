@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
@@ -29,14 +30,16 @@ func checkPasswordHash(password, hash string) bool {
 }
 
 func processImage(r *http.Request) (string, error) {
-	r.ParseMultipartForm(10 << 20)
-	file, header, err := r.FormFile("photo")
+	log.Info("Enter here.")
+	file, header, err := r.FormFile("image")
 	if err != nil {
-		log.WithError(err).Debug("No photo given from request.")
+		log.WithError(err).Error("No photo given from request.")
 		return "", nil
 	}
+
 	data, err := ioutil.ReadAll(file)
 	if err != nil {
+		log.WithError(err).Error("Failed to read image file.")
 		return "", err
 	}
 	defer func(file multipart.File) {
@@ -45,10 +48,15 @@ func processImage(r *http.Request) (string, error) {
 			log.WithError(err).Error("Failed to close photo file.")
 		}
 	}(file)
-	if err := ioutil.WriteFile("images/"+header.Filename, data, 0777); err != nil {
+
+	t := strconv.FormatInt(time.Now().Unix(), 10)
+	filename := "images/" + t + "-" + header.Filename
+
+	if err := ioutil.WriteFile(filename, data, 0777); err != nil {
+		log.WithError(err).Error("Failed to write to disk.")
 		return "", err
 	}
-	return header.Filename, nil
+	return filename, nil
 }
 
 func populateItem(item *database.Item, r *http.Request, sellerID uint32) error {
