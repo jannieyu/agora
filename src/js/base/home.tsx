@@ -1,8 +1,8 @@
 import * as React from "react"
 import { Row, Col } from "react-bootstrap"
 import { Button } from "semantic-ui-react"
-import { useCallback, useDispatch, useSelector, useTranslation, makeApp } from "./react_base"
-import { rootReducer, AppState } from "./reducers"
+import { useCallback, useDispatch, useSelector, useTranslation } from "./react_base"
+import { AppState } from "./reducers"
 import setData from "./actions"
 import { apiCall, API_ARGS } from "../api/example"
 
@@ -41,4 +41,4 @@ function Home() {
   )
 }
 
-export default makeApp(Home, rootReducer)
+export default Home

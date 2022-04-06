@@ -1,6 +1,13 @@
 import * as React from "react"
 import * as ReactDOM from "react-dom"
-import { BrowserRouter as Router, Route, Routes, useNavigate, useLocation } from "react-router-dom"
+import {
+  BrowserRouter as Router,
+  Route,
+  Routes,
+  useNavigate,
+  useLocation,
+  Link,
+} from "react-router-dom"
 import { library } from "@fortawesome/fontawesome-svg-core"
 import { fas } from "@fortawesome/free-solid-svg-icons"
 import { far } from "@fortawesome/free-regular-svg-icons"
@@ -125,9 +132,17 @@ function Base(props: BaseProps) {
       <LoginModal show={showLoginModal} onHide={hideLoginModal} isSignUp={isSignUp} />
       <Navbar bg="primary" variant="dark">
         <Container>
-          <Navbar.Brand href="/">Agora</Navbar.Brand>
+          <Navbar.Brand>
+            <Link to="/" className="unstyled-link">
+              Agora
+            </Link>
+          </Navbar.Brand>
           <Nav className="me-auto">
-            <Nav.Link href="/about">About</Nav.Link>
+            <Nav.Item className="nav-link">
+              <Link to="/about" className="unstyled-link">
+                About
+              </Link>
+            </Nav.Item>
             {user ? (
               <div className="login">
                 <Dropdown
@@ -139,7 +154,11 @@ function Base(props: BaseProps) {
                   className="icon"
                 >
                   <Dropdown.Menu>
-                    <Dropdown.Item text="Create Listing" href="./create_listing" />
+                    <Dropdown.Item>
+                      <Link to="/create_listing" className="unstyled-link">
+                        Create Listing
+                      </Link>
+                    </Dropdown.Item>
                     <Dropdown.Item text="Another Action" />
                     <Dropdown.Divider />
                     <Dropdown.Item onClick={onLogout} text="Log Out" />
