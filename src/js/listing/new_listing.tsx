@@ -246,7 +246,7 @@ function ListingForm() {
           </Form>
         </Col>
         <Col xs="6">
-          <h1 className="column-heading-centered">Preview (Customer View)</h1>
+          <h1 className="column-heading-centered">Preview (Buyer View)</h1>
           <br />
           <Listing
             name={name}
