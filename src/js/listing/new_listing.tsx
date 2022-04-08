@@ -1,5 +1,5 @@
 import * as React from "react"
-import { Row, Col } from "react-bootstrap"
+import { Row, Col, OverlayTrigger, Popover } from "react-bootstrap"
 import { Button, Form, Input } from "semantic-ui-react"
 import Dropzone from "react-dropzone"
 import { useCallback, useState } from "../base/react_base"
@@ -15,6 +15,11 @@ interface ListingProps {
 
 interface OnChangeObject {
   value: string
+}
+
+function isValidPrice(input: string) {
+  const pattern = /(?=.*?\d)^\$?(([1-9]\d{0,2}(,\d{3})*)|\d+)?(\.\d{1,2})?$/
+  return pattern.test(input)
 }
 
 function Listing(props: ListingProps) {
@@ -33,9 +38,9 @@ function Listing(props: ListingProps) {
           <div>
             <h2>{name}</h2>
             <div className="major-metadata">
-              {price ? (
+              {price && isValidPrice(price) ? (
                 <>
-                  <b>Price:</b> <span>{`$${price}`}</span>
+                  <b>Price:</b> <span>{price.startsWith("$") ? price : `$${price}`}</span>
                 </>
               ) : null}
             </div>
@@ -106,7 +111,8 @@ function ListingForm() {
   const [imageURL, setImageURL] = useState<string>("")
   const [image, setImage] = useState<File | null>(null)
 
-  const canSubmit = name && price && category && condition && description && image
+  const canSubmit =
+    name && price && category && condition && description && image && isValidPrice(price)
 
   const handleChangeName = useCallback((e: React.FormEvent<HTMLInputElement>) => {
     setName(e.currentTarget.value)
@@ -163,6 +169,30 @@ function ListingForm() {
     console.log(result)
   }, [name, category, condition, price, description, image])
 
+  const submitBtn = (
+    <Button type="submit" disabled={!canSubmit} onClick={onSubmit} positive>
+      Finish and List
+    </Button>
+  )
+
+  const wrappedSubmitBtn = canSubmit ? (
+    submitBtn
+  ) : (
+    <OverlayTrigger
+      placement="right"
+      trigger="hover"
+      overlay={
+        <Popover>
+          <Popover.Body>
+            All form fields must be filled without error and an image must be included to submit.
+          </Popover.Body>
+        </Popover>
+      }
+    >
+      <span>{submitBtn}</span>
+    </OverlayTrigger>
+  )
+
   return (
     <>
       <Row>
@@ -185,6 +215,7 @@ function ListingForm() {
                   label="Price"
                   placeholder="4.99"
                   onChange={handleChangePrice}
+                  error={!!price && !isValidPrice(price)}
                 />
               </Col>
             </Row>
@@ -237,11 +268,7 @@ function ListingForm() {
             </Row>
             <br />
             <Row>
-              <Col xs="6">
-                <Button type="submit" disabled={!canSubmit} onClick={onSubmit}>
-                  Finish and List
-                </Button>
-              </Col>
+              <Col xs="6">{wrappedSubmitBtn}</Col>
             </Row>
           </Form>
         </Col>
