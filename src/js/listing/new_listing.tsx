@@ -1,5 +1,6 @@
 import * as React from "react"
-import { Row, Col, OverlayTrigger, Popover } from "react-bootstrap"
+import { Row, Col, OverlayTrigger, Modal, Popover } from "react-bootstrap"
+import { useNavigate } from "react-router"
 import { Button, Form, Input } from "semantic-ui-react"
 import Dropzone from "react-dropzone"
 import { useCallback, useState } from "../base/react_base"
@@ -66,6 +67,49 @@ function Listing(props: ListingProps) {
   )
 }
 
+interface SubmissionModalProps {
+  onHide: () => void
+  show: boolean
+}
+
+function SubmissionModal(props: SubmissionModalProps) {
+  const { onHide, show } = props
+  const navigate = useNavigate()
+
+  const returnHome = () => navigate("/")
+
+  return (
+    <Modal
+      show={show}
+      onHide={onHide}
+      size="lg"
+      aria-labelledby="contained-modal-title-vcenter"
+      centered
+    >
+      <Modal.Header closeButton>
+        <Modal.Title id="contained-modal-title-vcenter">Success!</Modal.Title>
+      </Modal.Header>
+      <Modal.Body>
+        <Row>
+          <Col xs="12" align="center">
+            Your listing was successfully created and can now be bid on. Create another listing or
+            return home.
+          </Col>
+        </Row>
+        <br />
+        <Row>
+          <Col xs="6" align="center">
+            <Button onClick={onHide}>Create Another Listing</Button>
+          </Col>
+          <Col xs="6" align="center">
+            <Button onClick={returnHome}>Return Home</Button>
+          </Col>
+        </Row>
+      </Modal.Body>
+    </Modal>
+  )
+}
+
 function ListingForm() {
   const categories = [
     {
@@ -110,6 +154,9 @@ function ListingForm() {
   const [description, setDescription] = useState<string>("")
   const [imageURL, setImageURL] = useState<string>("")
   const [image, setImage] = useState<File | null>(null)
+  const [submitting, setSubmitting] = useState<boolean>(false)
+  const [showSuccessModal, setShowSuccessModal] = useState<boolean>(false)
+  const [showFailureModal, setShowFailureModal] = useState<boolean>(false)
 
   const canSubmit =
     name && price && category && condition && description && image && isValidPrice(price)
@@ -143,6 +190,19 @@ function ListingForm() {
     [],
   )
 
+  const reset = () => {
+    setName("")
+    setPrice("")
+    setCategory("")
+    setCondition("")
+    setDescription("")
+    setImageURL("")
+    setImage(null)
+    setSubmitting(false)
+    setShowSuccessModal(false)
+    setShowFailureModal(false)
+  }
+
   const handleChangeImage = useCallback((files: File[]) => {
     const reader = new FileReader()
     reader.onload = (e) => {
@@ -161,16 +221,22 @@ function ListingForm() {
     formData.append("description", description)
     formData.append("image", image, image.name)
 
+    setSubmitting(true)
     const response = await fetch("/api/add_item", {
       method: "POST",
       body: formData,
     })
-    const result = await response.json()
-    console.log(result)
+    if (response.status === 201) {
+      setSubmitting(false)
+      setShowSuccessModal(true)
+    } else {
+      setSubmitting(false)
+      setShowFailureModal(true)
+    }
   }, [name, category, condition, price, description, image])
 
   const submitBtn = (
-    <Button type="submit" disabled={!canSubmit} onClick={onSubmit} positive>
+    <Button type="submit" disabled={!canSubmit} loading={submitting} onClick={onSubmit} positive>
       Finish and List
     </Button>
   )
@@ -195,6 +261,7 @@ function ListingForm() {
 
   return (
     <>
+      <SubmissionModal onHide={reset} show={showSuccessModal} />
       <Row>
         <Col xs="6">
           <h1 className="column-heading-centered">Enter Listing Details</h1>
@@ -207,6 +274,7 @@ function ListingForm() {
                   label="Listing Name"
                   placeholder="Used Phys 1a Textbook"
                   onChange={handleChangeName}
+                  value={name}
                 />
               </Col>
               <Col xs="3">
