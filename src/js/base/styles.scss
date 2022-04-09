@@ -33,8 +33,13 @@
     padding: 11%;
     text-align: center;
 
+    .droparea-error,
     .droparea-text {
         font-size: 20px;
+    }
+
+    .droparea-error {
+        color: red;
     }
 }
 
