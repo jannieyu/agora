@@ -24,7 +24,7 @@ func (h handle) Login(w http.ResponseWriter, r *http.Request) {
 	session.Options = &sessions.Options{SameSite: http.SameSiteStrictMode}
 
 	urlParams := r.URL.Query()["data"][0]
-	var loginCredentials LoginCredentials
+	var loginCredentials utils.LoginCredentials
 	if err := json.Unmarshal([]byte(urlParams), &loginCredentials); err != nil {
 		log.WithError(err).Error("Failed to unmarshal login credentials.")
 		w.WriteHeader(http.StatusBadRequest)
