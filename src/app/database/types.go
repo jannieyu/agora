@@ -10,6 +10,8 @@ type User struct {
 	LastName  string `json:"lastName"`
 	Email     string `json:"email"`
 	Pword     string `json:"pword,omitempty"`
+	Image     string `json:"image,omitempty"`
+	Bio       string `json:"bio,omitempty"`
 }
 
 type Item struct {
