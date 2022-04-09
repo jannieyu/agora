@@ -131,7 +131,7 @@ export default function LoginModal(props: ModalProps) {
               : "Email and/or password do not match a valid account"
           }
         />
-        <Button type="submit" onClick={onLogin} disabled={!canSubmit}>
+        <Button type="submit" onClick={onLogin} disabled={!canSubmit} positive>
           Submit
         </Button>
       </Form>
