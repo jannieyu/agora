@@ -70,10 +70,11 @@ function Listing(props: ListingProps) {
 interface SubmissionModalProps {
   onHide: () => void
   show: boolean
+  wasSuccess: boolean
 }
 
 function SubmissionModal(props: SubmissionModalProps) {
-  const { onHide, show } = props
+  const { onHide, show, wasSuccess } = props
   const navigate = useNavigate()
 
   const returnHome = () => navigate("/")
@@ -87,25 +88,23 @@ function SubmissionModal(props: SubmissionModalProps) {
       centered
     >
       <Modal.Header closeButton>
-        <Modal.Title id="contained-modal-title-vcenter">Success!</Modal.Title>
+        <Modal.Title id="contained-modal-title-vcenter">
+          {wasSuccess ? "Success!" : "Error"}
+        </Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <Row>
           <Col xs="12" align="center">
-            Your listing was successfully created and can now be bid on. Create another listing or
-            return home.
-          </Col>
-        </Row>
-        <br />
-        <Row>
-          <Col xs="6" align="center">
-            <Button onClick={onHide}>Create Another Listing</Button>
-          </Col>
-          <Col xs="6" align="center">
-            <Button onClick={returnHome}>Return Home</Button>
+            {wasSuccess
+              ? "Your listing was created successfully! Create another listing or return home."
+              : "There was an error creating your listing. We are very sorry for the inconvenience. Please consider trying again or returning home."}
           </Col>
         </Row>
       </Modal.Body>
+      <Modal.Footer>
+        <Button onClick={onHide}>{wasSuccess ? "Create Another Listing" : "Try Again"}</Button>
+        <Button onClick={returnHome}>Return Home</Button>
+      </Modal.Footer>
     </Modal>
   )
 }
@@ -229,8 +228,10 @@ function ListingForm() {
     if (response.status === 201) {
       setSubmitting(false)
       setShowSuccessModal(true)
+      setShowFailureModal(false)
     } else {
       setSubmitting(false)
+      setShowSuccessModal(false)
       setShowFailureModal(true)
     }
   }, [name, category, condition, price, description, image])
@@ -261,7 +262,11 @@ function ListingForm() {
 
   return (
     <>
-      <SubmissionModal onHide={reset} show={showSuccessModal} />
+      <SubmissionModal
+        onHide={reset}
+        show={showSuccessModal || showFailureModal}
+        wasSuccess={showSuccessModal}
+      />
       <Row>
         <Col xs="6">
           <h1 className="column-heading-centered">Enter Listing Details</h1>
@@ -284,6 +289,7 @@ function ListingForm() {
                   placeholder="4.99"
                   onChange={handleChangePrice}
                   error={!!price && !isValidPrice(price)}
+                  value={price}
                 />
               </Col>
             </Row>
@@ -297,6 +303,7 @@ function ListingForm() {
                   selection
                   options={categories}
                   onChange={handleChangeCategory}
+                  value={category}
                 />
               </Col>
               <Col xs="6">
@@ -307,6 +314,7 @@ function ListingForm() {
                   selection
                   options={conditions}
                   onChange={handleChangeCondition}
+                  value={condition}
                 />
               </Col>
             </Row>
@@ -332,6 +340,7 @@ function ListingForm() {
                 placeholder="Enter a description of the product"
                 style={{ minHeight: 100, maxHeight: 400 }}
                 onChange={handleChangeDescription}
+                value={description}
               />
             </Row>
             <br />
