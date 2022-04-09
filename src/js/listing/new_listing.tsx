@@ -30,7 +30,7 @@ function Listing(props: ListingProps) {
     <Row>
       <Col xs="12">
         <div className="listing">
-          {category ? <b className="category">{`${category}/`}</b> : null}
+          {category ? <b className="category">{category}</b> : null}
           <div>
             {imageURL ? (
               <img src={imageURL} alt="Listing Preview" className="image-preview" />
@@ -117,6 +117,20 @@ function ListingForm() {
       text: "Apparel",
     },
     {
+      key: "Mens",
+      value: "Apparel/Mens",
+      text: "Apparel/Mens",
+      // Example of how we can create intented items in dropdown:
+      content: <div>{"\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0 Mens"}</div>,
+    },
+    {
+      key: "Womens",
+      value: "Apparel/Womens",
+      text: "Apparel/Womens",
+      // Example of how we can create intented items in dropdown:
+      content: <div>{"\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0 Womens"}</div>,
+    },
+    {
       key: "Books",
       value: "Books",
       text: "Books",
@@ -156,9 +170,17 @@ function ListingForm() {
   const [submitting, setSubmitting] = useState<boolean>(false)
   const [showSuccessModal, setShowSuccessModal] = useState<boolean>(false)
   const [showFailureModal, setShowFailureModal] = useState<boolean>(false)
+  const [imageError, setImageError] = useState<boolean>(false)
 
   const canSubmit =
-    name && price && category && condition && description && image && isValidPrice(price)
+    name &&
+    price &&
+    category &&
+    condition &&
+    description &&
+    image &&
+    isValidPrice(price) &&
+    !imageError
 
   const handleChangeName = useCallback((e: React.FormEvent<HTMLInputElement>) => {
     setName(e.currentTarget.value)
@@ -203,12 +225,24 @@ function ListingForm() {
   }
 
   const handleChangeImage = useCallback((files: File[]) => {
-    const reader = new FileReader()
-    reader.onload = (e) => {
-      setImageURL(e.target.result as string)
+    const imageFile = files[0]
+    if (
+      imageFile.name.endsWith(".png") ||
+      imageFile.name.endsWith(".jpg") ||
+      imageFile.name.endsWith(".gif")
+    ) {
+      setImageError(false)
+      const reader = new FileReader()
+      reader.onload = (e) => {
+        setImageURL(e.target.result as string)
+      }
+      reader.readAsDataURL(imageFile)
+      setImage(imageFile)
+    } else {
+      setImageError(true)
+      setImage(null)
+      setImageURL("")
     }
-    reader.readAsDataURL(files[0])
-    setImage(files[0])
   }, [])
 
   const onSubmit = useCallback(async () => {
@@ -247,7 +281,7 @@ function ListingForm() {
   ) : (
     <OverlayTrigger
       placement="right"
-      trigger="hover"
+      trigger={["hover", "focus"]}
       overlay={
         <Popover>
           <Popover.Body>
@@ -259,6 +293,11 @@ function ListingForm() {
       <span>{submitBtn}</span>
     </OverlayTrigger>
   )
+
+  const dropzoneAreaMessage = imageError
+    ? "Error uploading image: file type not supported"
+    : "Drag and drop an image of the listed item, or click to upload"
+  const dropzoneAreaClass = imageError ? "droparea-error" : "droparea-text"
 
   return (
     <>
@@ -325,10 +364,7 @@ function ListingForm() {
                   <div {...getRootProps()}>
                     <div className="droparea">
                       <input {...getInputProps()} />
-                      <b className="droparea-text">
-                        {image?.name ||
-                          "Drag and drop an image of the listed item, or click to upload"}
-                      </b>
+                      <b className={dropzoneAreaClass}>{image?.name || dropzoneAreaMessage}</b>
                     </div>
                   </div>
                 )}
