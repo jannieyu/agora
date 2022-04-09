@@ -4,6 +4,7 @@ import { useNavigate } from "react-router"
 import { Button, Form, Input } from "semantic-ui-react"
 import Dropzone from "react-dropzone"
 import { useCallback, useState } from "../base/react_base"
+import { conditions, categories } from "./constants"
 
 interface ListingProps {
   category: string
@@ -110,56 +111,6 @@ function SubmissionModal(props: SubmissionModalProps) {
 }
 
 function ListingForm() {
-  const categories = [
-    {
-      key: "Apparel",
-      value: "Apparel",
-      text: "Apparel",
-    },
-    {
-      key: "Mens",
-      value: "Apparel/Mens",
-      text: "Apparel/Mens",
-      // Example of how we can create intented items in dropdown:
-      content: <div>{"\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0 Mens"}</div>,
-    },
-    {
-      key: "Womens",
-      value: "Apparel/Womens",
-      text: "Apparel/Womens",
-      // Example of how we can create intented items in dropdown:
-      content: <div>{"\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0 Womens"}</div>,
-    },
-    {
-      key: "Books",
-      value: "Books",
-      text: "Books",
-    },
-    {
-      key: "Furniture",
-      value: "Furniture",
-      text: "Furniture",
-    },
-  ]
-
-  const conditions = [
-    {
-      key: "New",
-      value: "New",
-      text: "New",
-    },
-    {
-      key: "Lightly Used",
-      value: "Lightly Used",
-      text: "Lightly Used",
-    },
-    {
-      key: "Well Loved",
-      value: "Well Loved",
-      text: "Well Loved",
-    },
-  ]
-
   const [name, setName] = useState<string>("")
   const [price, setPrice] = useState<string>("")
   const [category, setCategory] = useState<string>("")

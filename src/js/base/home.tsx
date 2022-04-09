@@ -1,42 +1,32 @@
 import * as React from "react"
 import { Row, Col } from "react-bootstrap"
-import { Button } from "semantic-ui-react"
-import { useCallback, useDispatch, useSelector, useTranslation } from "./react_base"
-import { AppState } from "./reducers"
-import setData from "./actions"
-import { apiCall, API_ARGS } from "../api/example"
+import { Dropdown, Input } from "semantic-ui-react"
+import { categories } from "../listing/constants"
+
+const options = [
+  {
+    key: "all",
+    value: "all",
+    text: "All Categories",
+  },
+  ...categories,
+]
 
 function Home() {
-  const { t } = useTranslation()
-  const dispatch = useDispatch()
-  const numClicks = useSelector((state: AppState) => state.numClicks)
-
-  const onToggle = useCallback(() => {
-    dispatch(
-      setData({
-        numClicks: numClicks + 1,
-      }),
-    )
-    apiCall(
-      API_ARGS,
-      () => {},
-      () => {},
-    )
-  }, [numClicks, dispatch])
-
-  const headerPrefix = t("The button has been clicked")
-  const headerSuffix = t("times")
-
   return (
     <Row>
-      <Col xs={12}>
-        <h1 className="title">{`${headerPrefix} ${numClicks} ${headerSuffix}`}</h1>
+      <Col xs={3} />
+      <Col xs={6} align="center">
+        <Input
+          action={<Dropdown button basic floating options={options} defaultValue="all" />}
+          actionPosition="left"
+          icon="search"
+          size="large"
+          placeholder="Search..."
+          fluid
+        />
       </Col>
-      <Col xs={6}>
-        <Button onClick={onToggle} variant="contained">
-          {t("Example API Trigger")}
-        </Button>
-      </Col>
+      <Col xs={3} />
     </Row>
   )
 }
