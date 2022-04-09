@@ -25,7 +25,7 @@ import {
 import Home from "./home"
 import LoginModal from "./login_modal"
 import About from "./about"
-import NewListing from "../listing/new_listing"
+import NewListing from "../listings/new_listing"
 import "./styles.scss"
 import { apiCall as logoutCall } from "../api/logout"
 import {
