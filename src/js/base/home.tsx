@@ -8,7 +8,8 @@ import {
   Response as GetSearchItemsResponse,
   SearchItem,
 } from "../api/get_search_items"
-import Listing, { ListingProps } from "../listings/listing"
+import { ListingProps } from "../listings/listing"
+import Card from "../listings/card"
 
 const options = [
   {
@@ -19,19 +20,19 @@ const options = [
   ...categories,
 ]
 
-interface ListingRowProps {
-  listings: ListingProps[]
+interface CardRowProps {
+  cards: ListingProps[]
 }
 
-function ListingRow(props: ListingRowProps) {
-  const { listings } = props
+function CardRow(props: CardRowProps) {
+  const { cards } = props
 
   return (
     <>
       <Row>
-        {listings.map((prop: ListingProps) => (
+        {cards.map((prop: ListingProps) => (
           <Col xs={3} key={prop.id}>
-            <Listing {...prop} />
+            <Card {...prop} />
           </Col>
         ))}
       </Row>
@@ -53,15 +54,15 @@ function Home() {
     )
   }, [])
 
-  const listingRows = []
+  const cardRows = []
   for (let i = 0; i < searchItems.length; i += 4) {
-    const listings: ListingProps[] = []
+    const cards: ListingProps[] = []
     for (let j = 0; j < 4; j += 1) {
       if (i + j < searchItems.length) {
-        listings.push(searchItems[i + j])
+        cards.push(searchItems[i + j])
       }
     }
-    listingRows.push(<ListingRow listings={listings} key={i} />)
+    cardRows.push(<CardRow cards={cards} key={i} />)
   }
 
   return (
@@ -83,7 +84,7 @@ function Home() {
       <br />
       <hr />
       <br />
-      {listingRows}
+      {cardRows}
     </>
   )
 }

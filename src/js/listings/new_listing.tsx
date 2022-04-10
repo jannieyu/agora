@@ -5,7 +5,8 @@ import { Button, Form, Input } from "semantic-ui-react"
 import Dropzone from "react-dropzone"
 import { useCallback, useState } from "../base/react_base"
 import { conditions, categories } from "./constants"
-import Listing, { isValidPrice } from "./listing"
+import Listing from "./listing"
+import isValidPrice from "./util"
 
 interface OnChangeObject {
   value: string

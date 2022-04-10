@@ -1,5 +1,6 @@
 import * as React from "react"
 import { Row, Col } from "react-bootstrap"
+import isValidPrice from "./util"
 
 export interface ListingProps {
   category: string
@@ -11,11 +12,6 @@ export interface ListingProps {
   id: number
 }
 
-export function isValidPrice(input: string) {
-  const pattern = /(?=.*?\d)^\$?(([1-9]\d{0,2}(,\d{3})*)|\d+)?(\.\d{1,2})?$/
-  return pattern.test(input)
-}
-
 export default function Listing(props: ListingProps) {
   const { category, name, price, condition, image, description } = props
 
@@ -25,7 +21,7 @@ export default function Listing(props: ListingProps) {
         <div className="listing">
           {category ? <b className="category">{category}</b> : null}
           <div>
-            {image ? <img src={image} alt="Listing Preview" className="image-preview" /> : null}
+            {image ? <img src={image} alt="Listing Preview" className="listing-image" /> : null}
           </div>
           <div>
             <h2>{name}</h2>
