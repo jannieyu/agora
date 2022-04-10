@@ -2,6 +2,7 @@ package database
 
 import (
 	"github.com/shopspring/decimal"
+	"time"
 )
 
 type User struct {
@@ -24,4 +25,5 @@ type Item struct {
 	Price       decimal.Decimal `json:"price,omitempty"`
 	Condition   string          `json:"condition,omitempty"`
 	Description string          `json:"description,omitempty"`
+	CreatedAt   time.Time       `json:"created_at" gorm:"autoCreateTime"`
 }

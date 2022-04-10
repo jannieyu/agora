@@ -13,14 +13,6 @@ type handle struct {
 	store *sessions.CookieStore
 }
 
-type LoginCredentials struct {
-	Email     string
-	Password  string
-	IsSignUp  bool
-	FirstName string
-	LastName  string
-}
-
 func New(db *gorm.DB, store *sessions.CookieStore) handle {
 	return handle{db, store}
 }
