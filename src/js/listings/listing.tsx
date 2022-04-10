@@ -1,6 +1,7 @@
 import * as React from "react"
 import { Row, Col } from "react-bootstrap"
 import isValidPrice from "./util"
+import { User } from "../base/reducers"
 
 export interface ListingProps {
   category: string
@@ -9,6 +10,7 @@ export interface ListingProps {
   condition: string
   image: string
   description: string
+  seller: User
   id: number
 }
 
@@ -39,7 +41,6 @@ export default function Listing(props: ListingProps) {
                 </>
               ) : null}
             </div>
-            <br />
             <div>
               {description ? (
                 <>

@@ -45,10 +45,6 @@
 
 .card,
 .listing {
-    border-width: 2px;
-    border-radius: 10px;
-    border-color: #ccc;
-    border-style: solid;
     width: 95%;
     padding: 3%;
     margin-top: 0%;
@@ -63,6 +59,11 @@
 }
 
 .card {
+    border-width: 2px;
+    border-radius: 10px;
+    border-color: #ccc;
+    border-style: solid;
+
     display: grid;
     height: 100%;
 
@@ -72,9 +73,29 @@
 
 .card-image,
 .listing-image {
-    border-radius: 10px;
     padding-bottom: 5px;
     float: left;
+    object-fit: contain;
+}
+
+.card-metadata {
+    display: flex;
+    justify-content: space-between;
+}
+
+.card-edit:hover {
+    color: blue;
+}
+
+.card-trash:hover {
+    color: red;
+}
+
+.results-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-left: 2%;
 }
 
 .card-image {
@@ -82,11 +103,17 @@
     position: relative;
     top: 50%;
     transform: translateY(-50%);
+    max-height: 25vh;
 }
 
 .listing-image {
     width: 50%;
     padding-right: 15px;
+    max-height: 50vh;
+}
+
+.softly-rounded {
+    border-radius: .28571429rem !important;
 }
 
 .footer {

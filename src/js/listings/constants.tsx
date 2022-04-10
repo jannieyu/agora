@@ -30,6 +30,11 @@ export const categories = [
     value: "Furniture",
     text: "Furniture",
   },
+  {
+    key: "Electronics",
+    value: "Electronics",
+    text: "Electronics",
+  },
 ]
 
 export const conditions = [
