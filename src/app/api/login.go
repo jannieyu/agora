@@ -4,10 +4,11 @@ import (
 	"agora/src/app/database"
 	"agora/src/app/utils"
 	"encoding/json"
+	"net/http"
+
 	"github.com/gorilla/sessions"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/crypto/bcrypt"
-	"net/http"
 )
 
 func checkPasswordHash(password, hash string) bool {
@@ -78,6 +79,7 @@ func (h handle) Login(w http.ResponseWriter, r *http.Request) {
 		status.Email = user.Email
 		status.FirstName = user.FirstName
 		status.LastName = user.LastName
+		status.ID = user.ID
 		log.Info("Successful authentication of user.")
 
 	} else {
