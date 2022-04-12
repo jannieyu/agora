@@ -9,9 +9,10 @@ const (
 )
 
 type Filters struct {
-	SortBy    SortMethod
-	Condition string
-	Category  string
+	SortBy    SortMethod `json:"sort_by"`
+	Condition string     `json:"condition"`
+	Category  string     `json:"category"`
+	Keywords  string     `json:"keywords"`
 }
 
 type LoginCredentials struct {

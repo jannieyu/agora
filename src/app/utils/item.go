@@ -2,7 +2,7 @@ package utils
 
 import (
 	"agora/src/app/database"
-	"github.com/shopspring/decimal"
+	"github.com/blevesearch/bleve/v2"
 	log "github.com/sirupsen/logrus"
 	"io/ioutil"
 	"mime/multipart"
@@ -42,7 +42,7 @@ func processImage(r *http.Request) (string, error) {
 	return filename, nil
 }
 
-func PopulateItem(item *database.Item, r *http.Request, sellerID uint32) error {
+func PopulateItem(item *database.Item, r *http.Request, index bleve.Index, sellerID uint32) error {
 	item.Name = r.FormValue("name")
 	item.Category = r.FormValue("category")
 	item.Condition = r.FormValue("condition")
@@ -50,11 +50,11 @@ func PopulateItem(item *database.Item, r *http.Request, sellerID uint32) error {
 	item.SellerID = sellerID
 
 	if price := r.FormValue("price"); !strings.EqualFold(price, "") {
-		item_price, err := decimal.NewFromString(price)
+		item_price, err := strconv.ParseFloat(price, 32)
 		if err != nil {
 			log.WithError(err).Debug("Failed to parse string price.")
 		}
-		item.Price = item_price
+		item.Price = float32(item_price)
 	}
 
 	if image_location, err := processImage(r); err != nil {

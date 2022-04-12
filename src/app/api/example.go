@@ -6,8 +6,8 @@ import (
 )
 
 /* TODO: Untouched. Clean up or remove. */
-func (h handle) Authenticate(w http.ResponseWriter, r *http.Request) {
-	session, _ := h.store.Get(r, "user-auth")
+func (h Handle) Authenticate(w http.ResponseWriter, r *http.Request) {
+	session, _ := h.Store.Get(r, "user-auth")
 
 	// Check if user is authenticated
 	if auth, ok := session.Values["authenticated"].(bool); !ok || !auth {
@@ -16,6 +16,6 @@ func (h handle) Authenticate(w http.ResponseWriter, r *http.Request) {
 	} else {
 		urlParams := r.URL.Query()["data"]
 		log.Debug(urlParams)
-		safeEncode(w, urlParams[0])
+		SafeEncode(w, urlParams[0])
 	}
 }

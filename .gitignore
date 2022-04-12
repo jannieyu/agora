@@ -9,6 +9,7 @@ npm-debug.log
 # Go / Goland
 .idea
 src/app/images
+src/app/index.bleve
 
 # Python
 # Byte-compiled / optimized / DLL files

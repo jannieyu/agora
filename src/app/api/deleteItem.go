@@ -3,29 +3,39 @@ package api
 import (
 	"agora/src/app/database"
 	"encoding/json"
-	"github.com/gorilla/mux"
-	log "github.com/sirupsen/logrus"
 	"net/http"
 	"strconv"
+
+	log "github.com/sirupsen/logrus"
 )
 
-func (h handle) DeleteItem(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	id, _ := strconv.Atoi(vars["id"])
+func (h Handle) DeleteItem(w http.ResponseWriter, r *http.Request) {
+	urlParams := r.URL.Query()["data"][0]
+	item_id := struct {
+		id string
+	}{}
+	if err := json.Unmarshal([]byte(urlParams), &item_id); err != nil {
+		log.WithError(err).Error("Failed to unmarshal item id for item deletion.")
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
 	var item database.Item
-	if err := h.db.First(&item, id).Error; err != nil {
+	if err := h.Db.First(&item, item_id).Error; err != nil {
 		log.WithError(err).Error("Failed to find existing item entry in Items table.")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-
-	if err := h.db.Delete(&item).Error; err != nil {
+	if err := h.Db.Delete(&item).Error; err != nil {
 		log.WithError(err).Error("Failed to delete item entry in Items table.")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-
+	if err := h.Index.Delete(strconv.FormatUint(uint64(item.ID), 10)); err != nil {
+		log.WithError(err).Error("Failed to delete item index.")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	SafeEncode(w, "{}")
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode("{}")
 	log.Info("Completed item deletion.")
 }

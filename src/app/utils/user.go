@@ -4,12 +4,19 @@ import (
 	"agora/src/app/database"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/crypto/bcrypt"
+	"gorm.io/gorm"
 	"net/http"
 )
 
 func HashPassword(password string) (string, error) {
 	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
 	return string(bytes), err
+}
+
+func PreloadSafeSellerInfo(db *gorm.DB) *gorm.DB {
+	return db.Preload("Seller", func(tx *gorm.DB) *gorm.DB {
+		return tx.Select("id", "first_name", "last_name", "email")
+	})
 }
 
 func PopulateUser(user *database.User, r *http.Request) error {

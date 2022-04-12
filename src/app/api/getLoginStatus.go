@@ -17,7 +17,7 @@ func getUser(db *gorm.DB, store *sessions.CookieStore, r *http.Request) (databas
 	var user database.User
 	if authenticated, ok := session.Values["authenticated"]; ok && authenticated.(bool) {
 		if err := db.First(&user, session.Values["id"].(uint32)).Error; err != nil {
-			log.WithError(err).Error("Failed to find existing item entry in Items table.")
+			log.WithError(err).Error("Failed to make query to User table.")
 			return database.User{}, err
 		}
 		user.Pword = ""
@@ -25,11 +25,11 @@ func getUser(db *gorm.DB, store *sessions.CookieStore, r *http.Request) (databas
 	return user, nil
 }
 
-func (h handle) GetLoginStatus(w http.ResponseWriter, r *http.Request) {
-	user, err := getUser(h.db, h.store, r)
+func (h Handle) GetLoginStatus(w http.ResponseWriter, r *http.Request) {
+	user, err := getUser(h.Db, h.Store, r)
 	if err != nil {
 		log.WithError(err).Error("Failed to get user from database.")
 		w.WriteHeader(http.StatusInternalServerError)
 	}
-	safeEncode(w, user)
+	SafeEncode(w, user)
 }
