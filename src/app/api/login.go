@@ -78,6 +78,7 @@ func (h Handle) Login(w http.ResponseWriter, r *http.Request) {
 		status.Email = user.Email
 		status.FirstName = user.FirstName
 		status.LastName = user.LastName
+		status.ID = user.ID
 		log.Info("Successful authentication of user.")
 
 	} else {

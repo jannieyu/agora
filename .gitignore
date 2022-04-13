@@ -10,6 +10,8 @@ npm-debug.log
 .idea
 src/app/images
 src/app/index.bleve
+static/images
+
 
 # Python
 # Byte-compiled / optimized / DLL files

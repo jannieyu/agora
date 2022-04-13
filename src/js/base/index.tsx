@@ -25,7 +25,7 @@ import {
 import Home from "./home"
 import LoginModal from "./login_modal"
 import About from "./about"
-import NewListing from "../listing/new_listing"
+import NewListing from "../listings/new_listing"
 import "./styles.scss"
 import { apiCall as logoutCall } from "../api/logout"
 import {
@@ -48,7 +48,7 @@ function PageNotFound() {
     <>
       <h1>404: Page Not Found</h1>
       <p>
-        The page you requested does not exist. Please return to the <a href="/">home page</a>.
+        The page you requested does not exist. Please return to the <Link to="/">home page</Link>.
       </p>
     </>
   )
@@ -60,7 +60,7 @@ function Unauthorized() {
       <h1>Unauthorized</h1>
       <p>
         You are not authorized to view this page. Please log in or return to the{" "}
-        <a href="/">home page</a>.
+        <Link to="/">home page</Link>.
       </p>
     </>
   )
@@ -112,7 +112,7 @@ function Base(props: BaseProps) {
   }, [dispatch, navigate, requiresAuth])
 
   const onCreateListing = useCallback(() => {
-    navigate("/create_listing")
+    navigate("create_listing")
   }, [navigate])
 
   useEffect(() => {
@@ -186,8 +186,8 @@ function Base(props: BaseProps) {
 }
 
 const ROUTES = {
-  "/about": About,
-  "/create_listing": NewListing,
+  about: About,
+  create_listing: NewListing,
 }
 
 const store = createStore(rootReducer)
@@ -199,11 +199,13 @@ ReactDOM.render(
     <Router>
       <Base>
         <Routes>
-          <Route path="/" element={<Home />} index />
-          {Object.keys(ROUTES).map((route) => {
-            const Component = ROUTES[route]
-            return <Route path={route} key={route} element={<Component />} />
-          })}
+          <Route path="/">
+            <Route index element={<Home />} />
+            {Object.keys(ROUTES).map((route) => {
+              const Component = ROUTES[route]
+              return <Route path={route} key={route} element={<Component />} />
+            })}
+          </Route>
           <Route path="*" element={<PageNotFound />} />
         </Routes>
       </Base>

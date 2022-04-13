@@ -3,69 +3,12 @@ import { Row, Col, OverlayTrigger, Modal, Popover } from "react-bootstrap"
 import { useNavigate } from "react-router"
 import { Button, Form, Input } from "semantic-ui-react"
 import Dropzone from "react-dropzone"
-import { useCallback, useState } from "../base/react_base"
-
-interface ListingProps {
-  category: string
-  name: string
-  price: string
-  condition: string
-  imageURL: string
-  description: string
-}
-
-interface OnChangeObject {
-  value: string
-}
-
-function isValidPrice(input: string) {
-  const pattern = /(?=.*?\d)^\$?(([1-9]\d{0,2}(,\d{3})*)|\d+)?(\.\d{1,2})?$/
-  return pattern.test(input)
-}
-
-function Listing(props: ListingProps) {
-  const { category, name, price, condition, imageURL, description } = props
-
-  return (
-    <Row>
-      <Col xs="12">
-        <div className="listing">
-          {category ? <b className="category">{category}</b> : null}
-          <div>
-            {imageURL ? (
-              <img src={imageURL} alt="Listing Preview" className="image-preview" />
-            ) : null}
-          </div>
-          <div>
-            <h2>{name}</h2>
-            <div className="major-metadata">
-              {price && isValidPrice(price) ? (
-                <>
-                  <b>Price:</b> <span>{price.startsWith("$") ? price : `$${price}`}</span>
-                </>
-              ) : null}
-            </div>
-            <div className="major-metadata">
-              {condition ? (
-                <>
-                  <b>Condition:</b> <span>{condition}</span>
-                </>
-              ) : null}
-            </div>
-            <br />
-            <div>
-              {description ? (
-                <>
-                  <b className="major-metadata">Description:</b> <span>{description}</span>
-                </>
-              ) : null}
-            </div>
-          </div>
-        </div>
-      </Col>
-    </Row>
-  )
-}
+import { useCallback, useSelector, useState } from "../base/react_base"
+import { AppState } from "../base/reducers"
+import { conditions, categories } from "./constants"
+import Listing from "./listing"
+import isValidPrice from "./util"
+import { OnChangeObject } from "../base/types"
 
 interface SubmissionModalProps {
   onHide: () => void
@@ -110,55 +53,7 @@ function SubmissionModal(props: SubmissionModalProps) {
 }
 
 function ListingForm() {
-  const categories = [
-    {
-      key: "Apparel",
-      value: "Apparel",
-      text: "Apparel",
-    },
-    {
-      key: "Mens",
-      value: "Apparel/Mens",
-      text: "Apparel/Mens",
-      // Example of how we can create intented items in dropdown:
-      content: <div>{"\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0 Mens"}</div>,
-    },
-    {
-      key: "Womens",
-      value: "Apparel/Womens",
-      text: "Apparel/Womens",
-      // Example of how we can create intented items in dropdown:
-      content: <div>{"\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0 Womens"}</div>,
-    },
-    {
-      key: "Books",
-      value: "Books",
-      text: "Books",
-    },
-    {
-      key: "Furniture",
-      value: "Furniture",
-      text: "Furniture",
-    },
-  ]
-
-  const conditions = [
-    {
-      key: "New",
-      value: "New",
-      text: "New",
-    },
-    {
-      key: "Lightly Used",
-      value: "Lightly Used",
-      text: "Lightly Used",
-    },
-    {
-      key: "Well Loved",
-      value: "Well Loved",
-      text: "Well Loved",
-    },
-  ]
+  const activeUser = useSelector((state: AppState) => state.user)
 
   const [name, setName] = useState<string>("")
   const [price, setPrice] = useState<string>("")
@@ -394,7 +289,9 @@ function ListingForm() {
             condition={condition}
             description={description}
             category={category}
-            imageURL={imageURL}
+            image={imageURL}
+            seller={activeUser}
+            id={0}
           />
         </Col>
       </Row>

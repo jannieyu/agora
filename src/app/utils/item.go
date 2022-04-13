@@ -34,8 +34,9 @@ func processImage(r *http.Request) (string, error) {
 
 	t := strconv.FormatInt(time.Now().Unix(), 10)
 	filename := "images/" + t + "-" + header.Filename
+	diskLocation := "../../static/" + filename
 
-	if err := ioutil.WriteFile(filename, data, 0777); err != nil {
+	if err := ioutil.WriteFile(diskLocation, data, 0777); err != nil {
 		log.WithError(err).Error("Failed to write to disk.")
 		return "", err
 	}
