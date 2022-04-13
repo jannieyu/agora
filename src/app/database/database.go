@@ -8,7 +8,7 @@ import (
 
 func Init() (*gorm.DB, error) {
 	// Password should be set as EVN variable rather than hardcoded value
-	dsn := "host=localhost user=postgres password=iceprincess dbname=web port=5432 sslmode=disable TimeZone=US/Pacific"
+	dsn := "host=localhost user=postgres password=postgres dbname=web port=5432 sslmode=disable TimeZone=US/Pacific"
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		log.WithError(err).Error("Failed to connect to database.")

@@ -1,8 +1,9 @@
 package database
 
 import (
-	"github.com/shopspring/decimal"
 	"time"
+
+	"github.com/shopspring/decimal"
 )
 
 type User struct {
@@ -22,7 +23,7 @@ type Item struct {
 	Name        string          `json:"name,omitempty"`
 	Image       string          `json:"image,omitempty"`
 	Category    string          `json:"category,omitempty"`
-	Price       decimal.Decimal `json:"price,omitempty" sql:"type:decimal(6,2);"`
+	Price       decimal.Decimal `json:"price,omitempty" gorm:"type:decimal(6,2);"`
 	Condition   string          `json:"condition,omitempty"`
 	Description string          `json:"description,omitempty"`
 	CreatedAt   time.Time       `json:"createdAt" gorm:"autoCreateTime"`
