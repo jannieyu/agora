@@ -208,7 +208,7 @@ function Home() {
                 basic
                 floating
                 options={sortByOptions}
-                value={params.sort || "most_recent"}
+                value={params.sort || "recent"}
                 onChange={handleChangeSortBy}
               />
             </div>
