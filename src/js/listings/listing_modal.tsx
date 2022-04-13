@@ -1,7 +1,8 @@
 import * as React from "react"
 import { Modal } from "react-bootstrap"
 import { useCallback } from "../base/react_base"
-import Listing, { ListingProps } from "./listing"
+import Listing from "./listing"
+import { ListingProps } from "./types"
 
 interface ModalProps {
   onHide: () => void

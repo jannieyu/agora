@@ -3,14 +3,12 @@ import { Row, Col, OverlayTrigger, Modal, Popover } from "react-bootstrap"
 import { useNavigate } from "react-router"
 import { Button, Form, Input } from "semantic-ui-react"
 import Dropzone from "react-dropzone"
-import { useCallback, useState } from "../base/react_base"
+import { useCallback, useSelector, useState } from "../base/react_base"
+import { AppState } from "../base/reducers"
 import { conditions, categories } from "./constants"
 import Listing from "./listing"
 import isValidPrice from "./util"
-
-interface OnChangeObject {
-  value: string
-}
+import { OnChangeObject } from "../base/types"
 
 interface SubmissionModalProps {
   onHide: () => void
@@ -55,6 +53,8 @@ function SubmissionModal(props: SubmissionModalProps) {
 }
 
 function ListingForm() {
+  const activeUser = useSelector((state: AppState) => state.user)
+
   const [name, setName] = useState<string>("")
   const [price, setPrice] = useState<string>("")
   const [category, setCategory] = useState<string>("")
@@ -290,6 +290,7 @@ function ListingForm() {
             description={description}
             category={category}
             image={imageURL}
+            seller={activeUser}
             id={0}
           />
         </Col>

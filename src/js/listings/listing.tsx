@@ -1,18 +1,7 @@
 import * as React from "react"
 import { Row, Col } from "react-bootstrap"
 import isValidPrice from "./util"
-import { User } from "../base/reducers"
-
-export interface ListingProps {
-  category: string
-  name: string
-  price: string
-  condition: string
-  image: string
-  description: string
-  seller: User
-  id: number
-}
+import { ListingProps } from "./types"
 
 export default function Listing(props: ListingProps) {
   const { category, name, price, condition, image, description } = props
