@@ -40,7 +40,9 @@ func (h Handle) GetSearchItems(w http.ResponseWriter, r *http.Request) {
 		result = result.Where("condition = ?", filters.Condition)
 	}
 	if !strings.EqualFold(filters.Category, "all") && !strings.EqualFold(filters.Category, "") {
-		result = result.Where("category = ?", filters.Category)
+		result = result.Where(
+			"category = ? or category like ?", filters.Category, filters.Category+"/%",
+		)
 	}
 
 	var items = []database.Item{}
