@@ -28,29 +28,27 @@ func (h Handle) GetSearchItems(w http.ResponseWriter, r *http.Request) {
 	})
 
 	switch filters.SortBy {
-	case utils.MostRecent:
-		result = result.Order("created_at desc")
-	case utils.PriceHighToLow:
+	case utils.PriceHighLow:
 		result = result.Order("price desc")
-	case utils.PriceLowToHigh:
+	case utils.PriceLowHigh:
 		result = result.Order("price")
 	default:
-		log.Info(filters.SortBy)
+		result = result.Order("created_at desc")
 	}
 
-	if !strings.EqualFold(filters.Condition, "any") {
+	if !strings.EqualFold(filters.Condition, "any") && !strings.EqualFold(filters.Condition, "") {
 		result = result.Where("condition = ?", filters.Condition)
 	}
-	if !strings.EqualFold(filters.Category, "all") {
+	if !strings.EqualFold(filters.Category, "all") && !strings.EqualFold(filters.Category, "") {
 		result = result.Where("category = ?", filters.Category)
 	}
 
 	var items = []database.Item{}
 	var idx []uint32
-	if strings.EqualFold(filters.Keywords, "") {
+	if strings.EqualFold(filters.Search, "") {
 		result.Find(&items)
 	} else {
-		query := bleve.NewMatchQuery(filters.Keywords)
+		query := bleve.NewMatchQuery(filters.Search)
 		search := bleve.NewSearchRequest(query)
 		searchResults, err := h.Index.Search(search)
 		if err != nil {
@@ -72,5 +70,5 @@ func (h Handle) GetSearchItems(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	SafeEncode(w, items)
-	w.WriteHeader(http.StatusOK)
+	//w.WriteHeader(http.StatusOK)
 }

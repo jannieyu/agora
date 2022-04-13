@@ -3,6 +3,7 @@ package utils
 import (
 	"agora/src/app/database"
 	"github.com/blevesearch/bleve/v2"
+	"github.com/shopspring/decimal"
 	log "github.com/sirupsen/logrus"
 	"io/ioutil"
 	"mime/multipart"
@@ -51,11 +52,12 @@ func PopulateItem(item *database.Item, r *http.Request, index bleve.Index, selle
 	item.SellerID = sellerID
 
 	if price := r.FormValue("price"); !strings.EqualFold(price, "") {
-		item_price, err := strconv.ParseFloat(price, 32)
+		//item_price, err := strconv.ParseFloat(price, 32)
+		item_price, err := decimal.NewFromString(price)
 		if err != nil {
 			log.WithError(err).Debug("Failed to parse string price.")
 		}
-		item.Price = float32(item_price)
+		item.Price = item_price
 	}
 
 	if image_location, err := processImage(r); err != nil {

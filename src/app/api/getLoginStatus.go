@@ -16,7 +16,7 @@ func getUser(db *gorm.DB, store *sessions.CookieStore, r *http.Request) (databas
 	}
 	var user database.User
 	if authenticated, ok := session.Values["authenticated"]; ok && authenticated.(bool) {
-		if err := db.First(&user, session.Values["id"].(uint32)).Error; err != nil {
+		if err := db.Where("id = ?", session.Values["id"].(uint32)).Limit(1).Find(&user).Error; err != nil {
 			log.WithError(err).Error("Failed to make query to User table.")
 			return database.User{}, err
 		}

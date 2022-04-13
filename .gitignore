@@ -7,7 +7,6 @@ npm-debug.log
 .DS_Store
 
 # Go / Goland
-.idea
 src/app/images
 src/app/index.bleve
 static/images
