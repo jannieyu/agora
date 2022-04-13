@@ -12,7 +12,8 @@ import {
 import { ListingProps } from "../listings/types"
 import Card from "../listings/card"
 import ListingModal from "../listings/listing_modal"
-import { OnChangeObject } from "./types"
+import ConfirmationModal from "./confirmation_modal"
+import { ActionType, OnChangeObject } from "./types"
 
 const categoryOptions = [
   {
@@ -52,7 +53,7 @@ const sortByOptions = [
 
 interface CardRowProps {
   cards: ListingProps[]
-  handleClick: (idx: number) => void
+  handleClick: (idx: number, actionType: ActionType) => void
   rowIndex: number
 }
 
@@ -82,10 +83,15 @@ function Home() {
 
   const [searchBarText, setSearchBarText] = useState<string>("")
   const [loading, setLoading] = useState<boolean>(false)
+  const [deletingItemId, setDeletingItemId] = useState<number | null>(null)
 
-  const handleCardSelect = useCallback(
-    (idx: number) => {
-      setSelectedItem(searchItems[idx])
+  const handleCardAction = useCallback(
+    (idx: number, actionType: ActionType) => {
+      if (actionType === ActionType.SELECT) {
+        setSelectedItem(searchItems[idx])
+      } else if (actionType === ActionType.DELETE) {
+        setDeletingItemId(searchItems[idx].id)
+      }
     },
     [setSelectedItem, searchItems],
   )
@@ -132,7 +138,7 @@ function Home() {
     setSelectedItem(null)
   }, [setSelectedItem])
 
-  useEffect(() => {
+  const retreiveItems = useCallback(() => {
     setLoading(true)
     getSearchItems(
       params,
@@ -146,6 +152,15 @@ function Home() {
     )
   }, [params])
 
+  useEffect(() => {
+    retreiveItems()
+  }, [retreiveItems])
+
+  const closeConfirmDeleteModal = useCallback(() => {
+    setDeletingItemId(null)
+    retreiveItems()
+  }, [setDeletingItemId, retreiveItems])
+
   const cardRows = []
   for (let i = 0; i < searchItems.length; i += 4) {
     const cards: ListingProps[] = []
@@ -154,11 +169,16 @@ function Home() {
         cards.push(searchItems[i + j])
       }
     }
-    cardRows.push(<CardRow cards={cards} key={i} rowIndex={i} handleClick={handleCardSelect} />)
+    cardRows.push(<CardRow cards={cards} key={i} rowIndex={i} handleClick={handleCardAction} />)
   }
 
   return (
     <>
+      <ConfirmationModal
+        show={!!deletingItemId}
+        onHide={closeConfirmDeleteModal}
+        itemId={deletingItemId}
+      />
       <ListingModal show={!!selectedItem} onHide={deselectItem} selectedItem={selectedItem} />
       <Row>
         <Col xs={2} />
