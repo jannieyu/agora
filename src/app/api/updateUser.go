@@ -7,7 +7,7 @@ import (
 	"net/http"
 )
 
-func (h handle) updateUser(w http.ResponseWriter, r *http.Request) {
+func (h Handle) updateUser(w http.ResponseWriter, r *http.Request) {
 	var user database.User
 	if err := utils.PopulateUser(&user, r); err != nil {
 		log.WithError(err).Error("Failed to update user data.")
@@ -16,6 +16,6 @@ func (h handle) updateUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusCreated)
-	safeEncode(w, "{}")
+	SafeEncode(w, "{}")
 	log.Info("Completed user update.")
 }

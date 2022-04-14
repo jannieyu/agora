@@ -6,10 +6,11 @@ import (
 	"encoding/json"
 	log "github.com/sirupsen/logrus"
 	"net/http"
+	"strconv"
 )
 
-func (h handle) UpdateItem(w http.ResponseWriter, r *http.Request) {
-	session, err := h.store.Get(r, "user-auth")
+func (h Handle) UpdateItem(w http.ResponseWriter, r *http.Request) {
+	session, err := h.Store.Get(r, "user-auth")
 	if err != nil {
 		log.WithError(err).Error("Failed to get cookie session.")
 	}
@@ -23,20 +24,24 @@ func (h handle) UpdateItem(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var item database.Item
-	if err := h.db.First(&item, itemId).Error; err != nil {
+	if err := h.Db.First(&item, itemId).Error; err != nil {
 		log.WithError(err).Error("Failed to find existing item entry in Items table.")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
-	utils.PopulateItem(&item, r, session.Values["id"].(uint32))
-	if err := h.db.Save(&item).Error; err != nil {
+	utils.PopulateItem(&item, r, h.Index, session.Values["id"].(uint32))
+	if err := h.Db.Save(&item).Error; err != nil {
 		log.WithError(err).Error("Failed to save item entry in Items table.")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
+	if err := h.Index.Index(strconv.FormatUint(uint64(item.ID), 10), item); err != nil {
+		log.WithError(err).Error("Failed to index item.")
+	}
+
 	w.WriteHeader(http.StatusOK)
-	safeEncode(w, "{}")
+	SafeEncode(w, "{}")
 	log.Info("Completed item update.")
 }

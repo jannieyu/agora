@@ -17,23 +17,22 @@ func checkPasswordHash(password, hash string) bool {
 	return err == nil
 }
 
-func (h handle) Login(w http.ResponseWriter, r *http.Request) {
-	session, err := h.store.Get(r, "user-auth")
+func (h Handle) Login(w http.ResponseWriter, r *http.Request) {
+	session, err := h.Store.Get(r, "user-auth")
 	if err != nil {
 		log.WithError(err).Error("Failed to get cookie session at login.")
 	}
 	session.Options = &sessions.Options{SameSite: http.SameSiteStrictMode}
-
 	urlParams := r.URL.Query()["data"][0]
 	var loginCredentials utils.LoginCredentials
 	if err := json.Unmarshal([]byte(urlParams), &loginCredentials); err != nil {
 		log.WithError(err).Error("Failed to unmarshal login credentials.")
 		w.WriteHeader(http.StatusBadRequest)
-		safeEncode(w, "{}")
+		SafeEncode(w, "{}")
 	}
 
 	var user database.User
-	if err := h.db.Where(&database.User{Email: loginCredentials.Email}).Limit(1).Find(&user).Error; err != nil {
+	if err := h.Db.Where(&database.User{Email: loginCredentials.Email}).Limit(1).Find(&user).Error; err != nil {
 		log.WithError(err).Debug("Failed database query.")
 	}
 
@@ -43,7 +42,7 @@ func (h handle) Login(w http.ResponseWriter, r *http.Request) {
 	if loginCredentials.IsSignUp {
 		if userExists {
 			w.WriteHeader(http.StatusBadRequest)
-			safeEncode(w, "{}")
+			SafeEncode(w, "{}")
 		} else {
 			hash, err := utils.HashPassword(loginCredentials.Password)
 			if err != nil {
@@ -56,7 +55,7 @@ func (h handle) Login(w http.ResponseWriter, r *http.Request) {
 				Email:     loginCredentials.Email,
 				Pword:     hash,
 			}
-			if err := h.db.Create(&user).Error; err != nil {
+			if err := h.Db.Create(&user).Error; err != nil {
 				log.WithError(err).Error("Failed to add new user to database.")
 			}
 			userAuthenticated = true
@@ -85,7 +84,7 @@ func (h handle) Login(w http.ResponseWriter, r *http.Request) {
 	} else {
 		log.Info("Unauthorized user login.")
 		w.WriteHeader(http.StatusUnauthorized)
-		safeEncode(w, "{}")
+		SafeEncode(w, "{}")
 	}
-	safeEncode(w, status)
+	SafeEncode(w, status)
 }

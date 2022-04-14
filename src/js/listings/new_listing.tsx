@@ -145,7 +145,7 @@ function ListingForm() {
     formData.append("name", name)
     formData.append("category", category)
     formData.append("condition", condition)
-    formData.append("price", price)
+    formData.append("price", price.replace("$", ""))
     formData.append("description", description)
     formData.append("image", image, image.name)
 

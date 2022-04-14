@@ -6,8 +6,8 @@ import (
 	"net/http"
 )
 
-func (h handle) Logout(w http.ResponseWriter, r *http.Request) {
-	session, err := h.store.Get(r, "user-auth")
+func (h Handle) Logout(w http.ResponseWriter, r *http.Request) {
+	session, err := h.Store.Get(r, "user-auth")
 	if err != nil {
 		log.WithError(err).Error("Failed to get cookie session at logout.")
 	}
@@ -22,5 +22,5 @@ func (h handle) Logout(w http.ResponseWriter, r *http.Request) {
 
 	log.Info("Successful logout of user.")
 	w.WriteHeader(http.StatusOK)
-	safeEncode(w, "{}")
+	SafeEncode(w, "{}")
 }

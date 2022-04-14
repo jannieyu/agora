@@ -66,7 +66,7 @@ export default function Card(props: CardProps) {
           <div>{category}</div>
           <div>{condition}</div>
         </div>
-        {sellerId !== activeUser?.id ? (
+        {sellerId === activeUser?.id ? (
           <div>
             <Icon name="edit" className="card-edit" onClick={onEdit} />
             <Icon name="trash" className="card-trash" onClick={onDelete} />

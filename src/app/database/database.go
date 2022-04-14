@@ -14,13 +14,19 @@ func Init() (*gorm.DB, error) {
 		log.WithError(err).Error("Failed to connect to database.")
 		return nil, err
 	}
-	// if err := db.AutoMigrate(&User{}); err != nil {
-	// 	log.WithError(err).Error("Failed to initiate Users table.")
-	// 	return nil, err
-	// }
-	// if err := db.AutoMigrate(&Item{}); err != nil {
-	// 	log.WithError(err).Error("Failed to initiate Items table.")
-	// 	return nil, err
-	// }
+
+	if !db.Migrator().HasTable(&User{}) {
+		if err := db.AutoMigrate(&User{}); err != nil {
+			log.WithError(err).Error("Failed to initiate Users table.")
+			return nil, err
+		}
+	}
+	if !db.Migrator().HasTable(&Item{}) {
+		if err := db.AutoMigrate(&Item{}); err != nil {
+			log.WithError(err).Error("Failed to initiate Items table.")
+			return nil, err
+		}
+	}
+
 	return db, nil
 }

@@ -3,6 +3,7 @@ package main
 import (
 	"agora/src/app/api"
 	"agora/src/app/database"
+	"agora/src/app/search"
 	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
@@ -23,8 +24,12 @@ func main() {
 		log.WithError(err).Fatal("Cannot start database.")
 		panic(err)
 	}
-	h := api.New(db, sessions.NewCookieStore(key))
+	index, err := search.Init(db)
+	if err != nil {
+		log.WithError(err).Fatal("Cannot create index file.")
+	}
 
+	h := api.New(index, db, sessions.NewCookieStore(key))
 	r := mux.NewRouter()
 
 	r.HandleFunc("/api/example", h.Authenticate)

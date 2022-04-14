@@ -2,24 +2,27 @@ package api
 
 import (
 	"agora/src/app/database"
-	"encoding/json"
-	log "github.com/sirupsen/logrus"
+	"agora/src/app/utils"
 	"net/http"
+
+	log "github.com/sirupsen/logrus"
 )
 
-func (h handle) GetSellerItems(w http.ResponseWriter, r *http.Request) {
-	session, err := h.store.Get(r, "user-auth")
+func (h Handle) GetSellerItems(w http.ResponseWriter, r *http.Request) {
+	session, err := h.Store.Get(r, "user-auth")
 	if err != nil {
 		log.WithError(err).Error("Failed to get cookie session when retrieving seller items.")
 	}
+
 	seller_id := session.Values["id"].(uint32)
 	items := []database.Item{}
-	result := h.db.Where(&database.Item{SellerID: seller_id}).Find(&items)
-	if result.Error != nil {
-		log.WithError(result.Error).Error("Failed to make query to get seller items.")
+	db := utils.PreloadSafeSellerInfo(h.Db)
+	if err := db.Where(&database.Item{SellerID: seller_id}).Find(&items).Error; err != nil {
+		log.WithError(err).Error("Failed to make query to get seller items.")
 		w.WriteHeader(http.StatusInternalServerError)
-	} else {
-		w.WriteHeader(http.StatusOK)
+		return
 	}
-	json.NewEncoder(w).Encode(result)
+
+	SafeEncode(w, items)
+	w.WriteHeader(http.StatusOK)
 }
