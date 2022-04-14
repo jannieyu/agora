@@ -28,3 +28,13 @@ type Item struct {
 	Description string          `json:"description,omitempty"`
 	CreatedAt   time.Time       `json:"createdAt" gorm:"autoCreateTime"`
 }
+
+type Bid struct {
+	ID        uint32          `json:"id,omitempty" gorm:"primarykey"`
+	BidderID  uint32          `json:"bidderId"`
+	Bidder    User            `json:"bidder" gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;foreignkey:BidderID"`
+	ItemID    uint32          `json:"itemID"`
+	Item      Item            `json:"item" gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;foreignkey:ItemID"`
+	BidPrice  decimal.Decimal `json:"bidPrice" gorm:"type:decimal(6,2);"`
+	CreatedAt time.Time       `json:"createdAt" gorm:"autoCreateTime"`
+}
