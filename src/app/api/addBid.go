@@ -41,6 +41,22 @@ func (h Handle) AddBid(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	var item database.Item
+	if err := h.Db.First(&item, bidAPI.ItemID).Error; err != nil {
+		log.WithError(err).Error("Failed to select highest bid from existing item entry in Items table.")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	newBid, bool1 := bidPrice.Float64()
+	currHighestBid, bool2 := item.HighestBid.Float64()
+	if !bool1 || !bool2 {
+		log.WithError(err).Error("Inexact bid values: %d, %d", newBid, currHighestBid)
+	}
+	if newBid <= currHighestBid {
+		http.Error(w, "Invalid bid, must be higher than existing highest bid.", http.StatusBadRequest)
+		return
+	}
+
 	bid := database.Bid{
 		BidderID: bidderID,
 		ItemID:   bidAPI.ItemID,
@@ -51,6 +67,14 @@ func (h Handle) AddBid(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
+
+	item.HighestBid = bidPrice
+	if err := h.Db.Save(&item).Error; err != nil {
+		log.WithError(err).Error("Failed to save item entry in Items table.")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
 	w.WriteHeader(http.StatusCreated)
 	SafeEncode(w, "{}")
 	log.Info("Completed bid upload.")

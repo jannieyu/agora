@@ -17,17 +17,19 @@ type User struct {
 }
 
 type Item struct {
-	ID          uint32          `json:"id,omitempty" gorm:"primarykey"`
-	SellerID    uint32          `json:"sellerId,omitempty"`
-	Seller      User            `json:"seller,omitempty" gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;foreignkey:SellerID"`
-	Name        string          `json:"name,omitempty"`
-	Image       string          `json:"image,omitempty"`
-	Category    string          `json:"category,omitempty"`
-	Price       decimal.Decimal `json:"price,omitempty" gorm:"type:decimal(6,2);"`
-	Condition   string          `json:"condition,omitempty"`
-	Description string          `json:"description,omitempty"`
-	Bids        []Bid           `json:"bids" gorm:"foreignkey:ItemID"`
-	CreatedAt   time.Time       `json:"createdAt,omitempty" gorm:"autoCreateTime"`
+	ID            uint32          `json:"id,omitempty" gorm:"primarykey"`
+	SellerID      uint32          `json:"sellerId,omitempty"`
+	Seller        User            `json:"seller,omitempty" gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;foreignkey:SellerID"`
+	Name          string          `json:"name,omitempty"`
+	Image         string          `json:"image,omitempty"`
+	Category      string          `json:"category,omitempty"`
+	Price         decimal.Decimal `json:"price,omitempty" gorm:"type:decimal(6,2);"`
+	Condition     string          `json:"condition,omitempty"`
+	Description   string          `json:"description,omitempty"`
+	Bids          []Bid           `json:"bids" gorm:"foreignkey:ItemID"`
+	HighestBid    decimal.Decimal `json:"highestBid"`
+	BuyItNowPrice decimal.Decimal `json:"buyItNowPrice"`
+	CreatedAt     time.Time       `json:"createdAt,omitempty" gorm:"autoCreateTime"`
 }
 
 type Bid struct {
