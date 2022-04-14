@@ -47,13 +47,9 @@ func (h Handle) AddBid(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	newBid, bool1 := bidPrice.Float64()
-	currHighestBid, bool2 := item.HighestBid.Float64()
-	if !bool1 || !bool2 {
-		log.WithError(err).Error("Inexact bid values: %d, %d", newBid, currHighestBid)
-	}
-	if newBid <= currHighestBid {
-		http.Error(w, "Invalid bid, must be higher than existing highest bid.", http.StatusBadRequest)
+
+	if bidPrice.InexactFloat64() <= item.HighestBid.InexactFloat64() {
+		http.Error(w, "Invalid bid: must be higher than existing highest bid or starting price value.", http.StatusBadRequest)
 		return
 	}
 

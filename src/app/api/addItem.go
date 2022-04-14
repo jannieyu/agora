@@ -16,11 +16,13 @@ func (h Handle) AddItem(w http.ResponseWriter, r *http.Request) {
 	}
 	var item database.Item
 	sellerID := session.Values["id"].(uint32)
-	if err := utils.PopulateItem(&item, r, h.Index, sellerID); err != nil {
+	if err := utils.PopulateItem(&item, r, sellerID, true); err != nil {
 		log.WithError(err).Error("Failed to parse item data.")
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
+	item.HighestBid = item.StartingPrice
+	
 	if err := h.Db.Create(&item).Error; err != nil {
 		log.WithError(err).Error("Failed to add new item to database.")
 		w.WriteHeader(http.StatusInternalServerError)
