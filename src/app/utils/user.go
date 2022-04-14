@@ -2,10 +2,11 @@ package utils
 
 import (
 	"agora/src/app/database"
+	"net/http"
+
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
-	"net/http"
 )
 
 func HashPassword(password string) (string, error) {

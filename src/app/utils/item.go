@@ -2,15 +2,17 @@ package utils
 
 import (
 	"agora/src/app/database"
-	"github.com/blevesearch/bleve/v2"
-	"github.com/shopspring/decimal"
-	log "github.com/sirupsen/logrus"
+	"errors"
 	"io/ioutil"
 	"mime/multipart"
 	"net/http"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/blevesearch/bleve/v2"
+	"github.com/shopspring/decimal"
+	log "github.com/sirupsen/logrus"
 )
 
 func processImage(r *http.Request) (string, error) {
@@ -51,20 +53,30 @@ func PopulateItem(item *database.Item, r *http.Request, index bleve.Index, selle
 	item.Description = r.FormValue("description")
 	item.SellerID = sellerID
 
-	if price := r.FormValue("price"); !strings.EqualFold(price, "") {
-		//item_price, err := strconv.ParseFloat(price, 32)
-		item_price, err := decimal.NewFromString(price)
-		if err != nil {
-			log.WithError(err).Debug("Failed to parse string price.")
-		}
-		item.Price = item_price
+	itemPrice, err := ConvertStringPriceToDecimal(r.FormValue("price"))
+	if err != nil {
+		log.WithError(err).Error("Failed to parse item price value.")
+		return err
 	}
+	item.Price = itemPrice
 
-	if image_location, err := processImage(r); err != nil {
-		log.WithError(err).Debug("Failed to process item image.")
-	} else {
-		item.Image = image_location
+	image_location, err := processImage(r)
+	if err != nil {
+		log.WithError(err).Error("Failed to process item image.")
+		return err
 	}
+	item.Image = image_location
 
 	return nil
+}
+
+func ConvertStringPriceToDecimal(price string) (decimal.Decimal, error) {
+	if strings.EqualFold(price, "") {
+		return decimal.Decimal{}, errors.New("Received empty price string.")
+	}
+	itemPrice, err := decimal.NewFromString(price)
+	if err != nil {
+		return decimal.Decimal{}, err
+	}
+	return itemPrice, nil
 }

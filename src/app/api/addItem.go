@@ -23,7 +23,7 @@ func (h Handle) AddItem(w http.ResponseWriter, r *http.Request) {
 	}
 	if err := h.Db.Create(&item).Error; err != nil {
 		log.WithError(err).Error("Failed to add new item to database.")
-		w.WriteHeader(http.StatusBadRequest)
+		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 	if err := h.Index.Index(strconv.FormatUint(uint64(item.ID), 10), item); err != nil {

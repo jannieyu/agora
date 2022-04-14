@@ -14,7 +14,12 @@ type Filters struct {
 	Search    string     `json:"search,omitempty"`
 }
 
-type LoginCredentials struct {
+type BidAPI struct {
+	ItemID   uint32 `json:"itemId"`
+	BidPrice string `json:"bidPrice"`
+}
+
+type LoginCredentialsAPI struct {
 	Email     string
 	Password  string
 	IsSignUp  bool

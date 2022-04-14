@@ -26,7 +26,7 @@ type Item struct {
 	Price       decimal.Decimal `json:"price,omitempty" gorm:"type:decimal(6,2);"`
 	Condition   string          `json:"condition,omitempty"`
 	Description string          `json:"description,omitempty"`
-	Bids        []Bid           `json:"bids"`
+	Bids        []Bid           `json:"bids" gorm:"foreignkey:ItemID"`
 	CreatedAt   time.Time       `json:"createdAt,omitempty" gorm:"autoCreateTime"`
 }
 

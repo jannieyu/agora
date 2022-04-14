@@ -41,10 +41,10 @@ func main() {
 	r.HandleFunc("/api/delete_item", h.DeleteItem)
 	r.HandleFunc("/api/get_seller_items", h.GetSellerItems)
 	r.HandleFunc("/api/get_search_items", h.GetSearchItems)
+	r.HandleFunc("/api/add_bid", h.AddBid)
 
 	port := 8000
 	log.Info("Server up and running on port " + fmt.Sprint(port))
 
 	http.ListenAndServe(":"+fmt.Sprint(port), r)
-
 }
