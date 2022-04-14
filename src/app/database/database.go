@@ -21,15 +21,15 @@ func Init() (*gorm.DB, error) {
 			return nil, err
 		}
 	}
-	if !db.Migrator().HasTable(&Item{}) {
-		if err := db.AutoMigrate(&Item{}); err != nil {
-			log.WithError(err).Error("Failed to initiate Items table.")
-			return nil, err
-		}
-	}
 	if !db.Migrator().HasTable(&Bid{}) {
 		if err := db.AutoMigrate(&Bid{}); err != nil {
 			log.WithError(err).Error("Failed to initiate Bids table.")
+			return nil, err
+		}
+	}
+	if !db.Migrator().HasTable(&Item{}) {
+		if err := db.AutoMigrate(&Item{}); err != nil {
+			log.WithError(err).Error("Failed to initiate Items table.")
 			return nil, err
 		}
 	}
