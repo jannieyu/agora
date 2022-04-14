@@ -58,7 +58,7 @@ func PopulateItem(item *database.Item, r *http.Request, index bleve.Index, selle
 		log.WithError(err).Error("Failed to parse item price value.")
 		return err
 	}
-	item.Price = itemPrice
+	item.StartingPrice = itemPrice
 
 	image_location, err := processImage(r)
 	if err != nil {

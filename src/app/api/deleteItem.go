@@ -11,16 +11,16 @@ import (
 
 func (h Handle) DeleteItem(w http.ResponseWriter, r *http.Request) {
 	urlParams := r.URL.Query()["data"][0]
-	item_id := struct {
-		id string
+	payload := struct {
+		itemId uint32
 	}{}
-	if err := json.Unmarshal([]byte(urlParams), &item_id); err != nil {
+	if err := json.Unmarshal([]byte(urlParams), &payload); err != nil {
 		log.WithError(err).Error("Failed to unmarshal item id for item deletion.")
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 	var item database.Item
-	if err := h.Db.First(&item, item_id).Error; err != nil {
+	if err := h.Db.First(&item, payload.itemId).Error; err != nil {
 		log.WithError(err).Error("Failed to find existing item entry in Items table.")
 		w.WriteHeader(http.StatusInternalServerError)
 		return

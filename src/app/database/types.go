@@ -23,12 +23,12 @@ type Item struct {
 	Name          string          `json:"name,omitempty"`
 	Image         string          `json:"image,omitempty"`
 	Category      string          `json:"category,omitempty"`
-	Price         decimal.Decimal `json:"price,omitempty" gorm:"type:decimal(6,2);"`
+	StartingPrice decimal.Decimal `json:"price,omitempty" gorm:"type:decimal(6,2);"`
 	Condition     string          `json:"condition,omitempty"`
 	Description   string          `json:"description,omitempty"`
 	Bids          []Bid           `json:"bids" gorm:"foreignkey:ItemID"`
-	HighestBid    decimal.Decimal `json:"highestBid"`
-	BuyItNowPrice decimal.Decimal `json:"buyItNowPrice"`
+	HighestBid    decimal.Decimal `json:"highestBid"  gorm:"type:decimal(6,2);"`
+	BuyItNowPrice decimal.Decimal `json:"buyItNowPrice" gorm:"type:decimal(6,2);"`
 	CreatedAt     time.Time       `json:"createdAt,omitempty" gorm:"autoCreateTime"`
 }
 
