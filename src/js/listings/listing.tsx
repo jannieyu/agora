@@ -16,27 +16,32 @@ export default function Listing(props: ListingProps) {
           </div>
           <div>
             <h2>{name}</h2>
-            <div className="major-metadata">
+            <table className="listing-metadata-table">
               {price && isValidPrice(price) ? (
-                <>
-                  <b>Price:</b> <span>{price.startsWith("$") ? price : `$${price}`}</span>
-                </>
+                <tr>
+                  <td className="name-cell">
+                    <b>Price</b>
+                  </td>
+                  <td>{`$${price.replace("$", "")}`}</td>
+                </tr>
               ) : null}
-            </div>
-            <div className="major-metadata">
               {condition ? (
-                <>
-                  <b>Condition:</b> <span>{condition}</span>
-                </>
+                <tr>
+                  <td className="name-cell">
+                    <b>Condition</b>
+                  </td>
+                  <td>{condition}</td>
+                </tr>
               ) : null}
-            </div>
-            <div>
               {description ? (
-                <>
-                  <b className="major-metadata">Description:</b> <span>{description}</span>
-                </>
+                <tr>
+                  <td className="name-cell">
+                    <b>Description</b>
+                  </td>
+                  <td>{description}</td>
+                </tr>
               ) : null}
-            </div>
+            </table>
           </div>
         </div>
       </Col>
