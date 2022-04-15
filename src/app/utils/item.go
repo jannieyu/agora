@@ -57,18 +57,25 @@ func PopulateItem(item *database.Item, r *http.Request, sellerID uint32, isNew b
 		log.WithError(err).Error("Failed to parse starting price value.")
 		return err
 	}
-	if isNew {
-		item.StartingPrice = startingPrice
-	}
 
 	buyItNowPrice, err := ConvertStringPriceToDecimal(r.FormValue("buyItNowPrice"))
 	if err != nil {
 		log.WithError(err).Error("Failed to parse Buy It Now price value.")
 		return err
 	}
-	if buyItNowPrice.InexactFloat64() <= startingPrice.InexactFloat64() {
-		log.WithError(err).Error("Buy It Now price cannot be less than starting price.")
-		return errors.New("Buy It Now price cannot be less than starting price.")
+
+	if isNew {
+		item.StartingPrice = startingPrice
+		if buyItNowPrice.InexactFloat64() <= startingPrice.InexactFloat64() {
+			log.WithError(err).Error("Buy It Now price cannot be less than starting price.")
+			return errors.New("Buy It Now price cannot be less than starting price.")
+		}
+
+	} else {
+		if buyItNowPrice.InexactFloat64() <= item.HighestBid.InexactFloat64() {
+			log.WithError(err).Error("Buy It Now price cannot be less than existing highest bid.")
+			return errors.New("Buy It Now price cannot be less than existing highest bid.")
+		}
 	}
 	item.BuyItNowPrice = buyItNowPrice
 
