@@ -1,10 +1,22 @@
 import * as React from "react"
 import { Row, Col } from "react-bootstrap"
+import { Button, Transition } from "semantic-ui-react"
+import { useCallback, useSelector, useState } from "../base/react_base"
+import { AppState } from "../base/reducers"
 import isValidPrice from "./util"
 import { ListingProps } from "./types"
 
 export default function Listing(props: ListingProps) {
   const { category, name, price, condition, image, description, seller } = props
+  const activeUser = useSelector((state: AppState) => state.user)
+
+  const isBiddable = !!activeUser?.id && activeUser?.id !== seller?.id
+
+  const [showBidOptions, setShowBidOptions] = useState<boolean>(false)
+
+  const toggleShowBid = useCallback(() => {
+    setShowBidOptions(!showBidOptions)
+  }, [showBidOptions, setShowBidOptions])
 
   return (
     <Row>
@@ -50,6 +62,21 @@ export default function Listing(props: ListingProps) {
                 </tr>
               </tbody>
             </table>
+            <br />
+            {isBiddable ? (
+              <Button primary onClick={toggleShowBid}>
+                Place Bid
+              </Button>
+            ) : null}
+            <br />
+            <Transition.Group animation="zoom" duration={200}>
+              {showBidOptions && (
+                <div>
+                  <br />
+                  <div>Please enter bid amount</div>
+                </div>
+              )}
+            </Transition.Group>
           </div>
         </div>
       </Col>
