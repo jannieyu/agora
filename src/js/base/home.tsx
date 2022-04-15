@@ -40,13 +40,13 @@ const sortByOptions = [
     text: "Sort By: Most Recent",
   },
   {
-    key: "high_low",
-    value: "high_low",
+    key: "highLow",
+    value: "highLow",
     text: "Sort By: Price (High to Low)",
   },
   {
-    key: "low_high",
-    value: "low_high",
+    key: "lowLigh",
+    value: "lowLigh",
     text: "Sort By: Price (Low to High)",
   },
 ]

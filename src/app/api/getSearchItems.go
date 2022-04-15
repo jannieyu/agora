@@ -10,7 +10,6 @@ import (
 
 	"github.com/blevesearch/bleve/v2"
 	log "github.com/sirupsen/logrus"
-	"gorm.io/gorm"
 )
 
 func (h Handle) GetSearchItems(w http.ResponseWriter, r *http.Request) {
@@ -22,10 +21,8 @@ func (h Handle) GetSearchItems(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	result := h.Db
-	result = result.Preload("Seller", func(tx *gorm.DB) *gorm.DB {
-		return tx.Select("id", "first_name", "last_name", "email")
-	})
+	result := utils.PreloadSafeSellerInfo(h.Db)
+	result = result.Preload("Bids")
 
 	switch filters.SortBy {
 	case utils.PriceHighLow:

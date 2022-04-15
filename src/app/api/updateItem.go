@@ -30,7 +30,7 @@ func (h Handle) UpdateItem(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	utils.PopulateItem(&item, r, h.Index, session.Values["id"].(uint32))
+	utils.PopulateItem(&item, r, session.Values["id"].(uint32), false)
 	if err := h.Db.Save(&item).Error; err != nil {
 		log.WithError(err).Error("Failed to save item entry in Items table.")
 		w.WriteHeader(http.StatusInternalServerError)

@@ -3,9 +3,8 @@ package utils
 type SortMethod string
 
 const (
-	Recent       SortMethod = "recent"
-	PriceHighLow SortMethod = "high_low"
-	PriceLowHigh SortMethod = "low_high"
+	PriceHighLow SortMethod = "highLow"
+	PriceLowHigh SortMethod = "lowHigh"
 )
 
 type Filters struct {
@@ -15,7 +14,12 @@ type Filters struct {
 	Search    string     `json:"search,omitempty"`
 }
 
-type LoginCredentials struct {
+type BidAPI struct {
+	ItemID   uint32 `json:"itemId"`
+	BidPrice string `json:"bidPrice"`
+}
+
+type LoginCredentialsAPI struct {
 	Email     string
 	Password  string
 	IsSignUp  bool
