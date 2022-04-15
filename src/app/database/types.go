@@ -28,6 +28,7 @@ type Item struct {
 	Description   string          `json:"description,omitempty"`
 	Bids          []Bid           `json:"bids" gorm:"foreignkey:ItemID"`
 	HighestBid    decimal.Decimal `json:"highestBid"  gorm:"type:decimal(6,2);"`
+	NumBids       uint32          `json:"numBids"`
 	BuyItNowPrice decimal.Decimal `json:"buyItNowPrice" gorm:"type:decimal(6,2);"`
 	CreatedAt     time.Time       `json:"createdAt,omitempty" gorm:"autoCreateTime"`
 }

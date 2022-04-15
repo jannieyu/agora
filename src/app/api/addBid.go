@@ -65,6 +65,7 @@ func (h Handle) AddBid(w http.ResponseWriter, r *http.Request) {
 	}
 
 	item.HighestBid = bidPrice
+	item.NumBids += 1
 	if err := h.Db.Save(&item).Error; err != nil {
 		log.WithError(err).Error("Failed to save item entry in Items table.")
 		w.WriteHeader(http.StatusInternalServerError)

@@ -22,7 +22,8 @@ func (h Handle) AddItem(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	item.HighestBid = item.StartingPrice
-	
+	item.NumBids = 0
+
 	if err := h.Db.Create(&item).Error; err != nil {
 		log.WithError(err).Error("Failed to add new item to database.")
 		w.WriteHeader(http.StatusInternalServerError)
