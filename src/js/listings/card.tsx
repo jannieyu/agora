@@ -7,23 +7,21 @@ import { AppState } from "../base/reducers"
 import { ActionType } from "../base/types"
 
 export interface CardProps extends ListingProps {
-  handleClick: (idx: number, type: string) => void
-  rowIndex: number
-  colIndex: number
+  handleClick: (id: number, type: ActionType) => void
+  itemId: number
 }
 
 export default function Card(props: CardProps) {
-  const { category, name, price, condition, image, handleClick, rowIndex, colIndex, sellerId } =
-    props
+  const { category, name, price, condition, image, handleClick, itemId, sellerId } = props
   const navigate = useNavigate()
 
   const handleSelectCard = useCallback(() => {
-    handleClick(rowIndex + colIndex, ActionType.SELECT)
-  }, [rowIndex, colIndex, handleClick])
+    handleClick(itemId, ActionType.SELECT)
+  }, [itemId, handleClick])
 
   const handleDeleteItem = useCallback(() => {
-    handleClick(rowIndex + colIndex, ActionType.DELETE)
-  }, [rowIndex, colIndex, handleClick])
+    handleClick(itemId, ActionType.DELETE)
+  }, [itemId, handleClick])
 
   const activeUser = useSelector((state: AppState) => state.user)
 

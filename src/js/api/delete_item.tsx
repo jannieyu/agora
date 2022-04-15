@@ -1,7 +1,7 @@
 import buildWrappedGet from "../base/api"
 
 export type Arguments = {
-  id: string
+  id: number
 }
 
 export type Response = {}

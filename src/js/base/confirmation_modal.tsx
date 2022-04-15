@@ -24,7 +24,7 @@ export default function ConfirmationModal(props: ModalProps) {
 
   const onDelete = useCallback(() => {
     deleteCall(
-      { id: `${itemId}` },
+      { id: itemId },
       () => {
         hideAndReset()
       },

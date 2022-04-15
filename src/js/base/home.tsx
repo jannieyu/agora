@@ -53,19 +53,18 @@ const sortByOptions = [
 
 interface CardRowProps {
   cards: ListingProps[]
-  handleClick: (idx: number, actionType: ActionType) => void
-  rowIndex: number
+  handleClick: (id: number, type: ActionType) => void
 }
 
 function CardRow(props: CardRowProps) {
-  const { cards, handleClick, rowIndex } = props
+  const { cards, handleClick } = props
 
   return (
     <>
       <Row>
-        {cards.map((prop: ListingProps, idx: number) => (
+        {cards.map((prop: ListingProps) => (
           <Col xs={3} key={prop.id}>
-            <Card {...prop} handleClick={handleClick} rowIndex={rowIndex} colIndex={idx} />
+            <Card {...prop} handleClick={handleClick} itemId={prop.id} />
           </Col>
         ))}
       </Row>
@@ -86,11 +85,13 @@ function Home() {
   const [deletingItemId, setDeletingItemId] = useState<number | null>(null)
 
   const handleCardAction = useCallback(
-    (idx: number, actionType: ActionType) => {
+    (itemId: number, actionType: ActionType) => {
+      const desiredItem = searchItems.find((item: SearchItem) => item.id === itemId)
+
       if (actionType === ActionType.SELECT) {
-        setSelectedItem(searchItems[idx])
+        setSelectedItem(desiredItem)
       } else if (actionType === ActionType.DELETE) {
-        setDeletingItemId(searchItems[idx].id)
+        setDeletingItemId(itemId)
       }
     },
     [setSelectedItem, searchItems],
@@ -169,7 +170,7 @@ function Home() {
         cards.push(searchItems[i + j])
       }
     }
-    cardRows.push(<CardRow cards={cards} key={i} rowIndex={i} handleClick={handleCardAction} />)
+    cardRows.push(<CardRow cards={cards} key={i} handleClick={handleCardAction} />)
   }
 
   return (
