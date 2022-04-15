@@ -4,6 +4,7 @@ import (
 	"agora/src/app/database"
 	"agora/src/app/utils"
 	"encoding/json"
+	"github.com/shopspring/decimal"
 	log "github.com/sirupsen/logrus"
 	"gorm.io/gorm"
 	"net/http"
@@ -43,7 +44,7 @@ func (h Handle) AddBid(w http.ResponseWriter, r *http.Request) {
 
 	var item database.Item
 	if err := h.Db.First(&item, bidAPI.ItemID).Error; err != nil {
-		log.WithError(err).Error("Failed to select highest bid from existing item entry in Items table.")
+		log.WithError(err).Error("Failed to get existing item entry in Items table.")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -64,12 +65,14 @@ func (h Handle) AddBid(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	item.HighestBid = bidPrice
+	updateMaxBid(&item, bidPrice)
 	if err := h.Db.Save(&item).Error; err != nil {
 		log.WithError(err).Error("Failed to save item entry in Items table.")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
+
+	utils.RunBidBots(h.Db, item.ID)
 
 	w.WriteHeader(http.StatusCreated)
 	SafeEncode(w, "{}")
@@ -83,4 +86,8 @@ func checkValidBidder(bidderID uint32, itemID uint32, db *gorm.DB) (bool, error)
 		return false, err
 	}
 	return bidderID != item.SellerID, nil
+}
+
+func updateMaxBid(item *database.Item, maxBid decimal.Decimal) {
+	item.HighestBid = maxBid
 }
