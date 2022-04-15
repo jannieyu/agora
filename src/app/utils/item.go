@@ -58,7 +58,7 @@ func PopulateItem(item *database.Item, r *http.Request, sellerID uint32, isNew b
 		return err
 	}
 
-	buyItNowPrice, err := ConvertStringPriceToDecimal("923")
+	buyItNowPrice, err := ConvertStringPriceToDecimal(r.FormValue("buyItNowPrice"))
 	if err != nil {
 		log.WithError(err).Error("Failed to parse Buy It Now price value.")
 		return err
