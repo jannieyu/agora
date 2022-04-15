@@ -4,7 +4,7 @@ import isValidPrice from "./util"
 import { ListingProps } from "./types"
 
 export default function Listing(props: ListingProps) {
-  const { category, name, price, condition, image, description } = props
+  const { category, name, price, condition, image, description, seller } = props
 
   return (
     <Row>
@@ -17,30 +17,38 @@ export default function Listing(props: ListingProps) {
           <div>
             <h2>{name}</h2>
             <table className="listing-metadata-table">
-              {price && isValidPrice(price) ? (
+              <tbody>
+                {price && isValidPrice(price) ? (
+                  <tr>
+                    <td className="name-cell">
+                      <b>Price</b>
+                    </td>
+                    <td>{`$${price.replace("$", "")}`}</td>
+                  </tr>
+                ) : null}
+                {condition ? (
+                  <tr>
+                    <td className="name-cell">
+                      <b>Condition</b>
+                    </td>
+                    <td>{condition}</td>
+                  </tr>
+                ) : null}
+                {description ? (
+                  <tr>
+                    <td className="name-cell">
+                      <b>Description</b>
+                    </td>
+                    <td>{description}</td>
+                  </tr>
+                ) : null}
                 <tr>
                   <td className="name-cell">
-                    <b>Price</b>
+                    <b>Sold By</b>
                   </td>
-                  <td>{`$${price.replace("$", "")}`}</td>
+                  <td>{`${seller?.firstName} ${seller?.lastName}`}</td>
                 </tr>
-              ) : null}
-              {condition ? (
-                <tr>
-                  <td className="name-cell">
-                    <b>Condition</b>
-                  </td>
-                  <td>{condition}</td>
-                </tr>
-              ) : null}
-              {description ? (
-                <tr>
-                  <td className="name-cell">
-                    <b>Description</b>
-                  </td>
-                  <td>{description}</td>
-                </tr>
-              ) : null}
+              </tbody>
             </table>
           </div>
         </div>
