@@ -72,7 +72,7 @@ func (h Handle) AddBid(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	utils.RunBidBots(h.Db, item.ID)
+	//utils.RunBidBots(h.Db, item.ID)
 
 	w.WriteHeader(http.StatusCreated)
 	SafeEncode(w, "{}")
