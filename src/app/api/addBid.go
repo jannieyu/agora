@@ -4,6 +4,7 @@ import (
 	"agora/src/app/database"
 	"agora/src/app/utils"
 	"encoding/json"
+	"errors"
 	"github.com/shopspring/decimal"
 	log "github.com/sirupsen/logrus"
 	"gorm.io/gorm"
@@ -25,58 +26,46 @@ func (h Handle) AddBid(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if isValidBidder, err := checkValidBidder(bidderID, bidAPI.ItemID, h.Db); err != nil {
-		log.WithError(err).Error("Failed to check if bidder id is valid.")
-		w.WriteHeader(http.StatusInternalServerError)
-		return
+	w.WriteHeader(http.StatusCreated)
+	SafeEncode(w, "{}")
+	log.Info("Completed bid upload.")
+}
+
+func placeBid(bidderID uint32, itemID uint32, bidPriceString string, db *gorm.DB) error {
+
+	if isValidBidder, err := checkValidBidder(bidderID, itemID, db); err != nil {
+		return err
 	} else if isValidBidder == false {
-		log.WithError(err).Error("Invalid bid: bidder ID equals seller ID.")
-		w.WriteHeader(http.StatusBadRequest)
-		return
+		return err
 	}
 
-	bidPrice, err := utils.ConvertStringPriceToDecimal(bidAPI.BidPrice)
+	bidPrice, err := utils.ConvertStringPriceToDecimal(bidPriceString)
 	if err != nil {
-		log.WithError(err).Error("Failed to parse bid price value.")
-		w.WriteHeader(http.StatusBadRequest)
-		return
+		return err
 	}
 
 	var item database.Item
-	if err := h.Db.First(&item, bidAPI.ItemID).Error; err != nil {
-		log.WithError(err).Error("Failed to get existing item entry in Items table.")
-		w.WriteHeader(http.StatusInternalServerError)
-		return
+	if err := db.First(&item, itemID).Error; err != nil {
+		return err
 	}
 
 	if bidPrice.InexactFloat64() <= item.HighestBid.InexactFloat64() {
-		http.Error(w, "Invalid bid: must be higher than existing highest bid or starting price value.", http.StatusBadRequest)
-		return
+		return errors.New("Invalid bid: must be higher than existing highest bid or starting price value.")
 	}
 
 	bid := database.Bid{
 		BidderID: bidderID,
-		ItemID:   bidAPI.ItemID,
+		ItemID:   itemID,
 		BidPrice: bidPrice,
 	}
-	if err := h.Db.Create(&bid).Error; err != nil {
-		log.WithError(err).Error("Failed to add new bid to database.")
-		w.WriteHeader(http.StatusInternalServerError)
-		return
+	if err := db.Create(&bid).Error; err != nil {
+		return err
 	}
 
 	updateMaxBid(&item, bidPrice)
-	if err := h.Db.Save(&item).Error; err != nil {
-		log.WithError(err).Error("Failed to save item entry in Items table.")
-		w.WriteHeader(http.StatusInternalServerError)
-		return
+	if err := db.Save(&item).Error; err != nil {
+		return err
 	}
-
-	//utils.RunBidBots(h.Db, item.ID)
-
-	w.WriteHeader(http.StatusCreated)
-	SafeEncode(w, "{}")
-	log.Info("Completed bid upload.")
 }
 
 func checkValidBidder(bidderID uint32, itemID uint32, db *gorm.DB) (bool, error) {
