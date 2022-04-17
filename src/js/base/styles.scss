@@ -21,6 +21,10 @@
     padding: 3% 5% 5% 5%;
 }
 
+.bid-button {
+    margin-top: 4% !important;
+}
+
 .column-heading-centered {
     text-align: center;
 }
@@ -76,6 +80,10 @@
     padding-bottom: 5px;
     float: left;
     object-fit: contain;
+}
+
+.listing-information {
+    display: grid;
 }
 
 .card-metadata {

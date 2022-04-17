@@ -1,10 +1,34 @@
 import * as React from "react"
 import { Row, Col } from "react-bootstrap"
-import { Button, Transition } from "semantic-ui-react"
+import { Button, Form, Input, Transition } from "semantic-ui-react"
 import { useCallback, useSelector, useState } from "../base/react_base"
 import { AppState } from "../base/reducers"
 import isValidPrice from "./util"
 import { ListingProps } from "./types"
+
+function BidForm() {
+  const [bidAmount, setBidAmount] = useState<string>("")
+
+  const handleChangeBidAmount = useCallback(
+    (e: React.FormEvent<HTMLInputElement>) => {
+      setBidAmount(e.currentTarget.value)
+    },
+    [setBidAmount],
+  )
+
+  return (
+    <Form>
+      <Form.Field
+        control={Input}
+        label="Listing Name"
+        placeholder="Used Phys 1a Textbook"
+        onChange={handleChangeBidAmount}
+        value={bidAmount}
+      />
+      <Button>Submit Bid</Button>
+    </Form>
+  )
+}
 
 export default function Listing(props: ListingProps) {
   const { category, name, price, condition, image, description, seller } = props
@@ -26,7 +50,7 @@ export default function Listing(props: ListingProps) {
           <div>
             {image ? <img src={image} alt="Listing Preview" className="listing-image" /> : null}
           </div>
-          <div>
+          <div className="listing-information">
             <h2>{name}</h2>
             <table className="listing-metadata-table">
               <tbody>
@@ -46,6 +70,12 @@ export default function Listing(props: ListingProps) {
                     <td>{condition}</td>
                   </tr>
                 ) : null}
+                <tr>
+                  <td className="name-cell">
+                    <b>Sold By</b>
+                  </td>
+                  <td>{`${seller?.firstName} ${seller?.lastName}`}</td>
+                </tr>
                 {description ? (
                   <tr>
                     <td className="name-cell">
@@ -54,17 +84,10 @@ export default function Listing(props: ListingProps) {
                     <td>{description}</td>
                   </tr>
                 ) : null}
-                <tr>
-                  <td className="name-cell">
-                    <b>Sold By</b>
-                  </td>
-                  <td>{`${seller?.firstName} ${seller?.lastName}`}</td>
-                </tr>
               </tbody>
             </table>
-            <br />
             {isBiddable ? (
-              <Button primary onClick={toggleShowBid}>
+              <Button primary onClick={toggleShowBid} className="bid-button">
                 Place Bid
               </Button>
             ) : null}
@@ -73,7 +96,7 @@ export default function Listing(props: ListingProps) {
               {showBidOptions && (
                 <div>
                   <br />
-                  <div>Please enter bid amount</div>
+                  <BidForm />
                 </div>
               )}
             </Transition.Group>
