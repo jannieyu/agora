@@ -1,8 +1,9 @@
 import * as React from "react"
 import { Modal } from "react-bootstrap"
-import { useCallback } from "../base/react_base"
+import { useCallback, useSelector } from "../base/react_base"
 import Listing from "./listing"
 import { ListingProps } from "./types"
+import { AppState } from "../base/reducers"
 
 interface ModalProps {
   onHide: () => void
@@ -13,13 +14,15 @@ interface ModalProps {
 export default function ListingModal(props: ModalProps) {
   const { onHide, show, selectedItem } = props
 
+  const showingLoginModal = useSelector((state: AppState) => state.showLoginModal)
+
   const hideAndReset = useCallback(() => {
     onHide()
   }, [onHide])
 
   return (
     <Modal
-      show={show}
+      show={show && !showingLoginModal}
       onHide={hideAndReset}
       size="xl"
       aria-labelledby="contained-modal-title-vcenter"
