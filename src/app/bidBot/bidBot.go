@@ -1,8 +1,8 @@
 package bidBot
 
 import (
+	"agora/src/app/bid"
 	"agora/src/app/database"
-	"agora/src/app/utils"
 	"errors"
 	"github.com/shopspring/decimal"
 	log "github.com/sirupsen/logrus"
@@ -38,7 +38,7 @@ func runBotAgainstHighestBid(db *gorm.DB, bidBot *database.BidBot) (int, error) 
 		return http.StatusInternalServerError, err
 	}
 	autoBidPrice := decimal.Min(item.HighestBid.Add(bidBot.Increment), bidBot.MaxBid)
-	if statusCode, err := utils.PlaceBid(bidBot.OwnerID, bidBot.ItemID, autoBidPrice, db); err != nil {
+	if statusCode, err := bid.PlaceBid(bidBot.OwnerID, bidBot.ItemID, autoBidPrice, db); err != nil {
 		log.WithError(err).Error("Failed to place bid for bid bot ", bidBot.ID)
 		return statusCode, err
 	}
@@ -55,7 +55,7 @@ func RunManualBidAgainstBot(db *gorm.DB, itemId uint32, bidPrice decimal.Decimal
 		bidBot := bidBots[0]
 		autoBidPrice := decimal.Min(bidPrice.Add(bidBot.Increment), bidBot.MaxBid)
 		if autoBidPrice.GreaterThanOrEqual(bidPrice) {
-			if statusCode, err := utils.PlaceBid(bidBot.OwnerID, bidBot.ItemID, autoBidPrice, db); err != nil {
+			if statusCode, err := bid.PlaceBid(bidBot.OwnerID, bidBot.ItemID, autoBidPrice, db); err != nil {
 				log.WithError(err).Error("Failed to place bid for bid bot ", bidBot.ID)
 				return statusCode, err
 			}
@@ -72,7 +72,7 @@ func RunManualBidAgainstBot(db *gorm.DB, itemId uint32, bidPrice decimal.Decimal
 
 func updateBidBotWinner(db *gorm.DB, loserBidBot *database.BidBot, winnerBidBot *database.BidBot) (int, error) {
 	autoBidPrice := decimal.Min(loserBidBot.MaxBid.Add(winnerBidBot.Increment), winnerBidBot.MaxBid)
-	if statusCode, err := utils.PlaceBid(loserBidBot.OwnerID, loserBidBot.ItemID, loserBidBot.MaxBid, db); err != nil {
+	if statusCode, err := bid.PlaceBid(loserBidBot.OwnerID, loserBidBot.ItemID, loserBidBot.MaxBid, db); err != nil {
 		log.WithError(err).Error("Failed to place bid for bid bot ", loserBidBot.ID)
 		return statusCode, err
 	}
@@ -80,7 +80,7 @@ func updateBidBotWinner(db *gorm.DB, loserBidBot *database.BidBot, winnerBidBot 
 		log.WithError(err).Error("Failed to deactivate bid bot ", loserBidBot.ID)
 		return http.StatusInternalServerError, err
 	}
-	if statusCode, err := utils.PlaceBid(winnerBidBot.OwnerID, winnerBidBot.ItemID, autoBidPrice, db); err != nil {
+	if statusCode, err := bid.PlaceBid(winnerBidBot.OwnerID, winnerBidBot.ItemID, autoBidPrice, db); err != nil {
 		log.WithError(err).Error("Failed to place bid for bid bot ", winnerBidBot.ID)
 		return statusCode, err
 	}
@@ -88,7 +88,7 @@ func updateBidBotWinner(db *gorm.DB, loserBidBot *database.BidBot, winnerBidBot 
 }
 
 func updateBidBotTie(db *gorm.DB, loserBidBot *database.BidBot, winnerBidBot *database.BidBot) (int, error) {
-	if statusCode, err := utils.PlaceBid(winnerBidBot.OwnerID, winnerBidBot.ItemID, winnerBidBot.MaxBid, db); err != nil {
+	if statusCode, err := bid.PlaceBid(winnerBidBot.OwnerID, winnerBidBot.ItemID, winnerBidBot.MaxBid, db); err != nil {
 		log.WithError(err).Error("Failed to place bid for bid bot ", winnerBidBot.ID)
 		return statusCode, err
 	}

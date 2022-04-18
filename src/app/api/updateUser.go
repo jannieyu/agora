@@ -2,14 +2,14 @@ package api
 
 import (
 	"agora/src/app/database"
-	"agora/src/app/utils"
+	u "agora/src/app/user"
 	log "github.com/sirupsen/logrus"
 	"net/http"
 )
 
 func (h Handle) updateUser(w http.ResponseWriter, r *http.Request) {
 	var user database.User
-	if err := utils.PopulateUser(&user, r); err != nil {
+	if err := u.PopulateUser(&user, r); err != nil {
 		log.WithError(err).Error("Failed to update user data.")
 		w.WriteHeader(http.StatusBadRequest)
 		return

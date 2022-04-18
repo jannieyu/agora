@@ -1,4 +1,4 @@
-package utils
+package bid
 
 import (
 	"agora/src/app/database"

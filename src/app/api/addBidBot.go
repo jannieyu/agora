@@ -3,7 +3,7 @@ package api
 import (
 	"agora/src/app/bidBot"
 	"agora/src/app/database"
-	"agora/src/app/utils"
+	"agora/src/app/item"
 	"encoding/json"
 	"net/http"
 
@@ -21,7 +21,7 @@ func (h Handle) AddBidBot(w http.ResponseWriter, r *http.Request) {
 	ownerID := session.Values["id"].(uint32)
 
 	urlParams := r.URL.Query()["data"][0]
-	var bidBotAPI utils.BidBotAPI
+	var bidBotAPI bidBot.BidBotAPI
 	if err := json.Unmarshal([]byte(urlParams), &bidBotAPI); err != nil {
 		log.WithError(err).Error("Failed to unmarshal bid bot information.")
 		w.WriteHeader(http.StatusBadRequest)
@@ -66,13 +66,13 @@ func (h Handle) AddBidBot(w http.ResponseWriter, r *http.Request) {
 	SafeEncode(w, "{}")
 }
 
-func populateBidBot(bidBotAPI utils.BidBotAPI, ownerId uint32) (database.BidBot, error) {
+func populateBidBot(bidBotAPI bidBot.BidBotAPI, ownerId uint32) (database.BidBot, error) {
 
-	inc, err := utils.ConvertStringPriceToDecimal(bidBotAPI.Increment)
+	inc, err := item.ConvertStringPriceToDecimal(bidBotAPI.Increment)
 	if err != nil {
 		return database.BidBot{}, err
 	}
-	maxBid, err := utils.ConvertStringPriceToDecimal(bidBotAPI.MaxBid)
+	maxBid, err := item.ConvertStringPriceToDecimal(bidBotAPI.MaxBid)
 	if err != nil {
 		return database.BidBot{}, err
 	}

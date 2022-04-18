@@ -1,8 +1,9 @@
 package api
 
 import (
+	"agora/src/app/bid"
 	"agora/src/app/bidBot"
-	"agora/src/app/utils"
+	"agora/src/app/item"
 	"encoding/json"
 	log "github.com/sirupsen/logrus"
 	"net/http"
@@ -16,21 +17,21 @@ func (h Handle) AddBid(w http.ResponseWriter, r *http.Request) {
 	bidderID := session.Values["id"].(uint32)
 
 	urlParams := r.URL.Query()["data"][0]
-	var bidAPI utils.BidAPI
+	var bidAPI bid.BidAPI
 	if err := json.Unmarshal([]byte(urlParams), &bidAPI); err != nil {
 		log.WithError(err).Error("Failed to unmarshal bid information.")
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
-	bidPrice, err := utils.ConvertStringPriceToDecimal(bidAPI.BidPrice)
+	bidPrice, err := item.ConvertStringPriceToDecimal(bidAPI.BidPrice)
 	if err != nil {
 		log.WithError(err).Error("Failed to parse bid price data.")
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
-	if statusCode, err := utils.PlaceBid(bidderID, bidAPI.ItemID, bidPrice, h.Db); err != nil {
+	if statusCode, err := bid.PlaceBid(bidderID, bidAPI.ItemID, bidPrice, h.Db); err != nil {
 		log.WithError(err).Error("Failed to place bid.")
 		w.WriteHeader(statusCode)
 		return

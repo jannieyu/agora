@@ -2,7 +2,8 @@ package api
 
 import (
 	"agora/src/app/database"
-	"agora/src/app/utils"
+	"agora/src/app/search"
+	"agora/src/app/user"
 	"encoding/json"
 	"net/http"
 	"strconv"
@@ -14,20 +15,20 @@ import (
 
 func (h Handle) GetSearchItems(w http.ResponseWriter, r *http.Request) {
 	urlParams := r.URL.Query()["data"][0]
-	var filters utils.Filters
+	var filters search.Filters
 	if err := json.Unmarshal([]byte(urlParams), &filters); err != nil {
 		log.WithError(err).Error("Failed to unmarshal search filters.")
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
-	result := utils.PreloadSafeSellerInfo(h.Db)
+	result := user.PreloadSafeSellerInfo(h.Db)
 	result = result.Preload("Bids")
 
 	switch filters.SortBy {
-	case utils.PriceHighLow:
+	case search.PriceHighLow:
 		result = result.Order("price desc")
-	case utils.PriceLowHigh:
+	case search.PriceLowHigh:
 		result = result.Order("price")
 	default:
 		result = result.Order("created_at desc")
