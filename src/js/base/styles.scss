@@ -22,7 +22,8 @@
 }
 
 .bid-button {
-    margin-top: 4% !important;
+    margin-top: 2.5vh !important;
+    min-height: 5vh !important;
 }
 
 .column-heading-centered {
@@ -84,6 +85,11 @@
 
 .listing-information {
     display: grid;
+    overflow: auto;
+    max-height: 60vh;
+    padding-bottom: 2vh;
+    padding-right: 2vh;
+    padding-left: 2vh;
 }
 
 .card-metadata {

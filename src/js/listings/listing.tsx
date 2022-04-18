@@ -76,7 +76,7 @@ function BidForm(props: BidFormProps) {
     <Form>
       <Form.Field
         control={DollarInput}
-        label="Enter Bid Amount"
+        label={`Enter bid of $${minBid.toFixed(2)} or more.`}
         placeholder={minBid.toFixed(2)}
         onChange={handleChangeBidAmount}
         error={!!bidPrice && !isValidPrice(bidPrice)}
