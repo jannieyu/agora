@@ -88,7 +88,7 @@ function BidForm(props: BidFormProps) {
 }
 
 export default function Listing(props: ListingProps) {
-  const { category, name, price, condition, image, description, seller, id } = props
+  const { category, name, highestBid, condition, image, description, seller, id } = props
   const activeUser = useSelector((state: AppState) => state.user)
 
   const dispatch = useDispatch()
@@ -125,12 +125,12 @@ export default function Listing(props: ListingProps) {
             <h2>{name}</h2>
             <table className="listing-metadata-table">
               <tbody>
-                {price && isValidPrice(price) ? (
+                {highestBid && isValidPrice(highestBid) ? (
                   <tr>
                     <td className="name-cell">
-                      <b>Price</b>
+                      <b>Current Price</b>
                     </td>
-                    <td>{`$${safeParseFloat(price)?.toFixed(2)}`}</td>
+                    <td>{`$${safeParseFloat(highestBid)?.toFixed(2)}`}</td>
                   </tr>
                 ) : null}
                 {condition ? (
@@ -179,7 +179,7 @@ export default function Listing(props: ListingProps) {
               {showBidOptions && (
                 <div>
                   <br />
-                  <BidForm priceStr={price} itemId={id} />
+                  <BidForm priceStr={highestBid} itemId={id} />
                 </div>
               )}
             </Transition.Group>

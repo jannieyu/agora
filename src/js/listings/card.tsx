@@ -5,15 +5,15 @@ import { ListingProps } from "./types"
 import { useCallback, useSelector } from "../base/react_base"
 import { AppState } from "../base/reducers"
 import { ActionType } from "../base/types"
+import { safeParseFloat } from "../base/util"
 
 export interface CardProps extends ListingProps {
   handleClick: (id: number, type: ActionType) => void
   itemId: number
-  price: string
 }
 
 export default function Card(props: CardProps) {
-  const { category, name, price, condition, image, handleClick, itemId, sellerId } = props
+  const { category, name, highestBid, condition, image, handleClick, itemId, sellerId } = props
   const navigate = useNavigate()
 
   const handleSelectCard = useCallback(() => {
@@ -59,7 +59,7 @@ export default function Card(props: CardProps) {
         <div>
           <div className="major-metadata">
             <span>
-              <b>{`$${price}`}</b>
+              <b>{`$${safeParseFloat(highestBid)?.toFixed(2)}`}</b>
             </span>
           </div>
           <div>{category}</div>
