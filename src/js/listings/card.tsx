@@ -13,7 +13,8 @@ export interface CardProps extends ListingProps {
 }
 
 export default function Card(props: CardProps) {
-  const { category, name, highestBid, condition, image, handleClick, itemId, sellerId } = props
+  const { category, name, highestBid, condition, numBids, image, handleClick, itemId, sellerId } =
+    props
   const navigate = useNavigate()
 
   const handleSelectCard = useCallback(() => {
@@ -70,7 +71,9 @@ export default function Card(props: CardProps) {
             <Icon name="edit" className="card-edit" onClick={onEdit} />
             <Icon name="trash" className="card-trash" onClick={onDelete} />
           </div>
-        ) : null}
+        ) : (
+          <div>{`${numBids} bid${numBids === 1 ? "" : "s"}`}</div>
+        )}
       </div>
     </div>
   )

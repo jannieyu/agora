@@ -7,6 +7,7 @@ export interface ListingProps {
   price: string // starting price
   buyItNowPrice: string
   condition: string
+  numBids: number
   image: string
   description: string
   seller: User
