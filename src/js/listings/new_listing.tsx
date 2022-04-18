@@ -57,7 +57,8 @@ function ListingForm() {
   const activeUser = useSelector((state: AppState) => state.user)
 
   const [name, setName] = useState<string>("")
-  const [price, setPrice] = useState<string>("")
+  const [startingPrice, setStartingPrice] = useState<string>("")
+  const [buyItNowPrice, setBuyItNowPrice] = useState<string>("")
   const [category, setCategory] = useState<string>("")
   const [condition, setCondition] = useState<string>("")
   const [description, setDescription] = useState<string>("")
@@ -70,20 +71,26 @@ function ListingForm() {
 
   const canSubmit =
     name &&
-    price &&
+    startingPrice &&
+    buyItNowPrice &&
     category &&
     condition &&
     description &&
     image &&
-    isValidPrice(price) &&
+    isValidPrice(startingPrice) &&
+    isValidPrice(buyItNowPrice) &&
     !imageError
 
   const handleChangeName = useCallback((e: React.FormEvent<HTMLInputElement>) => {
     setName(e.currentTarget.value)
   }, [])
 
-  const handleChangePrice = useCallback((e: React.FormEvent<HTMLInputElement>) => {
-    setPrice(e.currentTarget.value)
+  const handleChangeStartingPrice = useCallback((e: React.FormEvent<HTMLInputElement>) => {
+    setStartingPrice(e.currentTarget.value)
+  }, [])
+
+  const handleChangeBuyItNowPrice = useCallback((e: React.FormEvent<HTMLInputElement>) => {
+    setBuyItNowPrice(e.currentTarget.value)
   }, [])
 
   const handleChangeCategory = useCallback(
@@ -109,7 +116,8 @@ function ListingForm() {
 
   const reset = () => {
     setName("")
-    setPrice("")
+    setStartingPrice("")
+    setBuyItNowPrice("")
     setCategory("")
     setCondition("")
     setDescription("")
@@ -146,7 +154,8 @@ function ListingForm() {
     formData.append("name", name)
     formData.append("category", category)
     formData.append("condition", condition)
-    formData.append("price", price)
+    formData.append("price", startingPrice)
+    formData.append("buyItNowPrice", buyItNowPrice)
     formData.append("description", description)
     formData.append("image", image, image.name)
 
@@ -164,7 +173,7 @@ function ListingForm() {
       setShowSuccessModal(false)
       setShowFailureModal(true)
     }
-  }, [name, category, condition, price, description, image])
+  }, [name, category, condition, startingPrice, buyItNowPrice, description, image])
 
   const submitBtn = (
     <Button type="submit" disabled={!canSubmit} loading={submitting} onClick={onSubmit} positive>
@@ -208,7 +217,7 @@ function ListingForm() {
           <br />
           <Form>
             <Row>
-              <Col xs="9">
+              <Col xs="6">
                 <Form.Field
                   control={Input}
                   label="Listing Name"
@@ -220,11 +229,21 @@ function ListingForm() {
               <Col xs="3">
                 <Form.Field
                   control={DollarInput}
-                  label="Price"
+                  label="Starting Price"
                   placeholder="4.99"
-                  onChange={handleChangePrice}
-                  error={!!price && !isValidPrice(price)}
-                  value={price}
+                  onChange={handleChangeStartingPrice}
+                  error={!!startingPrice && !isValidPrice(startingPrice)}
+                  value={startingPrice}
+                />
+              </Col>
+              <Col xs="3">
+                <Form.Field
+                  control={DollarInput}
+                  label="Buy It Now Price"
+                  placeholder="4.99"
+                  onChange={handleChangeBuyItNowPrice}
+                  error={!!buyItNowPrice && !isValidPrice(buyItNowPrice)}
+                  value={buyItNowPrice}
                 />
               </Col>
             </Row>
@@ -286,7 +305,9 @@ function ListingForm() {
           <br />
           <Listing
             name={name}
-            price={price}
+            highestBid={startingPrice}
+            price={startingPrice}
+            buyItNowPrice={buyItNowPrice}
             condition={condition}
             description={description}
             category={category}

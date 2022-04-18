@@ -9,6 +9,7 @@ import { ActionType } from "../base/types"
 export interface CardProps extends ListingProps {
   handleClick: (id: number, type: ActionType) => void
   itemId: number
+  price: string
 }
 
 export default function Card(props: CardProps) {
@@ -58,7 +59,7 @@ export default function Card(props: CardProps) {
         <div>
           <div className="major-metadata">
             <span>
-              <b>{price.startsWith("$") ? price : `$${price}`}</b>
+              <b>{`$${price}`}</b>
             </span>
           </div>
           <div>{category}</div>

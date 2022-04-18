@@ -8,15 +8,17 @@ import { safeParseFloat } from "../base/util"
 import { isValidPrice, calculateIncrement } from "./util"
 import { ListingProps } from "./types"
 import DollarInput from "./dollar_input"
+import { apiCall as addBidCall } from "../api/add_bid"
 
 interface BidFormProps {
   priceStr: string
+  itemId: number
 }
 
 function BidForm(props: BidFormProps) {
-  const { priceStr } = props
+  const { priceStr, itemId } = props
 
-  const [bidAmount, setBidAmount] = useState<string>("")
+  const [bidPrice, setBidPrice] = useState<string>("")
   const [submitting, setSubmitting] = useState<boolean>(false)
 
   const price = safeParseFloat(priceStr)
@@ -24,17 +26,30 @@ function BidForm(props: BidFormProps) {
 
   const handleChangeBidAmount = useCallback(
     (e: React.FormEvent<HTMLInputElement>) => {
-      setBidAmount(e.currentTarget.value)
+      setBidPrice(e.currentTarget.value)
     },
-    [setBidAmount],
+    [setBidPrice],
   )
+
+  const handleSubmit = useCallback(() => {
+    setSubmitting(true)
+    addBidCall(
+      { itemId, bidPrice },
+      () => {
+        setSubmitting(false)
+      },
+      () => {
+        setSubmitting(false)
+      },
+    )
+  }, [itemId, bidPrice])
 
   const minBid = price + minIncrement
 
-  const canSubmit = isValidPrice(bidAmount) && safeParseFloat(bidAmount) >= minBid
+  const canSubmit = isValidPrice(bidPrice) && safeParseFloat(bidPrice) >= minBid
 
   const submitBtn = (
-    <Button type="submit" disabled={!canSubmit} loading={submitting}>
+    <Button type="submit" disabled={!canSubmit} loading={submitting} onClick={handleSubmit}>
       Submit Bid
     </Button>
   )
@@ -48,7 +63,7 @@ function BidForm(props: BidFormProps) {
       overlay={
         <Popover>
           <Popover.Body>
-            You must enter a valid price of at least {`$${minBid}`} to submit the bid.
+            You must enter a valid price of at least {`$${minBid.toFixed(2)}`} to submit the bid.
           </Popover.Body>
         </Popover>
       }
@@ -64,8 +79,8 @@ function BidForm(props: BidFormProps) {
         label="Enter Bid Amount"
         placeholder={minBid.toFixed(2)}
         onChange={handleChangeBidAmount}
-        error={!!bidAmount && !isValidPrice(bidAmount)}
-        value={bidAmount}
+        error={!!bidPrice && !isValidPrice(bidPrice)}
+        value={bidPrice}
       />
       {wrappedSubmitBtn}
     </Form>
@@ -73,7 +88,7 @@ function BidForm(props: BidFormProps) {
 }
 
 export default function Listing(props: ListingProps) {
-  const { category, name, price, condition, image, description, seller } = props
+  const { category, name, price, condition, image, description, seller, id } = props
   const activeUser = useSelector((state: AppState) => state.user)
 
   const dispatch = useDispatch()
@@ -164,7 +179,7 @@ export default function Listing(props: ListingProps) {
               {showBidOptions && (
                 <div>
                   <br />
-                  <BidForm priceStr={price} />
+                  <BidForm priceStr={price} itemId={id} />
                 </div>
               )}
             </Transition.Group>
