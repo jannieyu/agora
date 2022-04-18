@@ -7,8 +7,9 @@ import { useCallback, useSelector, useState } from "../base/react_base"
 import { AppState } from "../base/reducers"
 import { conditions, categories } from "./constants"
 import Listing from "./listing"
-import isValidPrice from "./util"
+import { isValidPrice } from "./util"
 import { OnChangeObject } from "../base/types"
+import DollarInput from "./dollar_input"
 
 interface SubmissionModalProps {
   onHide: () => void
@@ -145,7 +146,7 @@ function ListingForm() {
     formData.append("name", name)
     formData.append("category", category)
     formData.append("condition", condition)
-    formData.append("price", price.replace("$", ""))
+    formData.append("price", price)
     formData.append("description", description)
     formData.append("image", image, image.name)
 
@@ -218,7 +219,7 @@ function ListingForm() {
               </Col>
               <Col xs="3">
                 <Form.Field
-                  control={Input}
+                  control={DollarInput}
                   label="Price"
                   placeholder="4.99"
                   onChange={handleChangePrice}

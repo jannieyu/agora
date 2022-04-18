@@ -1,13 +1,26 @@
 import * as React from "react"
-import { Row, Col } from "react-bootstrap"
-import { Button, Form, Input, Transition } from "semantic-ui-react"
-import { useCallback, useSelector, useState } from "../base/react_base"
+import { Row, Col, OverlayTrigger, Popover } from "react-bootstrap"
+import { Button, Form, Message, Transition } from "semantic-ui-react"
+import { useCallback, useDispatch, useSelector, useState } from "../base/react_base"
 import { AppState } from "../base/reducers"
-import isValidPrice from "./util"
+import setData from "../base/actions"
+import { safeParseFloat } from "../base/util"
+import { isValidPrice, calculateIncrement } from "./util"
 import { ListingProps } from "./types"
+import DollarInput from "./dollar_input"
 
-function BidForm() {
+interface BidFormProps {
+  priceStr: string
+}
+
+function BidForm(props: BidFormProps) {
+  const { priceStr } = props
+
   const [bidAmount, setBidAmount] = useState<string>("")
+  const [submitting, setSubmitting] = useState<boolean>(false)
+
+  const price = safeParseFloat(priceStr)
+  const minIncrement = calculateIncrement(price)
 
   const handleChangeBidAmount = useCallback(
     (e: React.FormEvent<HTMLInputElement>) => {
@@ -16,16 +29,45 @@ function BidForm() {
     [setBidAmount],
   )
 
+  const minBid = price + minIncrement
+
+  const canSubmit = isValidPrice(bidAmount) && safeParseFloat(bidAmount) >= minBid
+
+  const submitBtn = (
+    <Button type="submit" disabled={!canSubmit} loading={submitting}>
+      Submit Bid
+    </Button>
+  )
+
+  const wrappedSubmitBtn = canSubmit ? (
+    submitBtn
+  ) : (
+    <OverlayTrigger
+      placement="right"
+      trigger={["hover", "focus"]}
+      overlay={
+        <Popover>
+          <Popover.Body>
+            You must enter a valid price of at least {`$${minBid}`} to submit the bid.
+          </Popover.Body>
+        </Popover>
+      }
+    >
+      <span>{submitBtn}</span>
+    </OverlayTrigger>
+  )
+
   return (
     <Form>
       <Form.Field
-        control={Input}
-        label="Listing Name"
-        placeholder="Used Phys 1a Textbook"
+        control={DollarInput}
+        label="Enter Bid Amount"
+        placeholder={minBid.toFixed(2)}
         onChange={handleChangeBidAmount}
+        error={!!bidAmount && !isValidPrice(bidAmount)}
         value={bidAmount}
       />
-      <Button>Submit Bid</Button>
+      {wrappedSubmitBtn}
     </Form>
   )
 }
@@ -34,6 +76,8 @@ export default function Listing(props: ListingProps) {
   const { category, name, price, condition, image, description, seller } = props
   const activeUser = useSelector((state: AppState) => state.user)
 
+  const dispatch = useDispatch()
+
   const isBiddable = !!activeUser?.id && activeUser?.id !== seller?.id
 
   const [showBidOptions, setShowBidOptions] = useState<boolean>(false)
@@ -41,6 +85,18 @@ export default function Listing(props: ListingProps) {
   const toggleShowBid = useCallback(() => {
     setShowBidOptions(!showBidOptions)
   }, [showBidOptions, setShowBidOptions])
+
+  const onLogin = useCallback(() => {
+    dispatch(setData({ showLoginModal: true }))
+
+    dispatch(setData({ isSignUp: false }))
+  }, [dispatch])
+
+  const onSignUp = useCallback(() => {
+    dispatch(setData({ showLoginModal: true }))
+
+    dispatch(setData({ isSignUp: true }))
+  }, [dispatch])
 
   return (
     <Row>
@@ -59,7 +115,7 @@ export default function Listing(props: ListingProps) {
                     <td className="name-cell">
                       <b>Price</b>
                     </td>
-                    <td>{`$${price.replace("$", "")}`}</td>
+                    <td>{`$${safeParseFloat(price)?.toFixed(2)}`}</td>
                   </tr>
                 ) : null}
                 {condition ? (
@@ -88,15 +144,27 @@ export default function Listing(props: ListingProps) {
             </table>
             {isBiddable ? (
               <Button primary onClick={toggleShowBid} className="bid-button">
-                Place Bid
+                {showBidOptions ? "Cancel" : "Place Bid"}
               </Button>
+            ) : null}
+            {!isBiddable && !activeUser ? (
+              <Message>
+                <Button onClick={onLogin} color="green">
+                  Log in
+                </Button>{" "}
+                or{" "}
+                <Button onClick={onSignUp} color="orange">
+                  Sign Up
+                </Button>{" "}
+                to bid on this item.
+              </Message>
             ) : null}
             <br />
             <Transition.Group animation="zoom" duration={200}>
               {showBidOptions && (
                 <div>
                   <br />
-                  <BidForm />
+                  <BidForm priceStr={price} />
                 </div>
               )}
             </Transition.Group>

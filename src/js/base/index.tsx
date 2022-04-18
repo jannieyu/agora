@@ -19,7 +19,6 @@ import {
   Provider,
   createStore,
   useSelector,
-  useState,
   useEffect,
 } from "./react_base"
 import Home from "./home"
@@ -69,29 +68,30 @@ function Unauthorized() {
 function Base(props: BaseProps) {
   const { children } = props
 
-  const [showLoginModal, setShowLoginModal] = useState<boolean>(false)
-  const [isSignUp, setIsSignUp] = useState<boolean>(true)
-
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const location = useLocation()
   const user = useSelector((state: AppState) => state.user)
+  const showLoginModal = useSelector((state: AppState) => state.showLoginModal)
+  const isSignUp = useSelector((state: AppState) => state.isSignUp)
 
   const requiresAuth = LOGGED_IN_PATHS.has(location.pathname)
 
   const hideLoginModal = useCallback(() => {
-    setShowLoginModal(false)
-  }, [setShowLoginModal])
+    dispatch(setData({ showLoginModal: false }))
+  }, [dispatch])
 
   const onLogin = useCallback(() => {
-    setShowLoginModal(true)
-    setIsSignUp(false)
-  }, [])
+    dispatch(setData({ showLoginModal: true }))
+
+    dispatch(setData({ isSignUp: false }))
+  }, [dispatch])
 
   const onSignUp = useCallback(() => {
-    setShowLoginModal(true)
-    setIsSignUp(true)
-  }, [])
+    dispatch(setData({ showLoginModal: true }))
+
+    dispatch(setData({ isSignUp: true }))
+  }, [dispatch])
 
   const onLogout = useCallback(() => {
     logoutCall(

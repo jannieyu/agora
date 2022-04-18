@@ -8,6 +8,8 @@ export interface User {
 const initialState = {
   numClicks: 0 as number,
   user: null as User | null,
+  showLoginModal: false as boolean,
+  isSignUp: true as boolean,
 }
 
 export type AppState = typeof initialState
@@ -23,6 +25,7 @@ export interface Action {
   payload: ActionPayload
 }
 
+// eslint-disable-next-line default-param-last
 export const rootReducer = (state: AppState = initialState, action: Action) => {
   switch (action.type) {
     case ActionType.SET_DATA: {
