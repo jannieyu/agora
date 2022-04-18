@@ -33,7 +33,7 @@ import {
   Response as LoginStatusResponse,
 } from "../api/get_login_status"
 import { rootReducer, AppState } from "./reducers"
-import setData from "./actions"
+import { setData } from "./actions"
 
 interface BaseProps {
   children: React.ReactElement | React.ReactElement[]

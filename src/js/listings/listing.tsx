@@ -3,7 +3,7 @@ import { Row, Col, OverlayTrigger, Popover } from "react-bootstrap"
 import { Button, Form, Message, Transition } from "semantic-ui-react"
 import { useCallback, useDispatch, useSelector, useState } from "../base/react_base"
 import { AppState } from "../base/reducers"
-import setData from "../base/actions"
+import { setData, updateSearchItem } from "../base/actions"
 import { safeParseFloat } from "../base/util"
 import { isValidPrice, calculateIncrement } from "./util"
 import { ListingProps } from "./types"
@@ -39,6 +39,7 @@ function BidForm(props: BidFormProps) {
       { itemId, bidPrice },
       () => {
         setSubmitting(false)
+        updateSearchItem({ highestBid: safeParseFloat(bidPrice) }, itemId)
       },
       (err) => {
         setSubmitting(false)

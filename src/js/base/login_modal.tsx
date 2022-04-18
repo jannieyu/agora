@@ -2,7 +2,7 @@ import * as React from "react"
 import { Modal } from "react-bootstrap"
 import { Button, Form, Message, Input } from "semantic-ui-react"
 import { useCallback, useDispatch, useState } from "./react_base"
-import setData from "./actions"
+import { setData } from "./actions"
 import { apiCall as loginCall } from "../api/login"
 import { Response as LoginStatusResponse } from "../api/get_login_status"
 

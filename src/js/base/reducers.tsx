@@ -27,6 +27,7 @@ export type ActionPayload = Partial<AppState>
 export interface Action {
   type: ActionType
   payload: ActionPayload
+  itemId?: number
 }
 
 // eslint-disable-next-line default-param-last
@@ -36,7 +37,12 @@ export const rootReducer = (state: AppState = initialState, action: Action) => {
       return { ...state, ...action.payload }
     }
     case ActionType.UPDATE_SEARCH_ITEM: {
-      return { ...state }
+      return {
+        ...state,
+        searchItems: state.searchItems.map((item: SearchItem) =>
+          item.id === action.itemId ? { ...item, ...action.payload } : item,
+        ),
+      }
     }
     default: {
       return state

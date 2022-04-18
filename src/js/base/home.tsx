@@ -15,7 +15,7 @@ import ListingModal from "../listings/listing_modal"
 import ConfirmationModal from "./confirmation_modal"
 import { ActionType, OnChangeObject } from "./types"
 import { AppState } from "./reducers"
-import setData from "./actions"
+import { setData } from "./actions"
 
 const categoryOptions = [
   {
