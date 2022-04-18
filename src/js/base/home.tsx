@@ -76,7 +76,7 @@ function CardRow(props: CardRowProps) {
 }
 
 function Home() {
-  const [selectedItem, setSelectedItem] = useState<SearchItem | null>(null)
+  const [selectedItemId, setSelectedItemId] = useState<number | null>(null)
 
   const searchItems = useSelector((state: AppState) => state.searchItems)
 
@@ -89,18 +89,15 @@ function Home() {
 
   const dispatch = useDispatch()
 
-  const handleCardAction = useCallback(
-    (itemId: number, actionType: ActionType) => {
-      const desiredItem = searchItems.find((item: SearchItem) => item.id === itemId)
+  const handleCardAction = useCallback((itemId: number, actionType: ActionType) => {
+    if (actionType === ActionType.SELECT) {
+      setSelectedItemId(itemId)
+    } else if (actionType === ActionType.DELETE) {
+      setDeletingItemId(itemId)
+    }
+  }, [])
 
-      if (actionType === ActionType.SELECT) {
-        setSelectedItem(desiredItem)
-      } else if (actionType === ActionType.DELETE) {
-        setDeletingItemId(itemId)
-      }
-    },
-    [setSelectedItem, searchItems],
-  )
+  const selectedItem = searchItems.find((item: SearchItem) => item.id === selectedItemId)
 
   const handleChangeCategory = useCallback(
     (e: React.FormEvent<HTMLInputElement>, data: OnChangeObject) => {
@@ -141,8 +138,8 @@ function Home() {
   )
 
   const deselectItem = useCallback(() => {
-    setSelectedItem(null)
-  }, [setSelectedItem])
+    setSelectedItemId(null)
+  }, [])
 
   const retreiveItems = useCallback(() => {
     setLoading(true)

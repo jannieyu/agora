@@ -22,7 +22,7 @@ export enum ActionType {
   UPDATE_SEARCH_ITEM = "UPDATE_SEARCH_ITEM",
 }
 
-export type ActionPayload = Partial<AppState>
+export type ActionPayload = Partial<AppState> | Partial<SearchItem>
 
 export interface Action {
   type: ActionType

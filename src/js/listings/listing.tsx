@@ -12,11 +12,14 @@ import { apiCall as addBidCall } from "../api/add_bid"
 
 interface BidFormProps {
   priceStr: string
+  numBids: number
   itemId: number
 }
 
 function BidForm(props: BidFormProps) {
-  const { priceStr, itemId } = props
+  const { priceStr, numBids, itemId } = props
+
+  const dispatch = useDispatch()
 
   const [bidPrice, setBidPrice] = useState<string>("")
   const [submitting, setSubmitting] = useState<boolean>(false)
@@ -39,14 +42,14 @@ function BidForm(props: BidFormProps) {
       { itemId, bidPrice },
       () => {
         setSubmitting(false)
-        updateSearchItem({ highestBid: safeParseFloat(bidPrice) }, itemId)
+        dispatch(updateSearchItem({ highestBid: bidPrice, numBids: numBids + 1 }, itemId))
       },
       (err) => {
         setSubmitting(false)
         setError(err.body as string)
       },
     )
-  }, [itemId, bidPrice])
+  }, [dispatch, itemId, bidPrice, numBids])
 
   const minBid = price + minIncrement
 
@@ -93,7 +96,7 @@ function BidForm(props: BidFormProps) {
 }
 
 export default function Listing(props: ListingProps) {
-  const { category, name, highestBid, condition, image, description, seller, id } = props
+  const { category, name, highestBid, condition, image, description, seller, id, numBids } = props
   const activeUser = useSelector((state: AppState) => state.user)
 
   const dispatch = useDispatch()
@@ -184,7 +187,7 @@ export default function Listing(props: ListingProps) {
               {showBidOptions && (
                 <div>
                   <br />
-                  <BidForm priceStr={highestBid} itemId={id} />
+                  <BidForm priceStr={highestBid} itemId={id} numBids={numBids} />
                 </div>
               )}
             </Transition.Group>
