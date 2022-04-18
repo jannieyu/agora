@@ -1,13 +1,10 @@
 package api
 
 import (
-	"agora/src/app/database"
+	"agora/src/app/bidBot"
 	"agora/src/app/utils"
 	"encoding/json"
-	"errors"
-	"github.com/shopspring/decimal"
 	log "github.com/sirupsen/logrus"
-	"gorm.io/gorm"
 	"net/http"
 )
 
@@ -26,57 +23,26 @@ func (h Handle) AddBid(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	bidPrice, err := utils.ConvertStringPriceToDecimal(bidAPI.BidPrice)
+	if err != nil {
+		log.WithError(err).Error("Failed to parse bid price data.")
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	if statusCode, err := utils.PlaceBid(bidderID, bidAPI.ItemID, bidPrice, h.Db); err != nil {
+		log.WithError(err).Error("Failed to place bid.")
+		w.WriteHeader(statusCode)
+		return
+	}
+
+	if statusCode, err := bidBot.RunManualBidAgainstBot(h.Db, bidAPI.ItemID, bidPrice); err != nil {
+		log.WithError(err).Error("Failed to run manual bid against bots.")
+		w.WriteHeader(statusCode)
+		return
+	}
+
 	w.WriteHeader(http.StatusCreated)
 	SafeEncode(w, "{}")
 	log.Info("Completed bid upload.")
-}
-
-func placeBid(bidderID uint32, itemID uint32, bidPriceString string, db *gorm.DB) error {
-
-	if isValidBidder, err := checkValidBidder(bidderID, itemID, db); err != nil {
-		return err
-	} else if isValidBidder == false {
-		return err
-	}
-
-	bidPrice, err := utils.ConvertStringPriceToDecimal(bidPriceString)
-	if err != nil {
-		return err
-	}
-
-	var item database.Item
-	if err := db.First(&item, itemID).Error; err != nil {
-		return err
-	}
-
-	if bidPrice.InexactFloat64() <= item.HighestBid.InexactFloat64() {
-		return errors.New("Invalid bid: must be higher than existing highest bid or starting price value.")
-	}
-
-	bid := database.Bid{
-		BidderID: bidderID,
-		ItemID:   itemID,
-		BidPrice: bidPrice,
-	}
-	if err := db.Create(&bid).Error; err != nil {
-		return err
-	}
-
-	updateMaxBid(&item, bidPrice)
-	if err := db.Save(&item).Error; err != nil {
-		return err
-	}
-}
-
-func checkValidBidder(bidderID uint32, itemID uint32, db *gorm.DB) (bool, error) {
-	var item database.Item
-	if err := db.Select("seller_id").Where("id = ?", itemID).Find(&item).Error; err != nil {
-		log.WithError(err).Error("Failed to retrieve seller id of item.")
-		return false, err
-	}
-	return bidderID != item.SellerID, nil
-}
-
-func updateMaxBid(item *database.Item, maxBid decimal.Decimal) {
-	item.HighestBid = maxBid
 }

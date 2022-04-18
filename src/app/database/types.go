@@ -1,9 +1,8 @@
 package database
 
 import (
-	"time"
-
 	"github.com/shopspring/decimal"
+	"time"
 )
 
 type User struct {
@@ -29,6 +28,7 @@ type Item struct {
 	Bids          []Bid           `json:"bids" gorm:"foreignkey:ItemID"`
 	BidBots       []BidBot        `json:"bidBots" gorm:"foreignkey:ItemID"`
 	HighestBid    decimal.Decimal `json:"highestBid"  gorm:"type:decimal(6,2);"`
+	NumBids       uint32          `json:"numBids"`
 	BuyItNowPrice decimal.Decimal `json:"buyItNowPrice" gorm:"type:decimal(6,2);"`
 	CreatedAt     time.Time       `json:"createdAt,omitempty" gorm:"autoCreateTime"`
 }
