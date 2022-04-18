@@ -7,6 +7,9 @@ export interface SearchItem {
   category: string
   condition: string
   description: string
+  numBids: number
+  highestBid: string
+  buyItNowPrice: string
   id: number
   image: string
   name: string

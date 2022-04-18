@@ -3,7 +3,7 @@ import { Row, Col } from "react-bootstrap"
 import { Button, Dropdown, Icon, Input, Form } from "semantic-ui-react"
 import { useSearchParams } from "react-router-dom"
 import { categories, conditions } from "../listings/constants"
-import { useCallback, useEffect, useMemo, useState } from "./react_base"
+import { useCallback, useDispatch, useEffect, useMemo, useSelector, useState } from "./react_base"
 import {
   apiCall as getSearchItems,
   Response as GetSearchItemsResponse,
@@ -14,6 +14,8 @@ import Card from "../listings/card"
 import ListingModal from "../listings/listing_modal"
 import ConfirmationModal from "./confirmation_modal"
 import { ActionType, OnChangeObject } from "./types"
+import { AppState } from "./reducers"
+import setData from "./actions"
 
 const categoryOptions = [
   {
@@ -74,8 +76,9 @@ function CardRow(props: CardRowProps) {
 }
 
 function Home() {
-  const [searchItems, setSearchItems] = useState<SearchItem[]>([])
   const [selectedItem, setSelectedItem] = useState<SearchItem | null>(null)
+
+  const searchItems = useSelector((state: AppState) => state.searchItems)
 
   const [searchParams, setSearchParams] = useSearchParams()
   const params = useMemo(() => Object.fromEntries([...searchParams]), [searchParams])
@@ -83,6 +86,8 @@ function Home() {
   const [searchBarText, setSearchBarText] = useState<string>(params.search)
   const [loading, setLoading] = useState<boolean>(false)
   const [deletingItemId, setDeletingItemId] = useState<number | null>(null)
+
+  const dispatch = useDispatch()
 
   const handleCardAction = useCallback(
     (itemId: number, actionType: ActionType) => {
@@ -144,14 +149,18 @@ function Home() {
     getSearchItems(
       params,
       (data: GetSearchItemsResponse) => {
-        setSearchItems(data)
+        dispatch(
+          setData({
+            searchItems: data,
+          }),
+        )
         setLoading(false)
       },
       () => {
         setLoading(false)
       },
     )
-  }, [params])
+  }, [dispatch, params])
 
   useEffect(() => {
     retreiveItems()

@@ -240,7 +240,7 @@ function ListingForm() {
                 <Form.Field
                   control={DollarInput}
                   label="Buy It Now Price"
-                  placeholder="4.99"
+                  placeholder="9.99"
                   onChange={handleChangeBuyItNowPrice}
                   error={!!buyItNowPrice && !isValidPrice(buyItNowPrice)}
                   value={buyItNowPrice}
@@ -310,6 +310,7 @@ function ListingForm() {
             buyItNowPrice={buyItNowPrice}
             condition={condition}
             description={description}
+            numBids={0}
             category={category}
             image={imageURL}
             seller={activeUser}

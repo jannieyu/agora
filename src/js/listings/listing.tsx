@@ -132,7 +132,7 @@ export default function Listing(props: ListingProps) {
                 {highestBid && isValidPrice(highestBid) ? (
                   <tr>
                     <td className="name-cell">
-                      <b>Current Price</b>
+                      <b>Price</b>
                     </td>
                     <td>{`$${safeParseFloat(highestBid)?.toFixed(2)}`}</td>
                   </tr>
