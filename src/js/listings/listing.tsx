@@ -20,6 +20,7 @@ function BidForm(props: BidFormProps) {
 
   const [bidPrice, setBidPrice] = useState<string>("")
   const [submitting, setSubmitting] = useState<boolean>(false)
+  const [error, setError] = useState<string>("")
 
   const price = safeParseFloat(priceStr)
   const minIncrement = calculateIncrement(price)
@@ -27,6 +28,7 @@ function BidForm(props: BidFormProps) {
   const handleChangeBidAmount = useCallback(
     (e: React.FormEvent<HTMLInputElement>) => {
       setBidPrice(e.currentTarget.value)
+      setError("")
     },
     [setBidPrice],
   )
@@ -38,8 +40,9 @@ function BidForm(props: BidFormProps) {
       () => {
         setSubmitting(false)
       },
-      () => {
+      (err) => {
         setSubmitting(false)
+        setError(err.body as string)
       },
     )
   }, [itemId, bidPrice])
@@ -73,7 +76,7 @@ function BidForm(props: BidFormProps) {
   )
 
   return (
-    <Form>
+    <Form error={!!error}>
       <Form.Field
         control={DollarInput}
         label={`Enter bid of $${minBid.toFixed(2)} or more.`}
@@ -82,6 +85,7 @@ function BidForm(props: BidFormProps) {
         error={!!bidPrice && !isValidPrice(bidPrice)}
         value={bidPrice}
       />
+      <Message error header="Error" content={error} />
       {wrappedSubmitBtn}
     </Form>
   )
