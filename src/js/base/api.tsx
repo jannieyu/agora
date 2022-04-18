@@ -26,7 +26,7 @@ export default function buildWrappedGet<Args, Response extends unknown>(url: str
       .then(onLoad)
       .catch((err) => {
         err
-          .json()
+          .text()
           .then((body) => {
             onError({ body, status: err.status, statusText: err.statusText })
           })
