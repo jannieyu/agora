@@ -26,6 +26,8 @@ function BidForm(props: BidFormProps) {
   const [bidPrice, setBidPrice] = useState<string>("")
   const [submitting, setSubmitting] = useState<boolean>(false)
   const [error, setError] = useState<string>("")
+  const [showAutobidder, setShowAutobidder] = useState<boolean>(false)
+  const [autoBidPrice, setAutoBidPrice] = useState<string>("")
 
   const price = safeParseFloat(priceStr)
   const minIncrement = calculateIncrement(price)
@@ -37,6 +39,18 @@ function BidForm(props: BidFormProps) {
     },
     [setBidPrice],
   )
+
+  const handleChangeAutoBidAmount = useCallback(
+    (e: React.FormEvent<HTMLInputElement>) => {
+      setAutoBidPrice(e.currentTarget.value)
+      setError("")
+    },
+    [setAutoBidPrice],
+  )
+
+  const toggleShowAutobidder = useCallback(() => {
+    setShowAutobidder(!showAutobidder)
+  }, [showAutobidder])
 
   const handleSubmit = useCallback(() => {
     setSubmitting(true)
@@ -102,7 +116,26 @@ function BidForm(props: BidFormProps) {
           />
         </Col>
         <Col xs="6">
-          <Checkbox slider label="Enable Autobidder?" />
+          <Checkbox slider label="Enable Autobidder?" onChange={toggleShowAutobidder} />
+        </Col>
+      </Row>
+      <Row>
+        <Col xs="12">
+          <Transition.Group animation="zoom" duration={200}>
+            {showAutobidder && (
+              <div>
+                <br />
+                <Form.Field
+                  control={DollarInput}
+                  placeholder={(minBid * 2).toFixed(2)}
+                  onChange={handleChangeAutoBidAmount}
+                  error={!!autoBidPrice && !isValidPrice(autoBidPrice)}
+                  value={autoBidPrice}
+                  label="If the autobidder is enabled, Agora will automatically increase your bid by the minimum increment each time you are outbid, until you reach the maximum amount specified below."
+                />
+              </div>
+            )}
+          </Transition.Group>
         </Col>
       </Row>
       <Message error header="Error" content={error} />
