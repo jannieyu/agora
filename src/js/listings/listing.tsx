@@ -14,10 +14,11 @@ interface BidFormProps {
   priceStr: string
   numBids: number
   itemId: number
+  handleSuccess: (message: string) => void
 }
 
 function BidForm(props: BidFormProps) {
-  const { priceStr, numBids, itemId } = props
+  const { priceStr, numBids, itemId, handleSuccess } = props
 
   const dispatch = useDispatch()
 
@@ -43,13 +44,14 @@ function BidForm(props: BidFormProps) {
       () => {
         setSubmitting(false)
         dispatch(updateSearchItem({ highestBid: bidPrice, numBids: numBids + 1 }, itemId))
+        handleSuccess(`Bid of ${bidPrice} successfully created!`)
       },
       (err) => {
         setSubmitting(false)
         setError(err.body as string)
       },
     )
-  }, [dispatch, itemId, bidPrice, numBids])
+  }, [dispatch, itemId, bidPrice, numBids, handleSuccess])
 
   const minBid = price + minIncrement
 
@@ -101,9 +103,15 @@ export default function Listing(props: ListingProps) {
 
   const dispatch = useDispatch()
 
-  const isBiddable = !!activeUser?.id && activeUser?.id !== seller?.id
-
   const [showBidOptions, setShowBidOptions] = useState<boolean>(false)
+  const [successMessage, setSuccessMessage] = useState<string>("")
+
+  const isBiddable = !!activeUser?.id && activeUser?.id !== seller?.id && !successMessage
+
+  const handleSuccess = useCallback((message: string) => {
+    setShowBidOptions(false)
+    setSuccessMessage(message)
+  }, [])
 
   const toggleShowBid = useCallback(() => {
     setShowBidOptions(!showBidOptions)
@@ -187,9 +195,15 @@ export default function Listing(props: ListingProps) {
               {showBidOptions && (
                 <div>
                   <br />
-                  <BidForm priceStr={highestBid} itemId={id} numBids={numBids} />
+                  <BidForm
+                    priceStr={highestBid}
+                    itemId={id}
+                    numBids={numBids}
+                    handleSuccess={handleSuccess}
+                  />
                 </div>
               )}
+              {!showBidOptions && !!successMessage && <Message success>{successMessage}</Message>}
             </Transition.Group>
           </div>
         </div>
