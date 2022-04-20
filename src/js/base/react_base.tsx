@@ -1,7 +1,7 @@
 import * as React from "react"
 import { useCallback, useEffect, useMemo, useState } from "react"
 import { render } from "react-dom"
-import { createStore } from "redux"
+import { configureStore } from "@reduxjs/toolkit"
 import { Provider, useDispatch, useSelector } from "react-redux"
 import { useTranslation } from "react-i18next"
 
@@ -12,7 +12,7 @@ export {
   useMemo,
   useSelector,
   useTranslation,
-  createStore,
+  configureStore,
   useEffect,
   useState,
   Provider,
@@ -29,7 +29,7 @@ export const makeApp = (
   App: React.ComponentType,
   reducer: (state: AppState, action: Action) => AppState,
 ) => {
-  const store = createStore(reducer)
+  const store = configureStore({ reducer })
   return function Wrapped() {
     return (
       <Provider store={store}>

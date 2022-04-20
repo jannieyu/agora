@@ -17,7 +17,7 @@ import {
   useCallback,
   useDispatch,
   Provider,
-  createStore,
+  configureStore,
   useSelector,
   useEffect,
 } from "./react_base"
@@ -190,7 +190,7 @@ const ROUTES = {
   create_listing: NewListing,
 }
 
-const store = createStore(rootReducer)
+const store = configureStore({ reducer: rootReducer })
 
 library.add(fas, far)
 
