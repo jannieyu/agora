@@ -1,6 +1,7 @@
+/* eslint-disable jsx-a11y/label-has-associated-control */
 import * as React from "react"
 import { Row, Col, OverlayTrigger, Popover } from "react-bootstrap"
-import { Button, Form, Message, Transition } from "semantic-ui-react"
+import { Button, Checkbox, Form, Message, Transition } from "semantic-ui-react"
 import { useCallback, useDispatch, useSelector, useState } from "../base/react_base"
 import { AppState } from "../base/reducers"
 import { setData, updateSearchItem } from "../base/actions"
@@ -83,15 +84,29 @@ function BidForm(props: BidFormProps) {
 
   return (
     <Form error={!!error}>
-      <Form.Field
-        control={DollarInput}
-        label={`Enter bid of $${minBid.toFixed(2)} or more.`}
-        placeholder={minBid.toFixed(2)}
-        onChange={handleChangeBidAmount}
-        error={!!bidPrice && !isValidPrice(bidPrice)}
-        value={bidPrice}
-      />
+      <Row>
+        <Col xs="6">
+          <div className="field">
+            <label>{`Enter bid of $${minBid.toFixed(2)} or more.`}</label>
+          </div>
+        </Col>
+      </Row>
+      <Row className="align-items-center">
+        <Col xs="6">
+          <Form.Field
+            control={DollarInput}
+            placeholder={minBid.toFixed(2)}
+            onChange={handleChangeBidAmount}
+            error={!!bidPrice && !isValidPrice(bidPrice)}
+            value={bidPrice}
+          />
+        </Col>
+        <Col xs="6">
+          <Checkbox slider label="Enable Autobidder?" />
+        </Col>
+      </Row>
       <Message error header="Error" content={error} />
+      <br />
       {wrappedSubmitBtn}
     </Form>
   )
