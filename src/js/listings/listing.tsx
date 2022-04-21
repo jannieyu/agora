@@ -59,7 +59,7 @@ function BidForm(props: BidFormProps) {
       () => {
         setSubmitting(false)
         dispatch(updateSearchItem({ highestBid: bidPrice, numBids: numBids + 1 }, itemId))
-        handleSuccess(`Bid of ${bidPrice} successfully created!`)
+        handleSuccess(`Bid of $${bidPrice} successfully created!`)
       },
       (err) => {
         setSubmitting(false)
