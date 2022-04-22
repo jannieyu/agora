@@ -24,6 +24,7 @@ import {
 import Home from "./home"
 import LoginModal from "./login_modal"
 import About from "./about"
+import UserProfile from "../users/user_profile"
 import NewListing from "../listings/new_listing"
 import "./styles.scss"
 import { apiCall as logoutCall } from "../api/logout"
@@ -115,6 +116,10 @@ function Base(props: BaseProps) {
     navigate("create_listing")
   }, [navigate])
 
+  const onClickMyProfile = useCallback(() => {
+    navigate(`user_profile/?id=${user.id}`)
+  }, [navigate, user])
+
   useEffect(() => {
     getLoginStatus(
       LOGIN_STATUS_ARGS,
@@ -159,7 +164,7 @@ function Base(props: BaseProps) {
                 >
                   <Dropdown.Menu>
                     <Dropdown.Item text="Create Listing" onClick={onCreateListing} />
-                    <Dropdown.Item text="Another Action" />
+                    <Dropdown.Item text="My Profile" onClick={onClickMyProfile} />
                     <Dropdown.Divider />
                     <Dropdown.Item onClick={onLogout} text="Log Out" />
                   </Dropdown.Menu>
@@ -188,6 +193,7 @@ function Base(props: BaseProps) {
 const ROUTES = {
   about: About,
   create_listing: NewListing,
+  user_profile: UserProfile,
 }
 
 const store = configureStore({ reducer: rootReducer })
