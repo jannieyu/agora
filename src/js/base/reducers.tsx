@@ -26,7 +26,7 @@ const initialState = {
   showLoginModal: false as boolean,
   isSignUp: true as boolean,
   searchItems: [] as SearchItem[],
-  notifications: Array(0) as Notification[],
+  notifications: Array(123) as Notification[],
 }
 
 export type AppState = typeof initialState

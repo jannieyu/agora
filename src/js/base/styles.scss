@@ -138,18 +138,6 @@
     color: inherit;
 }
 
-.notif-bubble {
-    color: white;
-    background-color: red;
-    border-radius: 50%;
-    min-width: 1rem;
-    height: 100%;
-    display: inline-block;
-    text-align: center;
-    margin-left: 0.5rem;
-    padding: 2px;
-}
-
 .notif-dropdown {
     display: flex;
     align-items: center;
@@ -168,17 +156,17 @@
     position: absolute;
     margin-left: 0.5rem;
     right: 0.5rem;
-  }
+}
    
-  /* (D) MATCH HEIGHT */
-  .res-circle::after {
+/* (D) MATCH HEIGHT */
+.res-circle::after {
     content: "";
     display: block;
     padding-bottom: 100%;
-  }
+}
    
-  /* (E) TEXT BLOCK */
-  .circle-txt {
+/* (E) TEXT BLOCK */
+.circle-txt {
     /* (E1) CENTER TEXT IN CIRCLE */
     position: absolute;
     bottom: 50%;
@@ -188,7 +176,13 @@
     /* (E2) THE FONT - NOT REALLY IMPORTANT */
     font-family: arial, sans-serif;
     font-weight: bold;
-  }
+}
+
+
+.name-trigger > .res-circle {
+    font-size: 7pt;
+    top: 0.2rem;
+}
 
 .listing-metadata-table {
     .name-cell {

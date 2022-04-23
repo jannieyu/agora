@@ -25,6 +25,7 @@ import Home from "./home"
 import LoginModal from "./login_modal"
 import About from "./about"
 import UserProfile from "../users/user_profile"
+import NotificationPage from "../notifications/notification_page"
 import NewListing from "../listings/new_listing"
 import "./styles.scss"
 import { apiCall as logoutCall } from "../api/logout"
@@ -41,7 +42,7 @@ interface BaseProps {
 }
 
 // Paths that the user must be logged in to see
-const LOGGED_IN_PATHS = new Set(["/create_listing"])
+const LOGGED_IN_PATHS = new Set(["/create_listing", "/notifications"])
 
 function PageNotFound() {
   return (
@@ -139,7 +140,8 @@ function Base(props: BaseProps) {
   }, [dispatch])
 
   const notifStrLen = notifications.length.toString().length
-  const notifBubbleWidth = `${notifStrLen * 3 + 9}%`
+  const topNotifBubbleWidth = `${notifStrLen * 2 + 6}%`
+  const bottomNotifBubbleWidth = `${notifStrLen * 3 + 9}%`
 
   return (
     <>
@@ -166,11 +168,11 @@ function Base(props: BaseProps) {
                   button
                   className="icon"
                   trigger={
-                    <div className="notif-dropdown">
+                    <div className="name-trigger">
                       <span
                         style={
                           notifications.length
-                            ? { marginRight: `${0.3 + notifStrLen * 0.5}rem` }
+                            ? { marginRight: `${(notifStrLen - 1) * 0.2}rem` }
                             : null
                         }
                       >{`${user.firstName} ${user.lastName}`}</span>
@@ -178,7 +180,7 @@ function Base(props: BaseProps) {
                         <div
                           className="res-circle"
                           style={{
-                            width: notifBubbleWidth,
+                            width: topNotifBubbleWidth,
                           }}
                         >
                           <div className="circle-txt">{notifications.length}</div>
@@ -197,7 +199,7 @@ function Base(props: BaseProps) {
                           <div
                             className="res-circle"
                             style={{
-                              width: notifBubbleWidth,
+                              width: bottomNotifBubbleWidth,
                             }}
                           >
                             <div className="circle-txt">{notifications.length}</div>
@@ -234,6 +236,7 @@ const ROUTES = {
   about: About,
   create_listing: NewListing,
   user_profile: UserProfile,
+  notifications: NotificationPage,
 }
 
 const store = configureStore({ reducer: rootReducer })
