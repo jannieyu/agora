@@ -138,7 +138,7 @@ function Base(props: BaseProps) {
     )
   }, [dispatch])
 
-  const notifBubbleWidth = `${notifications.length.toString().length * 5 + 10}%`
+  const notifBubbleWidth = `${notifications.length.toString().length * 4 + 8}%`
 
   return (
     <>
@@ -165,7 +165,7 @@ function Base(props: BaseProps) {
                   button
                   className="icon"
                   trigger={
-                    <div>
+                    <div className="notif-dropdown">
                       {`${user.firstName} ${user.lastName}`}
                       {notifications.length > 0 ? (
                         <div
@@ -184,7 +184,7 @@ function Base(props: BaseProps) {
                     <Dropdown.Item text="Create Listing" onClick={onCreateListing} />
                     <Dropdown.Item text="My Profile" onClick={onClickMyProfile} />
                     <Dropdown.Item onClick={onClickNotifications}>
-                      <span className="notif-dropdown-item">
+                      <div className="notif-dropdown">
                         Notifications{" "}
                         {notifications.length > 0 ? (
                           <div
@@ -196,7 +196,7 @@ function Base(props: BaseProps) {
                             <div className="circle-txt">{notifications.length}</div>
                           </div>
                         ) : null}
-                      </span>
+                      </div>
                     </Dropdown.Item>
                     <Dropdown.Divider />
                     <Dropdown.Item onClick={onLogout} text="Log Out" />
