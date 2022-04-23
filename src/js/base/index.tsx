@@ -168,7 +168,11 @@ function Base(props: BaseProps) {
                   trigger={
                     <div className="notif-dropdown">
                       <span
-                        style={{ marginRight: `${0.3 + notifStrLen * 0.5}rem` }}
+                        style={
+                          notifications.length
+                            ? { marginRight: `${0.3 + notifStrLen * 0.5}rem` }
+                            : null
+                        }
                       >{`${user.firstName} ${user.lastName}`}</span>
                       {notifications.length > 0 ? (
                         <div
