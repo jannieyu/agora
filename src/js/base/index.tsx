@@ -138,7 +138,8 @@ function Base(props: BaseProps) {
     )
   }, [dispatch])
 
-  const notifBubbleWidth = `${notifications.length.toString().length * 4 + 8}%`
+  const notifStrLen = notifications.length.toString().length
+  const notifBubbleWidth = `${notifStrLen * 3 + 9}%`
 
   return (
     <>
@@ -166,7 +167,9 @@ function Base(props: BaseProps) {
                   className="icon"
                   trigger={
                     <div className="notif-dropdown">
-                      {`${user.firstName} ${user.lastName}`}
+                      <span
+                        style={{ marginRight: `${0.3 + notifStrLen * 0.5}rem` }}
+                      >{`${user.firstName} ${user.lastName}`}</span>
                       {notifications.length > 0 ? (
                         <div
                           className="res-circle"
