@@ -72,9 +72,7 @@ function Base(props: BaseProps) {
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const location = useLocation()
-  const user = useSelector((state: AppState) => state.user)
-  const showLoginModal = useSelector((state: AppState) => state.showLoginModal)
-  const isSignUp = useSelector((state: AppState) => state.isSignUp)
+  const { user, showLoginModal, isSignUp, notifications } = useSelector((state: AppState) => state)
 
   const requiresAuth = LOGGED_IN_PATHS.has(location.pathname)
 
@@ -120,6 +118,10 @@ function Base(props: BaseProps) {
     navigate(`user_profile/?id=${user.id}`)
   }, [navigate, user])
 
+  const onClickNotifications = useCallback(() => {
+    navigate(`notifications`)
+  }, [navigate])
+
   useEffect(() => {
     getLoginStatus(
       LOGIN_STATUS_ARGS,
@@ -135,6 +137,8 @@ function Base(props: BaseProps) {
       () => {},
     )
   }, [dispatch])
+
+  const notifBubbleWidth = `${notifications.length.toString().length * 5 + 10}%`
 
   return (
     <>
@@ -155,16 +159,45 @@ function Base(props: BaseProps) {
             {user ? (
               <div className="login">
                 <Dropdown
-                  text={`${user.firstName} ${user.lastName}`}
                   icon="bars"
                   floating
                   labeled
                   button
                   className="icon"
+                  trigger={
+                    <div>
+                      {`${user.firstName} ${user.lastName}`}
+                      {notifications.length > 0 ? (
+                        <div
+                          className="res-circle"
+                          style={{
+                            width: notifBubbleWidth,
+                          }}
+                        >
+                          <div className="circle-txt">{notifications.length}</div>
+                        </div>
+                      ) : null}
+                    </div>
+                  }
                 >
                   <Dropdown.Menu>
                     <Dropdown.Item text="Create Listing" onClick={onCreateListing} />
                     <Dropdown.Item text="My Profile" onClick={onClickMyProfile} />
+                    <Dropdown.Item onClick={onClickNotifications}>
+                      <span className="notif-dropdown-item">
+                        Notifications{" "}
+                        {notifications.length > 0 ? (
+                          <div
+                            className="res-circle"
+                            style={{
+                              width: notifBubbleWidth,
+                            }}
+                          >
+                            <div className="circle-txt">{notifications.length}</div>
+                          </div>
+                        ) : null}
+                      </span>
+                    </Dropdown.Item>
                     <Dropdown.Divider />
                     <Dropdown.Item onClick={onLogout} text="Log Out" />
                   </Dropdown.Menu>

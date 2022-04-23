@@ -7,12 +7,26 @@ export interface User {
   id: number
 }
 
+export enum NotificationType {
+  OUTBID = "OUTBID",
+  WINNER = "WINNER",
+  LOSER = "LOSER",
+  ITEM_BID_ON = "ITEM_BID_ON",
+}
+
+export interface Notification {
+  type: NotificationType
+  itemId: number
+  userId?: number
+}
+
 const initialState = {
   numClicks: 0 as number,
   user: null as User | null,
   showLoginModal: false as boolean,
   isSignUp: true as boolean,
   searchItems: [] as SearchItem[],
+  notifications: Array(123) as Notification[],
 }
 
 export type AppState = typeof initialState
