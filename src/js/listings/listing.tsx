@@ -70,8 +70,12 @@ function BidForm(props: BidFormProps) {
   }, [dispatch, itemId, bidPrice, numBids, handleSuccess])
 
   const minBid = price + minIncrement
+  const minAutoBid = minBid + minIncrement
 
-  const canSubmit = isValidPrice(bidPrice) && safeParseFloat(bidPrice) >= minBid
+  const isValidBid = isValidPrice(bidPrice) && safeParseFloat(bidPrice) >= minBid
+  const isValidAutoBid =
+    !showAutobidder || (isValidPrice(autoBidPrice) && safeParseFloat(autoBidPrice) >= minAutoBid)
+  const canSubmit = isValidBid && isValidAutoBid
 
   const submitBtn = (
     <Button type="submit" disabled={!canSubmit} loading={submitting} onClick={handleSubmit}>
@@ -88,7 +92,10 @@ function BidForm(props: BidFormProps) {
       overlay={
         <Popover>
           <Popover.Body>
-            You must enter a valid price of at least {`$${minBid.toFixed(2)}`} to submit the bid.
+            {!isValidBid
+              ? `You must enter a valid bid of at least $${minBid.toFixed(2)} to submit.`
+              : `You must enter a valid autobidder target of at least $${minAutoBid.toFixed(2)}
+                to submit the bid.`}
           </Popover.Body>
         </Popover>
       }
