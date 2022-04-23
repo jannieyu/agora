@@ -2,6 +2,7 @@
 import * as React from "react"
 import { Row, Col, OverlayTrigger, Popover } from "react-bootstrap"
 import { Button, Checkbox, Form, Message, Transition } from "semantic-ui-react"
+import { Link } from "react-router-dom"
 import { useCallback, useDispatch, useSelector, useState } from "../base/react_base"
 import { AppState } from "../base/reducers"
 import { setData, updateSearchItem } from "../base/actions"
@@ -209,7 +210,11 @@ export default function Listing(props: ListingProps) {
                   <td className="name-cell">
                     <b>Sold By</b>
                   </td>
-                  <td>{`${seller?.firstName} ${seller?.lastName}`}</td>
+                  <td>
+                    <Link
+                      to={`/user_profile/?id=${seller?.id}`}
+                    >{`${seller?.firstName} ${seller?.lastName}`}</Link>
+                  </td>
                 </tr>
                 {description ? (
                   <tr>
