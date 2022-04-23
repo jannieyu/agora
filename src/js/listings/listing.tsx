@@ -213,6 +213,7 @@ export default function Listing(props: ListingProps) {
                   <td>
                     <Link
                       to={`/user_profile/?id=${seller?.id}`}
+                      target="_blank"
                     >{`${seller?.firstName} ${seller?.lastName}`}</Link>
                   </td>
                 </tr>
