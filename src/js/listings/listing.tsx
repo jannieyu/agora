@@ -12,14 +12,29 @@ import { isValidPrice, calculateIncrement } from "./util"
 import { ListingProps } from "./types"
 import DollarInput from "./dollar_input"
 import { apiCall as addBidCall } from "../api/add_bid"
+import { BidHistory as BidHistoryT } from "../api/get_search_items"
+
+function HistoricalBidDatum(bid: BidHistoryT) {
+  const { createdAt, bidPrice } = bid
+
+  const dt = DateTime.fromISO(createdAt)
+  const day = dt.toLocaleString({ month: "long", day: "numeric" })
+  const hour = dt.toLocaleString(DateTime.TIME_SIMPLE)
+
+  return <li>{`A bid of $${bidPrice} was placed at ${hour} on ${day}.`}</li>
+}
 
 function BidHistory(props: ListingProps) {
-  const { price } = props
+  const { bids, price, createdAt } = props
 
   const [active, setActive] = useState<boolean>(false)
   const handleClick = useCallback(() => {
     setActive(!active)
   }, [active])
+
+  const dt = DateTime.fromISO(createdAt)
+  const day = dt.toLocaleString({ month: "long", day: "numeric" })
+  const hour = dt.toLocaleString(DateTime.TIME_SIMPLE)
 
   return (
     <Accordion>
@@ -29,7 +44,10 @@ function BidHistory(props: ListingProps) {
       </Accordion.Title>
       <Accordion.Content active={active}>
         <ul>
-          <li>{`The item was listed at XYZ on 123 with a starting price of $${price}.`}</li>
+          <li>{`The item was listed with a starting price of $${price} at ${hour} on ${day}.`}</li>
+          {bids?.map((bid: BidHistoryT) => (
+            <HistoricalBidDatum {...bid} key={bid.createdAt} />
+          ))}
         </ul>
       </Accordion.Content>
     </Accordion>
@@ -93,7 +111,10 @@ function BidForm(props: BidFormProps) {
         }
 
         dispatch(updateSearchItem({ highestBid: bidPrice, numBids: numBids + 1 }, itemId, newBid))
-        handleSuccess(`Bid of $${bidPrice} successfully created!`)
+        handleSuccess(
+          `Bid of $${bidPrice} successfully created! You will be notified if you are outbid or
+          if the auction ends and you win the item.`,
+        )
       },
       (err) => {
         setSubmitting(false)

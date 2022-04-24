@@ -1,3 +1,4 @@
+import { BidHistory } from "../api/get_search_items"
 import { User } from "../base/reducers"
 
 export interface ListingProps {
@@ -6,6 +7,7 @@ export interface ListingProps {
   highestBid: string
   price: string // starting price
   buyItNowPrice: string
+  bids: BidHistory[]
   condition: string
   numBids: number
   image: string

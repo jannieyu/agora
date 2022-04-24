@@ -2,6 +2,7 @@ import * as React from "react"
 import { Row, Col, OverlayTrigger, Modal, Popover } from "react-bootstrap"
 import { useNavigate } from "react-router"
 import { Button, Form, Input } from "semantic-ui-react"
+import { DateTime } from "luxon"
 import Dropzone from "react-dropzone"
 import { useCallback, useSelector, useState } from "../base/react_base"
 import { AppState } from "../base/reducers"
@@ -204,6 +205,8 @@ function ListingForm() {
     : "Drag and drop an image of the listed item, or click to upload"
   const dropzoneAreaClass = imageError ? "droparea-error" : "droparea-text"
 
+  const currTime = DateTime.now().toISO()
+
   return (
     <>
       <SubmissionModal
@@ -315,6 +318,8 @@ function ListingForm() {
             image={imageURL}
             seller={activeUser}
             id={0}
+            createdAt={currTime}
+            bids={[]}
           />
         </Col>
       </Row>
