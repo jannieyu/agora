@@ -1,7 +1,8 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
 import * as React from "react"
 import { Row, Col, OverlayTrigger, Popover } from "react-bootstrap"
-import { Button, Checkbox, Form, Message, Transition } from "semantic-ui-react"
+import { Accordion, Button, Checkbox, Form, Message, Icon, Transition } from "semantic-ui-react"
+import { DateTime } from "luxon"
 import { Link } from "react-router-dom"
 import { useCallback, useDispatch, useSelector, useState } from "../base/react_base"
 import { AppState } from "../base/reducers"
@@ -12,15 +13,39 @@ import { ListingProps } from "./types"
 import DollarInput from "./dollar_input"
 import { apiCall as addBidCall } from "../api/add_bid"
 
+function BidHistory(props: ListingProps) {
+  const { price } = props
+
+  const [active, setActive] = useState<boolean>(false)
+  const handleClick = useCallback(() => {
+    setActive(!active)
+  }, [active])
+
+  return (
+    <Accordion>
+      <Accordion.Title active={active} index={0} onClick={handleClick}>
+        <Icon name="dropdown" />
+        <b>Bid History</b>
+      </Accordion.Title>
+      <Accordion.Content active={active}>
+        <ul>
+          <li>{`The item was listed at XYZ on 123 with a starting price of $${price}.`}</li>
+        </ul>
+      </Accordion.Content>
+    </Accordion>
+  )
+}
+
 interface BidFormProps {
   priceStr: string
   numBids: number
   itemId: number
   handleSuccess: (message: string) => void
+  bidderId: number
 }
 
 function BidForm(props: BidFormProps) {
-  const { priceStr, numBids, itemId, handleSuccess } = props
+  const { priceStr, numBids, itemId, handleSuccess, bidderId } = props
 
   const dispatch = useDispatch()
 
@@ -59,7 +84,15 @@ function BidForm(props: BidFormProps) {
       { itemId, bidPrice },
       () => {
         setSubmitting(false)
-        dispatch(updateSearchItem({ highestBid: bidPrice, numBids: numBids + 1 }, itemId))
+
+        const newBid = {
+          bidderId,
+          itemId,
+          bidPrice,
+          createdAt: DateTime.now().toISO(),
+        }
+
+        dispatch(updateSearchItem({ highestBid: bidPrice, numBids: numBids + 1 }, itemId, newBid))
         handleSuccess(`Bid of $${bidPrice} successfully created!`)
       },
       (err) => {
@@ -67,7 +100,7 @@ function BidForm(props: BidFormProps) {
         setError(err.body as string)
       },
     )
-  }, [dispatch, itemId, bidPrice, numBids, handleSuccess])
+  }, [dispatch, itemId, bidPrice, numBids, handleSuccess, bidderId])
 
   const minBid = price + minIncrement
   const minAutoBid = minBid + minIncrement
@@ -234,6 +267,7 @@ export default function Listing(props: ListingProps) {
                 ) : null}
               </tbody>
             </table>
+            <BidHistory {...props} />
             {isBiddable ? (
               <Button primary onClick={toggleShowBid} className="bid-button">
                 {showBidOptions ? "Cancel" : "Place Bid"}
@@ -261,6 +295,7 @@ export default function Listing(props: ListingProps) {
                     itemId={id}
                     numBids={numBids}
                     handleSuccess={handleSuccess}
+                    bidderId={activeUser?.id}
                   />
                 </div>
               )}

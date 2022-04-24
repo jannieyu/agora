@@ -13,4 +13,5 @@ export interface ListingProps {
   seller: User
   id: number
   sellerId?: number
+  createdAt?: string
 }

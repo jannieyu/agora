@@ -185,6 +185,7 @@
 }
 
 .listing-metadata-table {
+    margin-left: calc(1.25em + 0.25rem); /* Explicit width + margin of dropdown icon. */
     .name-cell {
         padding-right: 15px;
         vertical-align: top;
