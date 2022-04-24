@@ -21,7 +21,7 @@ function HistoricalBidDatum(bid: BidHistoryT) {
   const day = dt.toLocaleString({ month: "long", day: "numeric" })
   const hour = dt.toLocaleString(DateTime.TIME_SIMPLE)
 
-  return <li>{`A bid of $${bidPrice} was placed at ${hour} on ${day}.`}</li>
+  return <li>{`A bid of $${bidPrice} was placed on ${day} at ${hour}.`}</li>
 }
 
 function BidHistory(props: ListingProps) {
@@ -44,7 +44,7 @@ function BidHistory(props: ListingProps) {
       </Accordion.Title>
       <Accordion.Content active={active}>
         <ul>
-          <li>{`The item was listed with a starting price of $${price} at ${hour} on ${day}.`}</li>
+          <li>{`The item was listed with a starting price of $${price} on ${day} at ${hour}.`}</li>
           {bids?.map((bid: BidHistoryT) => (
             <HistoricalBidDatum {...bid} key={bid.createdAt} />
           ))}
