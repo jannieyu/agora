@@ -2,7 +2,7 @@ package api
 
 import (
 	"agora/src/app/database"
-	"agora/src/app/utils"
+	"agora/src/app/user"
 	"net/http"
 
 	log "github.com/sirupsen/logrus"
@@ -16,7 +16,7 @@ func (h Handle) GetSellerItems(w http.ResponseWriter, r *http.Request) {
 
 	seller_id := session.Values["id"].(uint32)
 	items := []database.Item{}
-	db := utils.PreloadSafeSellerInfo(h.Db)
+	db := user.PreloadSafeSellerInfo(h.Db)
 	if err := db.Where(&database.Item{SellerID: seller_id}).Find(&items).Error; err != nil {
 		log.WithError(err).Error("Failed to make query to get seller items.")
 		w.WriteHeader(http.StatusInternalServerError)

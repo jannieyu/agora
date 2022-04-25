@@ -2,7 +2,7 @@ package api
 
 import (
 	"agora/src/app/database"
-	"agora/src/app/utils"
+	i "agora/src/app/item"
 	"net/http"
 	"strconv"
 
@@ -16,7 +16,7 @@ func (h Handle) AddItem(w http.ResponseWriter, r *http.Request) {
 	}
 	var item database.Item
 	sellerID := session.Values["id"].(uint32)
-	if err := utils.PopulateItem(&item, r, sellerID, true); err != nil {
+	if err := i.PopulateItem(&item, r, sellerID, true); err != nil {
 		log.WithError(err).Error("Failed to parse item data.")
 		w.WriteHeader(http.StatusBadRequest)
 		return
