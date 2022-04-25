@@ -21,7 +21,13 @@ function HistoricalBidDatum(bid: BidHistoryT) {
   const day = dt.toLocaleString({ month: "long", day: "numeric" })
   const hour = dt.toLocaleString(DateTime.TIME_SIMPLE)
 
-  return <li>{`A bid of $${bidPrice} was placed on ${day} at ${hour}.`}</li>
+  return (
+    <tr>
+      <td>{bidPrice}</td>
+      <td>{day}</td>
+      <td>{hour}</td>
+    </tr>
+  )
 }
 
 function BidHistory(props: ListingProps) {
@@ -36,6 +42,8 @@ function BidHistory(props: ListingProps) {
   const day = dt.toLocaleString({ month: "long", day: "numeric" })
   const hour = dt.toLocaleString(DateTime.TIME_SIMPLE)
 
+  const reversedBids = bids?.slice()?.reverse()
+
   return (
     <Accordion>
       <Accordion.Title active={active} index={0} onClick={handleClick}>
@@ -43,12 +51,25 @@ function BidHistory(props: ListingProps) {
         <b>Bid History</b>
       </Accordion.Title>
       <Accordion.Content active={active}>
-        <ul>
-          <li>{`The item was listed with a starting price of $${price} on ${day} at ${hour}.`}</li>
-          {bids?.map((bid: BidHistoryT) => (
-            <HistoricalBidDatum {...bid} key={bid.createdAt} />
-          ))}
-        </ul>
+        <table className="listing-history-table">
+          <thead>
+            <tr>
+              <th>Bid Price</th>
+              <th>Date</th>
+              <th>Time</th>
+            </tr>
+          </thead>
+          <tbody>
+            {reversedBids?.map((bid: BidHistoryT) => (
+              <HistoricalBidDatum {...bid} key={bid.createdAt} />
+            ))}
+            <tr>
+              <td>{price}</td>
+              <td>{day}</td>
+              <td>{hour}</td>
+            </tr>
+          </tbody>
+        </table>
       </Accordion.Content>
     </Accordion>
   )

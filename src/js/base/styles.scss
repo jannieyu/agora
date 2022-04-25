@@ -184,12 +184,20 @@
     top: 0.2rem;
 }
 
+.listing-history-table,
 .listing-metadata-table {
     margin-left: calc(1.25em + 0.25rem); /* Explicit width + margin of dropdown icon. */
+    width: calc(100% - (1.25em + 0.25rem));
     .name-cell {
         padding-right: 15px;
         vertical-align: top;
     }
+
+    th {
+        background-color: #ccc;
+    }
 }
 
-
+.listing-history-table {
+    text-align: center;
+}
