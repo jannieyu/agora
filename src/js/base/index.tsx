@@ -17,14 +17,15 @@ import {
   useCallback,
   useDispatch,
   Provider,
-  createStore,
+  configureStore,
   useSelector,
-  useState,
   useEffect,
 } from "./react_base"
 import Home from "./home"
 import LoginModal from "./login_modal"
 import About from "./about"
+import UserProfile from "../users/user_profile"
+import NotificationPage from "../notifications/notification_page"
 import NewListing from "../listings/new_listing"
 import "./styles.scss"
 import { apiCall as logoutCall } from "../api/logout"
@@ -34,14 +35,14 @@ import {
   Response as LoginStatusResponse,
 } from "../api/get_login_status"
 import { rootReducer, AppState } from "./reducers"
-import setData from "./actions"
+import { setData } from "./actions"
 
 interface BaseProps {
   children: React.ReactElement | React.ReactElement[]
 }
 
 // Paths that the user must be logged in to see
-const LOGGED_IN_PATHS = new Set(["/create_listing"])
+const LOGGED_IN_PATHS = new Set(["/create_listing", "/notifications"])
 
 function PageNotFound() {
   return (
@@ -69,29 +70,28 @@ function Unauthorized() {
 function Base(props: BaseProps) {
   const { children } = props
 
-  const [showLoginModal, setShowLoginModal] = useState<boolean>(false)
-  const [isSignUp, setIsSignUp] = useState<boolean>(true)
-
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const location = useLocation()
-  const user = useSelector((state: AppState) => state.user)
+  const { user, showLoginModal, isSignUp, notifications } = useSelector((state: AppState) => state)
 
   const requiresAuth = LOGGED_IN_PATHS.has(location.pathname)
 
   const hideLoginModal = useCallback(() => {
-    setShowLoginModal(false)
-  }, [setShowLoginModal])
+    dispatch(setData({ showLoginModal: false }))
+  }, [dispatch])
 
   const onLogin = useCallback(() => {
-    setShowLoginModal(true)
-    setIsSignUp(false)
-  }, [])
+    dispatch(setData({ showLoginModal: true }))
+
+    dispatch(setData({ isSignUp: false }))
+  }, [dispatch])
 
   const onSignUp = useCallback(() => {
-    setShowLoginModal(true)
-    setIsSignUp(true)
-  }, [])
+    dispatch(setData({ showLoginModal: true }))
+
+    dispatch(setData({ isSignUp: true }))
+  }, [dispatch])
 
   const onLogout = useCallback(() => {
     logoutCall(
@@ -115,6 +115,14 @@ function Base(props: BaseProps) {
     navigate("create_listing")
   }, [navigate])
 
+  const onClickMyProfile = useCallback(() => {
+    navigate(`user_profile/?id=${user.id}`)
+  }, [navigate, user])
+
+  const onClickNotifications = useCallback(() => {
+    navigate(`notifications`)
+  }, [navigate])
+
   useEffect(() => {
     getLoginStatus(
       LOGIN_STATUS_ARGS,
@@ -130,6 +138,10 @@ function Base(props: BaseProps) {
       () => {},
     )
   }, [dispatch])
+
+  const notifStrLen = notifications.length.toString().length
+  const topNotifBubbleWidth = `${notifStrLen * 2 + 6}%`
+  const bottomNotifBubbleWidth = `${notifStrLen * 3 + 9}%`
 
   return (
     <>
@@ -150,16 +162,51 @@ function Base(props: BaseProps) {
             {user ? (
               <div className="login">
                 <Dropdown
-                  text={`${user.firstName} ${user.lastName}`}
                   icon="bars"
                   floating
                   labeled
                   button
                   className="icon"
+                  trigger={
+                    <div className="name-trigger">
+                      <span
+                        style={
+                          notifications.length
+                            ? { marginRight: `${(notifStrLen - 1) * 0.2}rem` }
+                            : null
+                        }
+                      >{`${user.firstName} ${user.lastName}`}</span>
+                      {notifications.length > 0 ? (
+                        <div
+                          className="res-circle"
+                          style={{
+                            width: topNotifBubbleWidth,
+                          }}
+                        >
+                          <div className="circle-txt">{notifications.length}</div>
+                        </div>
+                      ) : null}
+                    </div>
+                  }
                 >
                   <Dropdown.Menu>
                     <Dropdown.Item text="Create Listing" onClick={onCreateListing} />
-                    <Dropdown.Item text="Another Action" />
+                    <Dropdown.Item text="My Profile" onClick={onClickMyProfile} />
+                    <Dropdown.Item onClick={onClickNotifications}>
+                      <div className="notif-dropdown">
+                        Notifications{" "}
+                        {notifications.length > 0 ? (
+                          <div
+                            className="res-circle"
+                            style={{
+                              width: bottomNotifBubbleWidth,
+                            }}
+                          >
+                            <div className="circle-txt">{notifications.length}</div>
+                          </div>
+                        ) : null}
+                      </div>
+                    </Dropdown.Item>
                     <Dropdown.Divider />
                     <Dropdown.Item onClick={onLogout} text="Log Out" />
                   </Dropdown.Menu>
@@ -188,9 +235,11 @@ function Base(props: BaseProps) {
 const ROUTES = {
   about: About,
   create_listing: NewListing,
+  user_profile: UserProfile,
+  notifications: NotificationPage,
 }
 
-const store = createStore(rootReducer)
+const store = configureStore({ reducer: rootReducer })
 
 library.add(fas, far)
 

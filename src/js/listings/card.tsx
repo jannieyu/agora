@@ -5,25 +5,25 @@ import { ListingProps } from "./types"
 import { useCallback, useSelector } from "../base/react_base"
 import { AppState } from "../base/reducers"
 import { ActionType } from "../base/types"
+import { safeParseFloat } from "../base/util"
 
 export interface CardProps extends ListingProps {
-  handleClick: (idx: number, type: string) => void
-  rowIndex: number
-  colIndex: number
+  handleClick: (id: number, type: ActionType) => void
+  itemId: number
 }
 
 export default function Card(props: CardProps) {
-  const { category, name, price, condition, image, handleClick, rowIndex, colIndex, sellerId } =
+  const { category, name, highestBid, condition, numBids, image, handleClick, itemId, sellerId } =
     props
   const navigate = useNavigate()
 
   const handleSelectCard = useCallback(() => {
-    handleClick(rowIndex + colIndex, ActionType.SELECT)
-  }, [rowIndex, colIndex, handleClick])
+    handleClick(itemId, ActionType.SELECT)
+  }, [itemId, handleClick])
 
   const handleDeleteItem = useCallback(() => {
-    handleClick(rowIndex + colIndex, ActionType.DELETE)
-  }, [rowIndex, colIndex, handleClick])
+    handleClick(itemId, ActionType.DELETE)
+  }, [itemId, handleClick])
 
   const activeUser = useSelector((state: AppState) => state.user)
 
@@ -60,7 +60,7 @@ export default function Card(props: CardProps) {
         <div>
           <div className="major-metadata">
             <span>
-              <b>{price.startsWith("$") ? price : `$${price}`}</b>
+              <b>{`$${safeParseFloat(highestBid)?.toFixed(2)}`}</b>
             </span>
           </div>
           <div>{category}</div>
@@ -71,7 +71,9 @@ export default function Card(props: CardProps) {
             <Icon name="edit" className="card-edit" onClick={onEdit} />
             <Icon name="trash" className="card-trash" onClick={onDelete} />
           </div>
-        ) : null}
+        ) : (
+          <div>{`${numBids} bid${numBids === 1 ? "" : "s"}`}</div>
+        )}
       </div>
     </div>
   )

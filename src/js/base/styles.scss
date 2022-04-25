@@ -11,14 +11,15 @@
 .login {
     position: absolute;
     right: 5%;
-
-    .login-icon {
-        padding-right: 1rem;
-    }
 }
 
 .login-form {
     padding: 3% 5% 5% 5%;
+}
+
+.bid-button {
+    margin-top: 2.5vh !important;
+    min-height: 5vh !important;
 }
 
 .column-heading-centered {
@@ -78,6 +79,15 @@
     object-fit: contain;
 }
 
+.listing-information {
+    display: grid;
+    overflow: auto;
+    max-height: 60vh;
+    padding-bottom: 2vh;
+    padding-right: 2vh;
+    padding-left: 2vh;
+}
+
 .card-metadata {
     display: flex;
     justify-content: space-between;
@@ -126,4 +136,68 @@
 
 .unstyled-link {
     color: inherit;
+}
+
+.notif-dropdown {
+    display: flex;
+    align-items: center;
+}
+
+.res-circle {
+    /* (A) PERCENTAGE WIDTH & BORDER RADIUS */
+    border-radius: 50%;
+  
+    /* (B) BACKGROUND COLOR */ 
+    background: red;
+    color: white;
+   
+    /* (C) NECESSARY TO POSITION TEXT BLOCK */
+    line-height: 0;
+    position: absolute;
+    margin-left: 0.5rem;
+    right: 0.5rem;
+}
+   
+/* (D) MATCH HEIGHT */
+.res-circle::after {
+    content: "";
+    display: block;
+    padding-bottom: 100%;
+}
+   
+/* (E) TEXT BLOCK */
+.circle-txt {
+    /* (E1) CENTER TEXT IN CIRCLE */
+    position: absolute;
+    bottom: 50%;
+    width: 100%;
+    text-align: center;
+   
+    /* (E2) THE FONT - NOT REALLY IMPORTANT */
+    font-family: arial, sans-serif;
+    font-weight: bold;
+}
+
+
+.name-trigger > .res-circle {
+    font-size: 7pt;
+    top: 0.2rem;
+}
+
+.listing-history-table,
+.listing-metadata-table {
+    margin-left: calc(1.25em + 0.25rem); /* Explicit width + margin of dropdown icon. */
+    width: calc(100% - (1.25em + 0.25rem));
+    .name-cell {
+        padding-right: 15px;
+        vertical-align: top;
+    }
+
+    th {
+        background-color: #ccc;
+    }
+}
+
+.listing-history-table {
+    text-align: center;
 }

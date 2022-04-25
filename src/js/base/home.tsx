@@ -3,7 +3,7 @@ import { Row, Col } from "react-bootstrap"
 import { Button, Dropdown, Icon, Input, Form } from "semantic-ui-react"
 import { useSearchParams } from "react-router-dom"
 import { categories, conditions } from "../listings/constants"
-import { useCallback, useEffect, useMemo, useState } from "./react_base"
+import { useCallback, useDispatch, useEffect, useMemo, useSelector, useState } from "./react_base"
 import {
   apiCall as getSearchItems,
   Response as GetSearchItemsResponse,
@@ -14,6 +14,8 @@ import Card from "../listings/card"
 import ListingModal from "../listings/listing_modal"
 import ConfirmationModal from "./confirmation_modal"
 import { ActionType, OnChangeObject } from "./types"
+import { AppState } from "./reducers"
+import { setData } from "./actions"
 
 const categoryOptions = [
   {
@@ -53,19 +55,18 @@ const sortByOptions = [
 
 interface CardRowProps {
   cards: ListingProps[]
-  handleClick: (idx: number, actionType: ActionType) => void
-  rowIndex: number
+  handleClick: (id: number, type: ActionType) => void
 }
 
 function CardRow(props: CardRowProps) {
-  const { cards, handleClick, rowIndex } = props
+  const { cards, handleClick } = props
 
   return (
     <>
       <Row>
-        {cards.map((prop: ListingProps, idx: number) => (
+        {cards.map((prop: ListingProps) => (
           <Col xs={3} key={prop.id}>
-            <Card {...prop} handleClick={handleClick} rowIndex={rowIndex} colIndex={idx} />
+            <Card {...prop} handleClick={handleClick} itemId={prop.id} />
           </Col>
         ))}
       </Row>
@@ -75,8 +76,9 @@ function CardRow(props: CardRowProps) {
 }
 
 function Home() {
-  const [searchItems, setSearchItems] = useState<SearchItem[]>([])
-  const [selectedItem, setSelectedItem] = useState<SearchItem | null>(null)
+  const [selectedItemId, setSelectedItemId] = useState<number | null>(null)
+
+  const searchItems = useSelector((state: AppState) => state.searchItems)
 
   const [searchParams, setSearchParams] = useSearchParams()
   const params = useMemo(() => Object.fromEntries([...searchParams]), [searchParams])
@@ -85,16 +87,17 @@ function Home() {
   const [loading, setLoading] = useState<boolean>(false)
   const [deletingItemId, setDeletingItemId] = useState<number | null>(null)
 
-  const handleCardAction = useCallback(
-    (idx: number, actionType: ActionType) => {
-      if (actionType === ActionType.SELECT) {
-        setSelectedItem(searchItems[idx])
-      } else if (actionType === ActionType.DELETE) {
-        setDeletingItemId(searchItems[idx].id)
-      }
-    },
-    [setSelectedItem, searchItems],
-  )
+  const dispatch = useDispatch()
+
+  const handleCardAction = useCallback((itemId: number, actionType: ActionType) => {
+    if (actionType === ActionType.SELECT) {
+      setSelectedItemId(itemId)
+    } else if (actionType === ActionType.DELETE) {
+      setDeletingItemId(itemId)
+    }
+  }, [])
+
+  const selectedItem = searchItems.find((item: SearchItem) => item.id === selectedItemId)
 
   const handleChangeCategory = useCallback(
     (e: React.FormEvent<HTMLInputElement>, data: OnChangeObject) => {
@@ -135,22 +138,26 @@ function Home() {
   )
 
   const deselectItem = useCallback(() => {
-    setSelectedItem(null)
-  }, [setSelectedItem])
+    setSelectedItemId(null)
+  }, [])
 
   const retreiveItems = useCallback(() => {
     setLoading(true)
     getSearchItems(
       params,
       (data: GetSearchItemsResponse) => {
-        setSearchItems(data)
+        dispatch(
+          setData({
+            searchItems: data,
+          }),
+        )
         setLoading(false)
       },
       () => {
         setLoading(false)
       },
     )
-  }, [params])
+  }, [dispatch, params])
 
   useEffect(() => {
     retreiveItems()
@@ -169,7 +176,7 @@ function Home() {
         cards.push(searchItems[i + j])
       }
     }
-    cardRows.push(<CardRow cards={cards} key={i} rowIndex={i} handleClick={handleCardAction} />)
+    cardRows.push(<CardRow cards={cards} key={i} handleClick={handleCardAction} />)
   }
 
   return (
