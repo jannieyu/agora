@@ -140,8 +140,8 @@ function Base(props: BaseProps) {
   }, [dispatch])
 
   const notifStrLen = notifications.length.toString().length
-  const topNotifBubbleWidth = `${notifStrLen * 2 + 6}%`
-  const bottomNotifBubbleWidth = `${notifStrLen * 3 + 9}%`
+  const topNotifBubbleWidth = `${notifStrLen * 0.15 + 0.9}rem`
+  const bottomNotifBubbleWidth = `${notifStrLen * 0.2 + 1.2}rem`
 
   return (
     <>

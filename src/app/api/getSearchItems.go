@@ -27,9 +27,9 @@ func (h Handle) GetSearchItems(w http.ResponseWriter, r *http.Request) {
 
 	switch filters.SortBy {
 	case search.PriceHighLow:
-		result = result.Order("price desc")
+		result = result.Order("highest_bid desc")
 	case search.PriceLowHigh:
-		result = result.Order("price")
+		result = result.Order("highest_bid")
 	default:
 		result = result.Order("created_at desc")
 	}

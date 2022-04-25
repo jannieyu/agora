@@ -17,7 +17,6 @@ export interface SearchItem {
   description: string
   numBids: number
   highestBid: string
-  buyItNowPrice: string
   id: number
   image: string
   name: string
