@@ -2,7 +2,7 @@ import buildWrappedGet from "../base/api"
 
 export type Arguments = {
   itemId: number
-  bidPrice: string
+  maxBid: string
 }
 
 export type Response = unknown

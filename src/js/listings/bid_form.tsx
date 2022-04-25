@@ -10,6 +10,7 @@ import { safeParseFloat } from "../base/util"
 import { isValidPrice, calculateIncrement } from "./util"
 import DollarInput from "./dollar_input"
 import { apiCall as addBidCall } from "../api/add_bid"
+import { apiCall as addBidBotCall } from "../api/add_bid_bot"
 
 interface RefinedBidFormProps {
   price: number
@@ -39,8 +40,8 @@ function AutomaticBidForm(props: RefinedBidFormProps) {
 
   const handleSubmit = useCallback(() => {
     setSubmitting(true)
-    addBidCall(
-      { itemId, bidPrice },
+    addBidBotCall(
+      { itemId, maxBid: bidPrice },
       () => {
         setSubmitting(false)
 
@@ -53,8 +54,8 @@ function AutomaticBidForm(props: RefinedBidFormProps) {
 
         dispatch(updateSearchItem({ highestBid: bidPrice, numBids: numBids + 1 }, itemId, newBid))
         handleSuccess(
-          `Bid of $${bidPrice} successfully created! You will be notified if you are outbid or
-          if the auction ends and you win the item.`,
+          `The autobidder was successfullly confirgured to bid up to $${bidPrice}! You will be notified
+          if another user's bid exceeds this price or if the auction ends and you win the item.`,
         )
       },
       (err) => {
