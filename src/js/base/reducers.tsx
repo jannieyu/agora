@@ -9,8 +9,8 @@ export interface User {
 
 export enum NotificationType {
   OUTBID = "OUTBID",
-  WINNER = "WINNER",
-  LOSER = "LOSER",
+  WON = "WON",
+  LOST = "LOST",
   ITEM_BID_ON = "ITEM_BID_ON",
   ITEM_SOLD = "ITEM_SOLD",
 }
@@ -34,10 +34,10 @@ const initialState = {
       type: NotificationType.OUTBID,
     },
     {
-      type: NotificationType.WINNER,
+      type: NotificationType.WON,
     },
     {
-      type: NotificationType.LOSER,
+      type: NotificationType.LOST,
     },
     {
       type: NotificationType.ITEM_BID_ON,

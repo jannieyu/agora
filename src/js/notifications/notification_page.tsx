@@ -6,25 +6,25 @@ import { useSelector } from "../base/react_base"
 import { AppState, Notification, NotificationType } from "../base/reducers"
 
 const iconMap = new Map<NotificationType, IconProp>([
-  [NotificationType.WINNER, "thumbs-up"],
-  [NotificationType.LOSER, "thumbs-down"],
+  [NotificationType.WON, "thumbs-up"],
+  [NotificationType.LOST, "thumbs-down"],
   [NotificationType.OUTBID, "face-frown"],
   [NotificationType.ITEM_BID_ON, "arrow-up"],
   [NotificationType.ITEM_SOLD, "sack-dollar"],
 ])
 
 const colorMap = new Map([
-  [NotificationType.WINNER, "green"],
-  [NotificationType.LOSER, "red"],
+  [NotificationType.WON, "green"],
+  [NotificationType.LOST, "red"],
   [NotificationType.OUTBID, "red"],
   [NotificationType.ITEM_BID_ON, "green"],
   [NotificationType.ITEM_SOLD, "green"],
 ])
 
 const messageMap = new Map([
-  [NotificationType.WINNER, "Congratulations! You have won ..."],
+  [NotificationType.WON, "Congratulations! You have won ..."],
   [
-    NotificationType.LOSER,
+    NotificationType.LOST,
     "We are sorry to let you know that the following item has been sold to another user",
   ],
   [NotificationType.OUTBID, "You have been outbid on the following item:"],
@@ -41,10 +41,10 @@ function LineItem(props: Notification) {
   return (
     <>
       <Row className="align-items-center">
-        <Col xs={3}>
-          <FontAwesomeIcon icon={iconMap.get(type)} size="3x" color={colorMap.get(type)} />
+        <Col xs={2}>
+          <FontAwesomeIcon icon={iconMap.get(type)} size="2x" color={colorMap.get(type)} />
         </Col>
-        <Col xs={9}>
+        <Col xs={10}>
           <div>{messageMap.get(type)}</div>
         </Col>
       </Row>
