@@ -201,3 +201,20 @@
 .listing-history-table {
     text-align: center;
 }
+
+.notification {
+    .notification-box {
+        padding: 16px 12px 16px 12px;
+    }
+
+    .unseen {
+        background-color: rgba(112, 181, 249, 0.2);
+    }
+
+    border-top: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+.notification > a {
+    color: inherit;
+}
+

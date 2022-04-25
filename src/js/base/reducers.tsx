@@ -7,6 +7,11 @@ export interface User {
   id: number
 }
 
+export interface ItemInfo {
+  name: string
+  id: number
+}
+
 export enum NotificationType {
   OUTBID = "OUTBID",
   WON = "WON",
@@ -21,6 +26,9 @@ export interface Notification {
   seen: boolean
   itemId?: number
   userId?: number
+
+  user?: User
+  itemInfo?: ItemInfo
 }
 
 const initialState = {
@@ -41,9 +49,11 @@ const initialState = {
     },
     {
       type: NotificationType.ITEM_BID_ON,
+      seen: true,
     },
     {
       type: NotificationType.ITEM_SOLD,
+      seen: true,
     },
   ] as Notification[],
 }

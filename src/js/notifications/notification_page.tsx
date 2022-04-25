@@ -1,5 +1,6 @@
 import * as React from "react"
 import { Row, Col } from "react-bootstrap"
+import { Link } from "react-router-dom"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { IconProp } from "@fortawesome/fontawesome-svg-core"
 import { useSelector } from "../base/react_base"
@@ -36,20 +37,26 @@ const messageMap = new Map([
 ])
 
 function LineItem(props: Notification) {
-  const { type } = props
+  const { type, seen } = props
 
   return (
-    <>
-      <Row className="align-items-center">
-        <Col xs={2}>
-          <FontAwesomeIcon icon={iconMap.get(type)} size="2x" color={colorMap.get(type)} />
-        </Col>
-        <Col xs={10}>
-          <div>{messageMap.get(type)}</div>
-        </Col>
-      </Row>
-      <hr />
-    </>
+    <div className="notification">
+      <Link to="/">
+        <div className={`notification-box ${seen ? "" : "unseen"}`}>
+          <Row className="align-items-center">
+            <Col xs={1}>
+              <FontAwesomeIcon icon={iconMap.get(type)} size="2x" color={colorMap.get(type)} />
+            </Col>
+            <Col xs={10}>
+              <div>{messageMap.get(type)}</div>
+            </Col>
+            <Col xs={1}>
+              {!seen ? <FontAwesomeIcon icon="circle" color="rgb(24, 118, 242)" /> : null}
+            </Col>
+          </Row>
+        </div>
+      </Link>
+    </div>
   )
 }
 
@@ -61,7 +68,6 @@ export default function NotificationPage() {
       <Col xs={3} />
       <Col xs={6}>
         <h1 className="column-heading-centered">Notifications</h1>
-        <hr />
         {notifications.map((notification: Notification) => (
           <LineItem {...notification} key={notification.id} />
         ))}
