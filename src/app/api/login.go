@@ -2,7 +2,7 @@ package api
 
 import (
 	"agora/src/app/database"
-	"agora/src/app/utils"
+	u "agora/src/app/user"
 	"encoding/json"
 	"net/http"
 
@@ -24,7 +24,7 @@ func (h Handle) Login(w http.ResponseWriter, r *http.Request) {
 	}
 	session.Options = &sessions.Options{SameSite: http.SameSiteStrictMode}
 	urlParams := r.URL.Query()["data"][0]
-	var loginCredentials utils.LoginCredentialsAPI
+	var loginCredentials u.LoginCredentialsAPI
 	if err := json.Unmarshal([]byte(urlParams), &loginCredentials); err != nil {
 		log.WithError(err).Error("Failed to unmarshal login credentials.")
 		w.WriteHeader(http.StatusBadRequest)
@@ -44,7 +44,7 @@ func (h Handle) Login(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusBadRequest)
 			SafeEncode(w, "{}")
 		} else {
-			hash, err := utils.HashPassword(loginCredentials.Password)
+			hash, err := u.HashPassword(loginCredentials.Password)
 			if err != nil {
 				log.WithError(err).Error("Failed to hash passcode.")
 			}

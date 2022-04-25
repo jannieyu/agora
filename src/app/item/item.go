@@ -1,4 +1,4 @@
-package utils
+package item
 
 import (
 	"agora/src/app/database"
@@ -14,7 +14,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func processImage(r *http.Request) (string, error) {
+func ProcessImage(r *http.Request) (string, error) {
 	log.Info("Enter here.")
 	file, header, err := r.FormFile("image")
 	if err != nil {
@@ -58,7 +58,8 @@ func PopulateItem(item *database.Item, r *http.Request, sellerID uint32, isNew b
 		return err
 	}
 
-	buyItNowPrice, err := ConvertStringPriceToDecimal(r.FormValue("buyItNowPrice"))
+	//r.FormValue("buyItNowPrice")
+	buyItNowPrice, err := ConvertStringPriceToDecimal("9023")
 	if err != nil {
 		log.WithError(err).Error("Failed to parse Buy It Now price value.")
 		return err
@@ -79,7 +80,7 @@ func PopulateItem(item *database.Item, r *http.Request, sellerID uint32, isNew b
 	}
 	item.BuyItNowPrice = buyItNowPrice
 
-	image_location, err := processImage(r)
+	image_location, err := ProcessImage(r)
 	if err != nil {
 		log.WithError(err).Error("Failed to process item image.")
 		return err

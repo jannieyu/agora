@@ -2,7 +2,7 @@ package api
 
 import (
 	"agora/src/app/database"
-	"agora/src/app/utils"
+	i "agora/src/app/item"
 	"encoding/json"
 	log "github.com/sirupsen/logrus"
 	"net/http"
@@ -30,7 +30,7 @@ func (h Handle) UpdateItem(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	utils.PopulateItem(&item, r, session.Values["id"].(uint32), false)
+	i.PopulateItem(&item, r, session.Values["id"].(uint32), false)
 	if err := h.Db.Save(&item).Error; err != nil {
 		log.WithError(err).Error("Failed to save item entry in Items table.")
 		w.WriteHeader(http.StatusInternalServerError)

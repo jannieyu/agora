@@ -27,6 +27,12 @@ func Init() (*gorm.DB, error) {
 			return nil, err
 		}
 	}
+	if !db.Migrator().HasTable(&BidBot{}) {
+		if err := db.AutoMigrate(&BidBot{}); err != nil {
+			log.WithError(err).Error("Failed to initiate BidBots table.")
+			return nil, err
+		}
+	}
 	if !db.Migrator().HasTable(&Item{}) {
 		if err := db.AutoMigrate(&Item{}); err != nil {
 			log.WithError(err).Error("Failed to initiate Items table.")

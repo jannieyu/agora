@@ -1,7 +1,8 @@
-package utils
+package user
 
 import (
 	"agora/src/app/database"
+	"agora/src/app/item"
 	"net/http"
 
 	log "github.com/sirupsen/logrus"
@@ -34,7 +35,7 @@ func PopulateUser(user *database.User, r *http.Request) error {
 
 	user.Bio = r.FormValue("bio")
 
-	if image_location, err := processImage(r); err != nil {
+	if image_location, err := item.ProcessImage(r); err != nil {
 		log.WithError(err).Error("Failed to process user image.")
 		return err
 	} else {
