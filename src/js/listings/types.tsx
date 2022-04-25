@@ -6,7 +6,6 @@ export interface ListingProps {
   name: string
   highestBid: string
   price: string // starting price
-  buyItNowPrice: string
   bids: BidHistory[]
   condition: string
   numBids: number
