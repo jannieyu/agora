@@ -24,10 +24,6 @@ func ValidateBidBot(db *gorm.DB, bidBot database.BidBot) (int, error) {
 	if bidBot.MaxBid.LessThanOrEqual(item.HighestBid) {
 		return http.StatusBadRequest, errors.New("Max bid must be greater than highest bid.")
 	}
-
-	if !bidBot.Increment.IsPositive() {
-		return http.StatusBadRequest, errors.New("Increment must be positive.")
-	}
 	return http.StatusOK, nil
 }
 
@@ -37,7 +33,11 @@ func runBotAgainstHighestBid(db *gorm.DB, bidBot *database.BidBot) (int, error) 
 		log.WithError(err).Error("Failed to make query to get item of bid bot.")
 		return http.StatusInternalServerError, err
 	}
-	autoBidPrice := decimal.Min(item.HighestBid.Add(bidBot.Increment), bidBot.MaxBid)
+	inc, err := getBidBotIncrementPrice(db, bidBot.ItemID)
+	if err != nil {
+		return http.StatusInternalServerError, err
+	}
+	autoBidPrice := decimal.Min(item.HighestBid.Add(inc), bidBot.MaxBid)
 	if statusCode, err := bid.PlaceBid(bidBot.OwnerID, bidBot.ItemID, autoBidPrice, db); err != nil {
 		log.WithError(err).Error("Failed to place bid for bid bot ", bidBot.ID)
 		return statusCode, err
@@ -50,10 +50,13 @@ func RunManualBidAgainstBot(db *gorm.DB, itemId uint32, bidPrice decimal.Decimal
 		log.WithError(err).Error("Failed to make query to get active bid bots for item.")
 		return http.StatusInternalServerError, err
 	}
-
 	if len(bidBots) != 0 {
 		bidBot := bidBots[0]
-		autoBidPrice := decimal.Min(bidPrice.Add(bidBot.Increment), bidBot.MaxBid)
+		inc, err := getBidBotIncrementPrice(db, bidBot.ItemID)
+		if err != nil {
+			return http.StatusInternalServerError, err
+		}
+		autoBidPrice := decimal.Min(bidPrice.Add(inc), bidBot.MaxBid)
 		if autoBidPrice.GreaterThanOrEqual(bidPrice) {
 			if statusCode, err := bid.PlaceBid(bidBot.OwnerID, bidBot.ItemID, autoBidPrice, db); err != nil {
 				log.WithError(err).Error("Failed to place bid for bid bot ", bidBot.ID)
@@ -71,7 +74,11 @@ func RunManualBidAgainstBot(db *gorm.DB, itemId uint32, bidPrice decimal.Decimal
 }
 
 func updateBidBotWinner(db *gorm.DB, loserBidBot *database.BidBot, winnerBidBot *database.BidBot) (int, error) {
-	autoBidPrice := decimal.Min(loserBidBot.MaxBid.Add(winnerBidBot.Increment), winnerBidBot.MaxBid)
+	inc, err := getBidBotIncrementPrice(db, loserBidBot.ItemID)
+	if err != nil {
+		return http.StatusInternalServerError, err
+	}
+	autoBidPrice := decimal.Min(loserBidBot.MaxBid.Add(inc), winnerBidBot.MaxBid)
 	if statusCode, err := bid.PlaceBid(loserBidBot.OwnerID, loserBidBot.ItemID, loserBidBot.MaxBid, db); err != nil {
 		log.WithError(err).Error("Failed to place bid for bid bot ", loserBidBot.ID)
 		return statusCode, err
@@ -135,4 +142,47 @@ func deactivateBidBot(db *gorm.DB, bidBot *database.BidBot) error {
 	}
 	log.Info("Deactivated bid bot ", bidBot.ID)
 	return nil
+}
+
+func getBidBotIncrementPrice(db *gorm.DB, itemID uint32) (decimal.Decimal, error) {
+	var item database.Item
+	if err := db.First(&item, itemID).Error; err != nil {
+		return decimal.Decimal{}, err
+	}
+	itemHighestBid := item.HighestBid
+
+	switch {
+	case itemHighestBid.LessThan(decimal.NewFromFloat(0.01)):
+		return decimal.Decimal{}, errors.New("Highest bid price is less than 0.01.")
+	case itemHighestBid.GreaterThanOrEqual(decimal.NewFromFloat(0.01)) &&
+		itemHighestBid.LessThanOrEqual(decimal.NewFromFloat(0.99)):
+		return decimal.NewFromFloat(0.05), nil
+	case itemHighestBid.GreaterThanOrEqual(decimal.NewFromFloat(1.00)) &&
+		itemHighestBid.LessThanOrEqual(decimal.NewFromFloat(4.99)):
+		return decimal.NewFromFloat(0.25), nil
+	case itemHighestBid.GreaterThanOrEqual(decimal.NewFromFloat(5.00)) &&
+		itemHighestBid.LessThanOrEqual(decimal.NewFromFloat(24.99)):
+		return decimal.NewFromFloat(0.50), nil
+	case itemHighestBid.GreaterThanOrEqual(decimal.NewFromFloat(25.00)) &&
+		itemHighestBid.LessThanOrEqual(decimal.NewFromFloat(99.99)):
+		return decimal.NewFromFloat(1.00), nil
+	case itemHighestBid.GreaterThanOrEqual(decimal.NewFromFloat(100.00)) &&
+		itemHighestBid.LessThanOrEqual(decimal.NewFromFloat(249.99)):
+		return decimal.NewFromFloat(2.00), nil
+	case itemHighestBid.GreaterThanOrEqual(decimal.NewFromFloat(250.00)) &&
+		itemHighestBid.LessThanOrEqual(decimal.NewFromFloat(449.99)):
+		return decimal.NewFromFloat(5.00), nil
+	case itemHighestBid.GreaterThanOrEqual(decimal.NewFromFloat(500.00)) &&
+		itemHighestBid.LessThanOrEqual(decimal.NewFromFloat(999.99)):
+		return decimal.NewFromFloat(10.00), nil
+	case itemHighestBid.GreaterThanOrEqual(decimal.NewFromFloat(1000.00)) &&
+		itemHighestBid.LessThanOrEqual(decimal.NewFromFloat(2499.99)):
+		return decimal.NewFromFloat(25.00), nil
+	case itemHighestBid.GreaterThanOrEqual(decimal.NewFromFloat(2500.00)) &&
+		itemHighestBid.LessThanOrEqual(decimal.NewFromFloat(4999.99)):
+		return decimal.NewFromFloat(50.00), nil
+
+	default:
+		return decimal.NewFromFloat(100.00), nil
+	}
 }

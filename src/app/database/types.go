@@ -43,11 +43,10 @@ type Bid struct {
 }
 
 type BidBot struct {
-	ID        uint32          `json:"id,omitempty" gorm:"primarykey"`
-	OwnerID   uint32          `json:"ownerId,omitempty"`
-	Owner     User            `json:"owner,omitempty" gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;foreignkey:OwnerID"`
-	ItemID    uint32          `json:"itemId,omitempty"`
-	Increment decimal.Decimal `json:"inc,omitempty" gorm:"type:decimal(6,2);"`
-	MaxBid    decimal.Decimal `json:"maxBid,omitempty" gorm:"type:decimal(6,2);"`
-	Active    bool            `json:"active,omitempty"`
+	ID      uint32          `json:"id,omitempty" gorm:"primarykey"`
+	OwnerID uint32          `json:"ownerId,omitempty"`
+	Owner   User            `json:"owner,omitempty" gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;foreignkey:OwnerID"`
+	ItemID  uint32          `json:"itemId,omitempty"`
+	MaxBid  decimal.Decimal `json:"maxBid,omitempty" gorm:"type:decimal(6,2);"`
+	Active  bool            `json:"active,omitempty"`
 }

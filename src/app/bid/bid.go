@@ -56,7 +56,7 @@ func checkValidBidder(bidderID uint32, itemID uint32, db *gorm.DB) (bool, error)
 
 func checkValidBidIncrement(bidPrice float64, itemHighestBid float64) error {
 	switch {
-	case itemHighestBid <= 0.01:
+	case itemHighestBid < 0.01:
 		return errors.New("Highest bid price is less than 0.01.")
 	case 0.01 <= itemHighestBid && itemHighestBid <= 0.99:
 		if itemHighestBid+0.05 > bidPrice {

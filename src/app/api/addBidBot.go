@@ -67,21 +67,15 @@ func (h Handle) AddBidBot(w http.ResponseWriter, r *http.Request) {
 }
 
 func populateBidBot(bidBotAPI bidBot.BidBotAPI, ownerId uint32) (database.BidBot, error) {
-
-	inc, err := item.ConvertStringPriceToDecimal(bidBotAPI.Increment)
-	if err != nil {
-		return database.BidBot{}, err
-	}
 	maxBid, err := item.ConvertStringPriceToDecimal(bidBotAPI.MaxBid)
 	if err != nil {
 		return database.BidBot{}, err
 	}
 	bot := database.BidBot{
-		OwnerID:   ownerId,
-		ItemID:    bidBotAPI.ItemID,
-		Increment: inc,
-		MaxBid:    maxBid,
-		Active:    true,
+		OwnerID: ownerId,
+		ItemID:  bidBotAPI.ItemID,
+		MaxBid:  maxBid,
+		Active:  true,
 	}
 	return bot, nil
 }
