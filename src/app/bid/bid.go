@@ -57,6 +57,7 @@ func PlaceBid(bidderID uint32, itemID uint32, bidPrice decimal.Decimal, db *gorm
 }
 
 func CreateNotification(db *gorm.DB, note database.Notification) error {
+	note.Seen = false
 	if err := db.Create(&note).Error; err != nil {
 		return err
 	}
