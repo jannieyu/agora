@@ -9,6 +9,7 @@ export interface User {
 
 export interface ItemInfo {
   name: string
+  highestBid: string
   id: number
 }
 
@@ -37,22 +38,29 @@ const initialState = {
   showLoginModal: false as boolean,
   isSignUp: true as boolean,
   searchItems: [] as SearchItem[],
+  selectedItemId: null as number | null,
   notifications: [
     {
+      type: NotificationType.ITEM_BID_ON,
+      id: 4,
+    },
+    {
       type: NotificationType.OUTBID,
+      id: 1,
+      itemId: 12,
     },
     {
       type: NotificationType.WON,
+      id: 2,
     },
     {
       type: NotificationType.LOST,
-    },
-    {
-      type: NotificationType.ITEM_BID_ON,
+      id: 3,
       seen: true,
     },
     {
       type: NotificationType.ITEM_SOLD,
+      id: 5,
       seen: true,
     },
   ] as Notification[],
@@ -64,6 +72,7 @@ export enum ActionType {
   SET_DATA = "SET_DATA",
   UPDATE_SEARCH_ITEM = "UPDATE_SEARCH_ITEM",
   CREATE_NOTIFICATION = "CREATE_NOTIFICATION",
+  UPDATE_NOTIFICATION = "UPDATE_NOTIFICATION",
 }
 
 export type SearchItemAction = {
@@ -72,7 +81,12 @@ export type SearchItemAction = {
   newBid?: BidHistory
 }
 
-export type ActionPayload = Partial<AppState> | SearchItemAction | Notification
+export type NotificationAction = {
+  data: Partial<Notification>
+  notificationId: number
+}
+
+export type ActionPayload = Partial<AppState> | SearchItemAction | Notification | NotificationAction
 
 export interface Action {
   type: ActionType
@@ -104,6 +118,20 @@ export const rootReducer = (state: AppState = initialState, action: Action) => {
       return {
         ...state,
         notifications: [...state.notifications, action.payload],
+      }
+    }
+    case ActionType.UPDATE_NOTIFICATION: {
+      const { data, notificationId } = action.payload as NotificationAction
+      return {
+        ...state,
+        notifications: state.notifications.map((notification: Notification) =>
+          notification.id === notificationId
+            ? {
+                ...notification,
+                ...data,
+              }
+            : notification,
+        ),
       }
     }
     default: {

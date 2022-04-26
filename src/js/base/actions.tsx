@@ -19,3 +19,8 @@ export const createNotification = (data: Notification) => ({
   type: ActionType.CREATE_NOTIFICATION,
   payload: data,
 })
+
+export const updateNotification = (data: Partial<Notification>, notificationId: number) => ({
+  type: ActionType.UPDATE_NOTIFICATION,
+  payload: { data, notificationId },
+})

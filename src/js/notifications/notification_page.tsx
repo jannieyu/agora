@@ -1,10 +1,12 @@
 import * as React from "react"
 import { Row, Col } from "react-bootstrap"
-import { Link } from "react-router-dom"
+import { useNavigate } from "react-router-dom"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { IconProp } from "@fortawesome/fontawesome-svg-core"
-import { useSelector } from "../base/react_base"
+import { useDispatch, useSelector } from "../base/react_base"
 import { AppState, Notification, NotificationType } from "../base/reducers"
+import { setData, updateNotification } from "../base/actions"
+import { safeParseFloat } from "../base/util"
 
 const iconMap = new Map<NotificationType, IconProp>([
   [NotificationType.WON, "thumbs-up"],
@@ -22,40 +24,88 @@ const colorMap = new Map([
   [NotificationType.ITEM_SOLD, "green"],
 ])
 
-const messageMap = new Map([
-  [NotificationType.WON, "Congratulations! You have won ..."],
-  [
-    NotificationType.LOST,
-    "We are sorry to let you know that the following item has been sold to another user",
-  ],
-  [NotificationType.OUTBID, "You have been outbid on the following item:"],
-  [NotificationType.ITEM_BID_ON, "Your listing ... has been bid on! The current price is ..."],
-  [
-    NotificationType.ITEM_SOLD,
-    "Congratulations, your item ... has been sold to ... at a price of ...!",
-  ],
-])
-
 function LineItem(props: Notification) {
-  const { type, seen } = props
+  const { id, type, seen, itemId, itemInfo, user } = props
+
+  const navigate = useNavigate()
+  const dispatch = useDispatch()
+
+  const lineItemContent = (() => {
+    const price = `$${safeParseFloat(itemInfo?.highestBid)?.toFixed(2)}`
+
+    switch (type) {
+      case NotificationType.ITEM_BID_ON:
+        return (
+          <div>
+            A bid of {price} was placed on your listing {`${itemInfo?.name}`}.
+          </div>
+        )
+      case NotificationType.WON:
+        return (
+          <div>
+            Congratulations! You won {`${itemInfo?.name}`} for a final bid price of
+            {price} Please contact {`${user?.firstName} ${user?.lastName}`} to arrange an exchange.
+            Their email address is {`${user?.email}`} and they may have more contact info listed on
+            their profile page.
+          </div>
+        )
+      case NotificationType.LOST:
+        return (
+          <div>
+            We are sorry to inform you that you lost the auction for {`${itemInfo?.name}`}. We hope
+            you were satisfied by your AuctionHouse experience. Any feedback is welcome at
+            dev@auctionhouse.com
+          </div>
+        )
+      case NotificationType.ITEM_SOLD:
+        return (
+          <div>
+            Congratulations! Your item {`${itemInfo?.name}`} was sold to{" "}
+            {`${user?.firstName} ${user?.lastName}`} for a final price of {price}. Please contact
+            {`${user?.firstName} ${user?.lastName}`} to arrange an exchange. Their email address is{" "}
+            {`${user?.email}`} and they may have more contact info listed on their profile page.
+          </div>
+        )
+      case NotificationType.OUTBID:
+        return (
+          <div>
+            You have been outbid on {`${itemInfo?.name}`}. The new highest bid is {price}. If you
+            are still interested in this item, make sure to submit another bid before the auction
+            ends!
+          </div>
+        )
+      default:
+        return <div />
+    }
+  })()
+
+  const onClick = () => {
+    dispatch(updateNotification({ seen: true }, id))
+    if (type === NotificationType.OUTBID) {
+      dispatch(setData({ selectedItemId: itemId }))
+      navigate("/")
+    }
+  }
 
   return (
     <div className="notification">
-      <Link to="/">
-        <div className={`notification-box ${seen ? "" : "unseen"}`}>
-          <Row className="align-items-center">
-            <Col xs={1}>
-              <FontAwesomeIcon icon={iconMap.get(type)} size="2x" color={colorMap.get(type)} />
-            </Col>
-            <Col xs={10}>
-              <div>{messageMap.get(type)}</div>
-            </Col>
-            <Col xs={1}>
-              {!seen ? <FontAwesomeIcon icon="circle" color="rgb(24, 118, 242)" /> : null}
-            </Col>
-          </Row>
-        </div>
-      </Link>
+      <div
+        className={`notification-box ${seen ? "" : "unseen"}`}
+        onClick={onClick}
+        onKeyPress={onClick}
+        role="link"
+        tabIndex={0}
+      >
+        <Row className="align-items-center">
+          <Col xs={1}>
+            <FontAwesomeIcon icon={iconMap.get(type)} size="2x" color={colorMap.get(type)} />
+          </Col>
+          <Col xs={10}>{lineItemContent}</Col>
+          <Col xs={1}>
+            {!seen ? <FontAwesomeIcon icon="circle" color="rgb(24, 118, 242)" /> : null}
+          </Col>
+        </Row>
+      </div>
     </div>
   )
 }

@@ -139,7 +139,8 @@ function Base(props: BaseProps) {
     )
   }, [dispatch])
 
-  const notifStrLen = notifications.length.toString().length
+  const numNewNotifications = notifications.filter((notif) => !notif.seen).length
+  const notifStrLen = numNewNotifications.toString().length
   const topNotifBubbleWidth = `${notifStrLen * 0.15 + 0.9}rem`
   const bottomNotifBubbleWidth = `${notifStrLen * 0.2 + 1.2}rem`
 
@@ -171,19 +172,19 @@ function Base(props: BaseProps) {
                     <div className="name-trigger">
                       <span
                         style={
-                          notifications.length
+                          numNewNotifications
                             ? { marginRight: `${(notifStrLen - 1) * 0.2}rem` }
                             : null
                         }
                       >{`${user.firstName} ${user.lastName}`}</span>
-                      {notifications.length > 0 ? (
+                      {numNewNotifications > 0 ? (
                         <div
                           className="res-circle"
                           style={{
                             width: topNotifBubbleWidth,
                           }}
                         >
-                          <div className="circle-txt">{notifications.length}</div>
+                          <div className="circle-txt">{numNewNotifications}</div>
                         </div>
                       ) : null}
                     </div>
@@ -195,14 +196,14 @@ function Base(props: BaseProps) {
                     <Dropdown.Item onClick={onClickNotifications}>
                       <div className="notif-dropdown">
                         Notifications{" "}
-                        {notifications.length > 0 ? (
+                        {numNewNotifications > 0 ? (
                           <div
                             className="res-circle"
                             style={{
                               width: bottomNotifBubbleWidth,
                             }}
                           >
-                            <div className="circle-txt">{notifications.length}</div>
+                            <div className="circle-txt">{numNewNotifications}</div>
                           </div>
                         ) : null}
                       </div>

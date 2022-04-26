@@ -76,9 +76,7 @@ function CardRow(props: CardRowProps) {
 }
 
 function Home() {
-  const [selectedItemId, setSelectedItemId] = useState<number | null>(null)
-
-  const searchItems = useSelector((state: AppState) => state.searchItems)
+  const { searchItems, selectedItemId } = useSelector((state: AppState) => state)
 
   const [searchParams, setSearchParams] = useSearchParams()
   const params = useMemo(() => Object.fromEntries([...searchParams]), [searchParams])
@@ -89,13 +87,16 @@ function Home() {
 
   const dispatch = useDispatch()
 
-  const handleCardAction = useCallback((itemId: number, actionType: ActionType) => {
-    if (actionType === ActionType.SELECT) {
-      setSelectedItemId(itemId)
-    } else if (actionType === ActionType.DELETE) {
-      setDeletingItemId(itemId)
-    }
-  }, [])
+  const handleCardAction = useCallback(
+    (itemId: number, actionType: ActionType) => {
+      if (actionType === ActionType.SELECT) {
+        dispatch(setData({ selectedItemId: itemId }))
+      } else if (actionType === ActionType.DELETE) {
+        setDeletingItemId(itemId)
+      }
+    },
+    [dispatch],
+  )
 
   const selectedItem = searchItems.find((item: SearchItem) => item.id === selectedItemId)
 
@@ -138,8 +139,8 @@ function Home() {
   )
 
   const deselectItem = useCallback(() => {
-    setSelectedItemId(null)
-  }, [])
+    dispatch(setData({ selectedItemId: null }))
+  }, [dispatch])
 
   const retreiveItems = useCallback(() => {
     setLoading(true)
