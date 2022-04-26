@@ -13,14 +13,20 @@ export enum NotificationType {
   LOST = "LOST",
   ITEM_BID_ON = "ITEM_BID_ON",
   ITEM_SOLD = "ITEM_SOLD",
+  BIDBOT_DEACTIVATED = "BIDBOT_DEACTIVATED",
+  BIDBOT_BID = "BIDBOT_BID",
 }
 
 export interface Notification {
-  type: NotificationType
+  noteType: NotificationType
   id: number
   seen: boolean
   itemId?: number
   userId?: number
+  price?: string
+
+  user?: User
+  itemName?: string
 }
 
 const initialState = {
@@ -29,23 +35,7 @@ const initialState = {
   showLoginModal: false as boolean,
   isSignUp: true as boolean,
   searchItems: [] as SearchItem[],
-  notifications: [
-    {
-      type: NotificationType.OUTBID,
-    },
-    {
-      type: NotificationType.WON,
-    },
-    {
-      type: NotificationType.LOST,
-    },
-    {
-      type: NotificationType.ITEM_BID_ON,
-    },
-    {
-      type: NotificationType.ITEM_SOLD,
-    },
-  ] as Notification[],
+  notifications: [] as Notification[],
 }
 
 export type AppState = typeof initialState
@@ -54,6 +44,7 @@ export enum ActionType {
   SET_DATA = "SET_DATA",
   UPDATE_SEARCH_ITEM = "UPDATE_SEARCH_ITEM",
   CREATE_NOTIFICATION = "CREATE_NOTIFICATION",
+  UPDATE_NOTIFICATION = "UPDATE_NOTIFICATION",
 }
 
 export type SearchItemAction = {
@@ -62,7 +53,12 @@ export type SearchItemAction = {
   newBid?: BidHistory
 }
 
-export type ActionPayload = Partial<AppState> | SearchItemAction | Notification
+export type NotificationAction = {
+  data: Partial<Notification>
+  notificationId: number
+}
+
+export type ActionPayload = Partial<AppState> | SearchItemAction | Notification | NotificationAction
 
 export interface Action {
   type: ActionType
@@ -94,6 +90,20 @@ export const rootReducer = (state: AppState = initialState, action: Action) => {
       return {
         ...state,
         notifications: [...state.notifications, action.payload],
+      }
+    }
+    case ActionType.UPDATE_NOTIFICATION: {
+      const { data, notificationId } = action.payload as NotificationAction
+      return {
+        ...state,
+        notifications: state.notifications.map((notification: Notification) =>
+          notification.id === notificationId
+            ? {
+                ...notification,
+                ...data,
+              }
+            : notification,
+        ),
       }
     }
     default: {
