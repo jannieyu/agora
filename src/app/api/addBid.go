@@ -3,10 +3,13 @@ package api
 import (
 	"agora/src/app/bid"
 	"agora/src/app/bidBot"
+	"agora/src/app/database"
 	"agora/src/app/item"
+	"agora/src/app/notification"
 	"encoding/json"
-	log "github.com/sirupsen/logrus"
 	"net/http"
+
+	log "github.com/sirupsen/logrus"
 )
 
 func (h Handle) AddBid(w http.ResponseWriter, r *http.Request) {
@@ -31,16 +34,37 @@ func (h Handle) AddBid(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	prevHighestBid, err := bidBot.GetPrevHighestBid(h.Db, bidAPI.ItemID)
+	if err != nil {
+		log.WithError(err).Error("Failed to retrieve previous highest bid on item.")
+		w.WriteHeader(http.StatusInternalServerError)
+	}
+
 	if statusCode, err := bid.PlaceBid(bidderID, bidAPI.ItemID, bidPrice, h.Db); err != nil {
 		log.WithError(err).Error("Failed to place bid.")
 		w.WriteHeader(statusCode)
 		return
 	}
 
-	if statusCode, err := bidBot.RunManualBidAgainstBot(h.Db, bidAPI.ItemID, bidPrice); err != nil {
+	statusCode, existingBot, err := bidBot.RunManualBidAgainstBot(h.Db, bidAPI.ItemID, bidderID, bidPrice)
+	if err != nil {
 		log.WithError(err).Error("Failed to run manual bid against bots.")
 		w.WriteHeader(statusCode)
 		return
+	}
+	if !existingBot {
+		if prevHighestBid.ID > 0 && prevHighestBid.BidderID != bidderID {
+			if err := bid.CreateNotification(h.Db, database.Notification{
+				ReceiverID: prevHighestBid.BidderID,
+				SenderID:   bidderID,
+				ItemID:     bidAPI.ItemID,
+				Price:      bidPrice,
+				NoteType:   notification.OUTBID,
+			}); err != nil {
+				log.WithError(err).Error("Failed to create new notification.")
+				w.WriteHeader(http.StatusInternalServerError)
+			}
+		}
 	}
 
 	w.WriteHeader(http.StatusCreated)
