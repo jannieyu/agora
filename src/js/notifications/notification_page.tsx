@@ -84,6 +84,9 @@ function LineItem(props: Notification) {
     if (noteType === NotificationType.OUTBID) {
       navigate(`/?itemId=${itemId}`)
     }
+    if (noteType === NotificationType.ITEM_BID_ON) {
+      navigate(`/?itemId=${itemId}`)
+    }
   }
 
   return (
