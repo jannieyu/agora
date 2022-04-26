@@ -7,6 +7,10 @@ import (
 	"net/http"
 )
 
+type seenNotePayload struct {
+	NoteIds []uint32
+}
+
 func (h Handle) UpdateSeenNotifications(w http.ResponseWriter, r *http.Request) {
 	session, err := h.Store.Get(r, "user-auth")
 	if err != nil {
@@ -17,14 +21,15 @@ func (h Handle) UpdateSeenNotifications(w http.ResponseWriter, r *http.Request) 
 	receiverId := session.Values["id"].(uint32)
 
 	urlParams := r.URL.Query()["data"][0]
-	var payload map[string][]uint32
+	var payload seenNotePayload
 	if err := json.Unmarshal([]byte(urlParams), &payload); err != nil {
 		log.WithError(err).Error("Failed to unmarshal bid information.")
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
+
 	var noteReceiverIds []uint32
-	if err := h.Db.Table("notifications").Select("receiver_id").Where("id IN ?", payload["noteIds"]).Find(&noteReceiverIds).Error; err != nil {
+	if err := h.Db.Table("notifications").Select("receiver_id").Where("id IN ?", payload.NoteIds).Find(&noteReceiverIds).Error; err != nil {
 		log.WithError(err).Error("Failed to query notifications to be marked as seen.")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
@@ -36,7 +41,7 @@ func (h Handle) UpdateSeenNotifications(w http.ResponseWriter, r *http.Request) 
 			return
 		}
 	}
-	if err = h.Db.Table("notifications").Where("id IN ?", payload["noteIds"]).Updates(map[string]interface{}{"seen": true}).Error; err != nil {
+	if err = h.Db.Table("notifications").Where("id IN ?", payload.NoteIds).Updates(map[string]interface{}{"seen": true}).Error; err != nil {
 		log.WithError(err).Error("Failed to update notifications as seen.")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
