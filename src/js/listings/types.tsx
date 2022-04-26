@@ -15,4 +15,5 @@ export interface ListingProps {
   id: number
   sellerId?: number
   createdAt?: string
+  defaultShowHistory?: boolean
 }

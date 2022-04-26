@@ -29,9 +29,9 @@ function HistoricalBidDatum(bid: BidHistoryT) {
 }
 
 function BidHistory(props: ListingProps) {
-  const { bids, price, createdAt } = props
+  const { bids, price, createdAt, defaultShowHistory } = props
 
-  const [active, setActive] = useState<boolean>(false)
+  const [active, setActive] = useState<boolean>(defaultShowHistory)
   const handleClick = useCallback(() => {
     setActive(!active)
   }, [active])
@@ -154,7 +154,7 @@ export default function Listing(props: ListingProps) {
                 ) : null}
               </tbody>
             </table>
-            <BidHistory {...props} />
+            <BidHistory {...props} defaultShowHistory={!isBiddable} />
             {isBiddable ? (
               <Button primary onClick={toggleShowBid} className="bid-button">
                 {showBidOptions ? "Cancel" : "Place Bid"}
