@@ -21,7 +21,7 @@ function HistoricalBidDatum(bid: BidHistoryT) {
 
   return (
     <tr>
-      <td>{bidPrice}</td>
+      <td>{safeParseFloat(bidPrice).toFixed(2)}</td>
       <td>{day}</td>
       <td>{hour}</td>
     </tr>

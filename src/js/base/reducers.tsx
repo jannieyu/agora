@@ -7,12 +7,6 @@ export interface User {
   id: number
 }
 
-export interface ItemInfo {
-  name: string
-  highestBid: string
-  id: number
-}
-
 export enum NotificationType {
   OUTBID = "OUTBID",
   WON = "WON",
@@ -32,7 +26,7 @@ export interface Notification {
   price?: string
 
   user?: User
-  itemInfo?: ItemInfo
+  itemName?: string
 }
 
 const initialState = {

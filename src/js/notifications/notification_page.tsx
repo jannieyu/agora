@@ -1,9 +1,10 @@
 import * as React from "react"
 import { Row, Col } from "react-bootstrap"
 import { useNavigate } from "react-router-dom"
+import { Button } from "semantic-ui-react"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { IconProp } from "@fortawesome/fontawesome-svg-core"
-import { useDispatch, useSelector } from "../base/react_base"
+import { useCallback, useDispatch, useSelector } from "../base/react_base"
 import { AppState, Notification, NotificationType } from "../base/reducers"
 import { updateNotification } from "../base/actions"
 import { safeParseFloat } from "../base/util"
@@ -29,7 +30,7 @@ const colorMap = new Map([
 ])
 
 function LineItem(props: Notification) {
-  const { id, noteType, seen, itemId, price, itemInfo, user } = props
+  const { id, noteType, seen, itemId, price, itemName, user } = props
 
   const navigate = useNavigate()
   const dispatch = useDispatch()
@@ -41,13 +42,13 @@ function LineItem(props: Notification) {
       case NotificationType.ITEM_BID_ON:
         return (
           <div>
-            A bid of {priceStr} was placed on your listing {`${itemInfo?.name}`}.
+            A bid of {priceStr} was placed on your listing {itemName}.
           </div>
         )
       case NotificationType.WON:
         return (
           <div>
-            Congratulations! You won {`${itemInfo?.name}`} for a final bid price of
+            Congratulations! You won {itemName} for a final bid price of
             {priceStr} Please contact {`${user?.firstName} ${user?.lastName}`} to arrange an
             exchange. Their email address is {`${user?.email}`} and they may have more contact info
             listed on their profile page.
@@ -56,15 +57,15 @@ function LineItem(props: Notification) {
       case NotificationType.LOST:
         return (
           <div>
-            We are sorry to inform you that you lost the auction for {`${itemInfo?.name}`}. We hope
-            you were satisfied by your AuctionHouse experience. Any feedback is welcome at
+            We are sorry to inform you that you lost the auction for {itemName}. We hope you were
+            satisfied by your AuctionHouse experience. Any feedback is welcome at
             dev@auctionhouse.com
           </div>
         )
       case NotificationType.ITEM_SOLD:
         return (
           <div>
-            Congratulations! Your item {`${itemInfo?.name}`} was sold to{" "}
+            Congratulations! Your item {itemName} was sold to{" "}
             {`${user?.firstName} ${user?.lastName}`} for a final price of {priceStr}. Please contact
             {`${user?.firstName} ${user?.lastName}`} to arrange an exchange. Their email address is{" "}
             {`${user?.email}`} and they may have more contact info listed on their profile page.
@@ -73,23 +74,22 @@ function LineItem(props: Notification) {
       case NotificationType.OUTBID:
         return (
           <div>
-            You have been outbid on {`${itemInfo?.name}`}. The new highest bid is {priceStr}. If you
-            are still interested in this item, make sure to submit another bid before the auction
-            ends!
+            You have been outbid on {itemName}. The new highest bid is {priceStr}. If you are still
+            interested in this item, make sure to submit another bid before the auction ends!
           </div>
         )
       case NotificationType.BIDBOT_BID:
         return (
           <div>
-            An automatic bid of {priceStr} was placed on {`${itemInfo?.name}`} on your behalf.
+            An automatic bid of {priceStr} was placed on {itemName} on your behalf.
           </div>
         )
       case NotificationType.BIDBOT_DEACTIVATED:
         return (
           <div>
-            A bid of {priceStr} was placed on {`${itemInfo?.name}`}, exceeding your automatic
-            bidder&apos;s upper limit. As such, your automatic bidder has been deactivated. Make
-            sure to place another bid if you are still interested in this item!
+            A bid of {priceStr} was placed on {itemName}, exceeding your automatic bidder&apos;s
+            upper limit. As such, your automatic bidder has been deactivated. Make sure to place
+            another bid if you are still interested in this item!
           </div>
         )
       default:
@@ -97,8 +97,12 @@ function LineItem(props: Notification) {
     }
   })()
 
-  const onClick = () => {
+  const dismiss = useCallback(() => {
     dispatch(updateNotification({ seen: true }, id))
+  }, [dispatch, id])
+
+  const onClick = () => {
+    dismiss()
     if (
       noteType === NotificationType.OUTBID ||
       noteType === NotificationType.ITEM_BID_ON ||
@@ -111,14 +115,11 @@ function LineItem(props: Notification) {
 
   return (
     <div className="notification">
-      <div
-        className={`notification-box ${seen ? "" : "unseen"}`}
-        onClick={onClick}
-        onKeyPress={onClick}
-        role="link"
-        tabIndex={0}
-      >
+      <div className={`notification-box ${seen ? "" : "unseen"}`}>
         <Row className="align-items-center">
+          <Col xs={1} className="column-heading-centered">
+            {!seen ? <FontAwesomeIcon icon="circle" color="rgb(24, 118, 242)" /> : null}
+          </Col>
           <Col xs={1}>
             <FontAwesomeIcon
               icon={iconMap.get(noteType)}
@@ -126,9 +127,23 @@ function LineItem(props: Notification) {
               color={colorMap.get(noteType)}
             />
           </Col>
-          <Col xs={10}>{lineItemContent}</Col>
-          <Col xs={1}>
-            {!seen ? <FontAwesomeIcon icon="circle" color="rgb(24, 118, 242)" /> : null}
+          <Col
+            xs={8}
+            className="notification-text"
+            onClick={onClick}
+            onKeyPress={onClick}
+            role="link"
+            tabIndex={0}
+          >
+            {lineItemContent}
+          </Col>
+
+          <Col xs={2} className="column-heading-centered">
+            {!seen ? (
+              <Button size="mini" basic color="black" onClick={dismiss}>
+                Dismiss
+              </Button>
+            ) : null}
           </Col>
         </Row>
       </div>
@@ -143,14 +158,14 @@ export default function NotificationPage() {
 
   return (
     <Row>
-      <Col xs={3} />
-      <Col xs={6}>
+      <Col xs={2} />
+      <Col xs={8}>
         <h1 className="column-heading-centered">Notifications</h1>
         {reverseNotifs.map((notification: Notification) => (
           <LineItem {...notification} key={notification.id} />
         ))}
       </Col>
-      <Col xs={3} />
+      <Col xs={2} />
     </Row>
   )
 }
