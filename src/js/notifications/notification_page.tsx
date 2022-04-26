@@ -88,8 +88,8 @@ function LineItem(props: Notification) {
         return (
           <div>
             A bid of {priceStr} was placed on {`${itemInfo?.name}`}, exceeding your automatic
-            bidder's upper limit. As such, your automatic bidder has been deactivated. Make sure to
-            place another bid if you are still interested in this item!
+            bidder&apos;s upper limit. As such, your automatic bidder has been deactivated. Make
+            sure to place another bid if you are still interested in this item!
           </div>
         )
       default:
