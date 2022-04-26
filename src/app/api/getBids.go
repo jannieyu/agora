@@ -6,7 +6,6 @@ import (
 	"net/http"
 
 	log "github.com/sirupsen/logrus"
-	"gorm.io/gorm"
 )
 
 func (h Handle) GetBids(w http.ResponseWriter, r *http.Request) {
@@ -22,9 +21,6 @@ func (h Handle) GetBids(w http.ResponseWriter, r *http.Request) {
 
 	var bids []database.Bid
 	result := h.Db
-	result = result.Preload("Bidder", func(tx *gorm.DB) *gorm.DB {
-		return tx.Select("id", "first_name", "last_name")
-	})
 	if err := result.Select("bid_price", "bidder_id", "created_at").Where(&database.Bid{ItemID: payload.itemId}).Find(&bids).Error; err != nil {
 		log.WithError(err).Error("Failed to make query to get item bids.")
 		w.WriteHeader(http.StatusInternalServerError)
