@@ -22,11 +22,12 @@ export enum NotificationType {
 }
 
 export interface Notification {
-  type: NotificationType
+  noteType: NotificationType
   id: number
   seen: boolean
   itemId?: number
   userId?: number
+  price?: string
 
   user?: User
   itemInfo?: ItemInfo
@@ -38,31 +39,7 @@ const initialState = {
   showLoginModal: false as boolean,
   isSignUp: true as boolean,
   searchItems: [] as SearchItem[],
-  notifications: [
-    {
-      type: NotificationType.ITEM_BID_ON,
-      id: 4,
-    },
-    {
-      type: NotificationType.OUTBID,
-      id: 1,
-      itemId: 12,
-    },
-    {
-      type: NotificationType.WON,
-      id: 2,
-    },
-    {
-      type: NotificationType.LOST,
-      id: 3,
-      seen: true,
-    },
-    {
-      type: NotificationType.ITEM_SOLD,
-      id: 5,
-      seen: true,
-    },
-  ] as Notification[],
+  notifications: [] as Notification[],
 }
 
 export type AppState = typeof initialState

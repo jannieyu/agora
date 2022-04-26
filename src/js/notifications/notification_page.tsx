@@ -25,28 +25,28 @@ const colorMap = new Map([
 ])
 
 function LineItem(props: Notification) {
-  const { id, type, seen, itemId, itemInfo, user } = props
+  const { id, noteType, seen, itemId, price, itemInfo, user } = props
 
   const navigate = useNavigate()
   const dispatch = useDispatch()
 
   const lineItemContent = (() => {
-    const price = `$${safeParseFloat(itemInfo?.highestBid)?.toFixed(2)}`
+    const priceStr = `$${safeParseFloat(price)?.toFixed(2)}`
 
-    switch (type) {
+    switch (noteType) {
       case NotificationType.ITEM_BID_ON:
         return (
           <div>
-            A bid of {price} was placed on your listing {`${itemInfo?.name}`}.
+            A bid of {priceStr} was placed on your listing {`${itemInfo?.name}`}.
           </div>
         )
       case NotificationType.WON:
         return (
           <div>
             Congratulations! You won {`${itemInfo?.name}`} for a final bid price of
-            {price} Please contact {`${user?.firstName} ${user?.lastName}`} to arrange an exchange.
-            Their email address is {`${user?.email}`} and they may have more contact info listed on
-            their profile page.
+            {priceStr} Please contact {`${user?.firstName} ${user?.lastName}`} to arrange an
+            exchange. Their email address is {`${user?.email}`} and they may have more contact info
+            listed on their profile page.
           </div>
         )
       case NotificationType.LOST:
@@ -61,7 +61,7 @@ function LineItem(props: Notification) {
         return (
           <div>
             Congratulations! Your item {`${itemInfo?.name}`} was sold to{" "}
-            {`${user?.firstName} ${user?.lastName}`} for a final price of {price}. Please contact
+            {`${user?.firstName} ${user?.lastName}`} for a final price of {priceStr}. Please contact
             {`${user?.firstName} ${user?.lastName}`} to arrange an exchange. Their email address is{" "}
             {`${user?.email}`} and they may have more contact info listed on their profile page.
           </div>
@@ -69,7 +69,7 @@ function LineItem(props: Notification) {
       case NotificationType.OUTBID:
         return (
           <div>
-            You have been outbid on {`${itemInfo?.name}`}. The new highest bid is {price}. If you
+            You have been outbid on {`${itemInfo?.name}`}. The new highest bid is {priceStr}. If you
             are still interested in this item, make sure to submit another bid before the auction
             ends!
           </div>
@@ -81,7 +81,7 @@ function LineItem(props: Notification) {
 
   const onClick = () => {
     dispatch(updateNotification({ seen: true }, id))
-    if (type === NotificationType.OUTBID) {
+    if (noteType === NotificationType.OUTBID) {
       navigate(`/?itemId=${itemId}`)
     }
   }
@@ -97,7 +97,11 @@ function LineItem(props: Notification) {
       >
         <Row className="align-items-center">
           <Col xs={1}>
-            <FontAwesomeIcon icon={iconMap.get(type)} size="2x" color={colorMap.get(type)} />
+            <FontAwesomeIcon
+              icon={iconMap.get(noteType)}
+              size="2x"
+              color={colorMap.get(noteType)}
+            />
           </Col>
           <Col xs={10}>{lineItemContent}</Col>
           <Col xs={1}>
@@ -111,13 +115,15 @@ function LineItem(props: Notification) {
 
 export default function NotificationPage() {
   const notifications = useSelector((state: AppState) => state.notifications)
+  const reverseNotifs = [...notifications]
+  reverseNotifs.reverse()
 
   return (
     <Row>
       <Col xs={3} />
       <Col xs={6}>
         <h1 className="column-heading-centered">Notifications</h1>
-        {notifications.map((notification: Notification) => (
+        {reverseNotifs.map((notification: Notification) => (
           <LineItem {...notification} key={notification.id} />
         ))}
       </Col>

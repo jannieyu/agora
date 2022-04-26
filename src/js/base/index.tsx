@@ -34,6 +34,10 @@ import {
   API_ARGS as LOGIN_STATUS_ARGS,
   Response as LoginStatusResponse,
 } from "../api/get_login_status"
+import {
+  apiCall as getNotifications,
+  Response as GetNotificationsResponse,
+} from "../api/get_notifications"
 import { rootReducer, AppState } from "./reducers"
 import { setData } from "./actions"
 
@@ -138,6 +142,22 @@ function Base(props: BaseProps) {
       () => {},
     )
   }, [dispatch])
+
+  useEffect(() => {
+    if (user) {
+      getNotifications(
+        {},
+        (notificationResponse: GetNotificationsResponse) => {
+          dispatch(
+            setData({
+              notifications: notificationResponse,
+            }),
+          )
+        },
+        () => {},
+      )
+    }
+  }, [dispatch, user])
 
   const numNewNotifications = notifications.filter((notif) => !notif.seen).length
   const notifStrLen = numNewNotifications.toString().length
