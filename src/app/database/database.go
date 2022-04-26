@@ -15,12 +15,6 @@ func Init() (*gorm.DB, error) {
 		return nil, err
 	}
 
-	if !db.Migrator().HasTable(&User{}) {
-		if err := db.AutoMigrate(&User{}); err != nil {
-			log.WithError(err).Error("Failed to initiate Users table.")
-			return nil, err
-		}
-	}
 	if !db.Migrator().HasTable(&Bid{}) {
 		if err := db.AutoMigrate(&Bid{}); err != nil {
 			log.WithError(err).Error("Failed to initiate Bids table.")
@@ -33,6 +27,20 @@ func Init() (*gorm.DB, error) {
 			return nil, err
 		}
 	}
+	if !db.Migrator().HasTable(&Notification{}) {
+		if err := db.AutoMigrate(&Notification{}); err != nil {
+			log.WithError(err).Error("Failed to initiate Notifications table.")
+			return nil, err
+		}
+	}
+
+	if !db.Migrator().HasTable(&User{}) {
+		if err := db.AutoMigrate(&User{}); err != nil {
+			log.WithError(err).Error("Failed to initiate Users table.")
+			return nil, err
+		}
+	}
+
 	if !db.Migrator().HasTable(&Item{}) {
 		if err := db.AutoMigrate(&Item{}); err != nil {
 			log.WithError(err).Error("Failed to initiate Items table.")

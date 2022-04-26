@@ -44,6 +44,7 @@ func main() {
 	r.HandleFunc("/api/add_bid", h.AddBid)
 	r.HandleFunc("/api/get_bids", h.GetBids)
 	r.HandleFunc("/api/add_bid_bot", h.AddBidBot)
+	r.HandleFunc("/api/get_notifications", h.GetNotifications)
 
 	port := 8000
 	log.Info("Server up and running on port " + fmt.Sprint(port))

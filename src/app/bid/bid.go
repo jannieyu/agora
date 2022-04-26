@@ -2,6 +2,7 @@ package bid
 
 import (
 	"agora/src/app/database"
+	"agora/src/app/notification"
 	"errors"
 	"fmt"
 	"github.com/shopspring/decimal"
@@ -31,10 +32,10 @@ func PlaceBid(bidderID uint32, itemID uint32, bidPrice decimal.Decimal, db *gorm
 		ItemID:   itemID,
 		BidPrice: bidPrice,
 	}
+
 	if err := db.Create(&bid).Error; err != nil {
 		return http.StatusInternalServerError, err
 	}
-
 	updateMaxBid(&item, bidPrice)
 	updateNumBid(&item)
 	if err := db.Save(&item).Error; err != nil {
@@ -42,7 +43,24 @@ func PlaceBid(bidderID uint32, itemID uint32, bidPrice decimal.Decimal, db *gorm
 
 	}
 
-	return 0, nil
+	if err := CreateNotification(db, database.Notification{
+		ReceiverID: item.SellerID,
+		SenderID:   bid.BidderID,
+		ItemID:     bid.ItemID,
+		Price:      bid.BidPrice,
+		NoteType:   notification.ITEM_BID_ON,
+	}); err != nil {
+		return http.StatusInternalServerError, err
+	}
+
+	return http.StatusOK, nil
+}
+
+func CreateNotification(db *gorm.DB, note database.Notification) error {
+	if err := db.Create(&note).Error; err != nil {
+		return err
+	}
+	return nil
 }
 
 func checkValidBidder(bidderID uint32, itemID uint32, db *gorm.DB) (bool, error) {
@@ -61,43 +79,43 @@ func checkValidBidIncrement(bidPrice float64, itemHighestBid float64) error {
 	case 0.01 <= itemHighestBid && itemHighestBid <= 0.99:
 		if itemHighestBid+0.05 > bidPrice {
 
-			return errors.New(fmt.Sprintf("Bid must be at least %d", itemHighestBid+0.05))
+			return errors.New(fmt.Sprintf("Bid must be at least %f", itemHighestBid+0.05))
 		}
 	case 1.00 <= itemHighestBid && itemHighestBid <= 4.99:
 		if itemHighestBid+0.25 > bidPrice {
-			return errors.New(fmt.Sprintf("Bid must be at least %d", itemHighestBid+0.25))
+			return errors.New(fmt.Sprintf("Bid must be at least %f", itemHighestBid+0.25))
 		}
 	case 5.00 <= itemHighestBid && itemHighestBid <= 24.99:
 		if itemHighestBid+0.50 > bidPrice {
-			return errors.New(fmt.Sprintf("Bid must be at least %d", itemHighestBid+0.50))
+			return errors.New(fmt.Sprintf("Bid must be at least %f", itemHighestBid+0.50))
 		}
 	case 25.00 <= itemHighestBid && itemHighestBid <= 99.99:
 		if itemHighestBid+1.00 > bidPrice {
-			return errors.New(fmt.Sprintf("Bid must be at least %d", itemHighestBid+1.00))
+			return errors.New(fmt.Sprintf("Bid must be at least %f", itemHighestBid+1.00))
 		}
 	case 100.00 <= itemHighestBid && itemHighestBid <= 249.99:
 		if itemHighestBid+2.50 > bidPrice {
-			return errors.New(fmt.Sprintf("Bid must be at least %d", itemHighestBid+2.50))
+			return errors.New(fmt.Sprintf("Bid must be at least %f", itemHighestBid+2.50))
 		}
 	case 250.00 <= itemHighestBid && itemHighestBid <= 499.99:
 		if itemHighestBid+5.00 > bidPrice {
-			return errors.New(fmt.Sprintf("Bid must be at least %d", itemHighestBid+5.00))
+			return errors.New(fmt.Sprintf("Bid must be at least %f", itemHighestBid+5.00))
 		}
 	case 500.00 <= itemHighestBid && itemHighestBid <= 999.99:
 		if itemHighestBid+10.00 > bidPrice {
-			return errors.New(fmt.Sprintf("Bid must be at least %d", itemHighestBid+10.00))
+			return errors.New(fmt.Sprintf("Bid must be at least %f", itemHighestBid+10.00))
 		}
 	case 1000.00 <= itemHighestBid && itemHighestBid <= 2499.99:
 		if itemHighestBid+25.00 > bidPrice {
-			return errors.New(fmt.Sprintf("Bid must be at least %d", itemHighestBid+25.00))
+			return errors.New(fmt.Sprintf("Bid must be at least %f", itemHighestBid+25.00))
 		}
 	case 2500.00 <= itemHighestBid && itemHighestBid <= 4999.99:
 		if itemHighestBid+50.00 > bidPrice {
-			return errors.New(fmt.Sprintf("Bid must be at least %d", itemHighestBid+50.00))
+			return errors.New(fmt.Sprintf("Bid must be at least %f", itemHighestBid+50.00))
 		}
 	default:
 		if itemHighestBid+100.00 > bidPrice {
-			return errors.New(fmt.Sprintf("Bid must be at least %d", itemHighestBid+100.00))
+			return errors.New(fmt.Sprintf("Bid must be at least %f", itemHighestBid+100.00))
 		}
 	}
 	return nil
