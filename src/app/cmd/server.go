@@ -39,7 +39,6 @@ func main() {
 	r.HandleFunc("/api/add_item", h.AddItem)
 	r.HandleFunc("/api/update_item", h.UpdateItem)
 	r.HandleFunc("/api/delete_item", h.DeleteItem)
-	r.HandleFunc("/api/get_seller_items", h.GetSellerItems)
 	r.HandleFunc("/api/get_search_items", h.GetSearchItems)
 	r.HandleFunc("/api/add_bid", h.AddBid)
 	r.HandleFunc("/api/get_bids", h.GetBids)
