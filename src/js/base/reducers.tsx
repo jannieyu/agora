@@ -38,7 +38,6 @@ const initialState = {
   showLoginModal: false as boolean,
   isSignUp: true as boolean,
   searchItems: [] as SearchItem[],
-  selectedItemId: null as number | null,
   notifications: [
     {
       type: NotificationType.ITEM_BID_ON,

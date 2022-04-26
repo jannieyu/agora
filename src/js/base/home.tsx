@@ -16,6 +16,7 @@ import ConfirmationModal from "./confirmation_modal"
 import { ActionType, OnChangeObject } from "./types"
 import { AppState } from "./reducers"
 import { setData } from "./actions"
+import { safeParseFloat } from "./util"
 
 const categoryOptions = [
   {
@@ -76,7 +77,7 @@ function CardRow(props: CardRowProps) {
 }
 
 function Home() {
-  const { searchItems, selectedItemId } = useSelector((state: AppState) => state)
+  const { searchItems } = useSelector((state: AppState) => state)
 
   const [searchParams, setSearchParams] = useSearchParams()
   const params = useMemo(() => Object.fromEntries([...searchParams]), [searchParams])
@@ -90,14 +91,15 @@ function Home() {
   const handleCardAction = useCallback(
     (itemId: number, actionType: ActionType) => {
       if (actionType === ActionType.SELECT) {
-        dispatch(setData({ selectedItemId: itemId }))
+        setSearchParams({ ...params, itemId: `${itemId}` })
       } else if (actionType === ActionType.DELETE) {
         setDeletingItemId(itemId)
       }
     },
-    [dispatch],
+    [params, setSearchParams],
   )
 
+  const selectedItemId = safeParseFloat(params.itemId)
   const selectedItem = searchItems.find((item: SearchItem) => item.id === selectedItemId)
 
   const handleChangeCategory = useCallback(
@@ -139,13 +141,20 @@ function Home() {
   )
 
   const deselectItem = useCallback(() => {
-    dispatch(setData({ selectedItemId: null }))
-  }, [dispatch])
+    const newParams = { ...params }
+    delete newParams.itemId
+    setSearchParams(newParams)
+  }, [params, setSearchParams])
 
   const retreiveItems = useCallback(() => {
     setLoading(true)
     getSearchItems(
-      params,
+      {
+        category: params.category,
+        condition: params.condition,
+        sort: params.sort,
+        search: params.search,
+      },
       (data: GetSearchItemsResponse) => {
         dispatch(
           setData({
@@ -158,7 +167,7 @@ function Home() {
         setLoading(false)
       },
     )
-  }, [dispatch, params])
+  }, [dispatch, params.search, params.category, params.condition, params.sort])
 
   useEffect(() => {
     retreiveItems()

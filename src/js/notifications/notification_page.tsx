@@ -5,7 +5,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { IconProp } from "@fortawesome/fontawesome-svg-core"
 import { useDispatch, useSelector } from "../base/react_base"
 import { AppState, Notification, NotificationType } from "../base/reducers"
-import { setData, updateNotification } from "../base/actions"
+import { updateNotification } from "../base/actions"
 import { safeParseFloat } from "../base/util"
 
 const iconMap = new Map<NotificationType, IconProp>([
@@ -82,8 +82,7 @@ function LineItem(props: Notification) {
   const onClick = () => {
     dispatch(updateNotification({ seen: true }, id))
     if (type === NotificationType.OUTBID) {
-      dispatch(setData({ selectedItemId: itemId }))
-      navigate("/")
+      navigate(`/?itemId=${itemId}`)
     }
   }
 
