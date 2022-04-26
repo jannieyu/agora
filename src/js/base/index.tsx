@@ -211,8 +211,7 @@ function Base(props: BaseProps) {
                   }
                 >
                   <Dropdown.Menu>
-                    <Dropdown.Item text="Create Listing" onClick={onCreateListing} />
-                    <Dropdown.Item text="My Profile" onClick={onClickMyProfile} />
+                    <Dropdown.Item text="My Bids" onClick={onClickMyProfile} />
                     <Dropdown.Item onClick={onClickNotifications}>
                       <div className="notif-dropdown">
                         Notifications{" "}
@@ -229,6 +228,10 @@ function Base(props: BaseProps) {
                       </div>
                     </Dropdown.Item>
                     <Dropdown.Divider />
+                    <Dropdown.Item text="Create Listing" onClick={onCreateListing} />
+                    <Dropdown.Item text="My Listings" onClick={onClickMyProfile} />
+                    <Dropdown.Divider />
+                    <Dropdown.Item text="Account" onClick={onClickMyProfile} />
                     <Dropdown.Item onClick={onLogout} text="Log Out" />
                   </Dropdown.Menu>
                 </Dropdown>
