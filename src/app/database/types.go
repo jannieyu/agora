@@ -28,6 +28,7 @@ type Notification struct {
 	ItemID     uint32            `json:"itemId,omitempty"`
 	Price      decimal.Decimal   `json:"price,omitempty" gorm:"type:decimal(6,2);"`
 	NoteType   notification.Note `json:"noteType,omitempty"`
+	Seen       bool              `json:"seen,omitempty"`
 }
 
 type User struct {
