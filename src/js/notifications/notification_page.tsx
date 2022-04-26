@@ -14,6 +14,8 @@ const iconMap = new Map<NotificationType, IconProp>([
   [NotificationType.OUTBID, "face-frown"],
   [NotificationType.ITEM_BID_ON, "arrow-up"],
   [NotificationType.ITEM_SOLD, "sack-dollar"],
+  [NotificationType.BIDBOT_BID, "arrow-up"],
+  [NotificationType.BIDBOT_DEACTIVATED, "face-frown"],
 ])
 
 const colorMap = new Map([
@@ -22,6 +24,8 @@ const colorMap = new Map([
   [NotificationType.OUTBID, "red"],
   [NotificationType.ITEM_BID_ON, "green"],
   [NotificationType.ITEM_SOLD, "green"],
+  [NotificationType.BIDBOT_BID, "green"],
+  [NotificationType.BIDBOT_DEACTIVATED, "red"],
 ])
 
 function LineItem(props: Notification) {
@@ -74,6 +78,20 @@ function LineItem(props: Notification) {
             ends!
           </div>
         )
+      case NotificationType.BIDBOT_BID:
+        return (
+          <div>
+            An automatic bid of {priceStr} was placed on {`${itemInfo?.name}`} on your behalf.
+          </div>
+        )
+      case NotificationType.BIDBOT_DEACTIVATED:
+        return (
+          <div>
+            A bid of {priceStr} was placed on {`${itemInfo?.name}`}, exceeding your automatic
+            bidder's upper limit. As such, your automatic bidder has been deactivated. Make sure to
+            place another bid if you are still interested in this item!
+          </div>
+        )
       default:
         return <div />
     }
@@ -81,10 +99,12 @@ function LineItem(props: Notification) {
 
   const onClick = () => {
     dispatch(updateNotification({ seen: true }, id))
-    if (noteType === NotificationType.OUTBID) {
-      navigate(`/?itemId=${itemId}`)
-    }
-    if (noteType === NotificationType.ITEM_BID_ON) {
+    if (
+      noteType === NotificationType.OUTBID ||
+      noteType === NotificationType.ITEM_BID_ON ||
+      noteType === NotificationType.BIDBOT_BID ||
+      noteType === NotificationType.BIDBOT_DEACTIVATED
+    ) {
       navigate(`/?itemId=${itemId}`)
     }
   }

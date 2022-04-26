@@ -19,6 +19,8 @@ export enum NotificationType {
   LOST = "LOST",
   ITEM_BID_ON = "ITEM_BID_ON",
   ITEM_SOLD = "ITEM_SOLD",
+  BIDBOT_DEACTIVATED = "BIDBOT_DEACTIVATED",
+  BIDBOT_BID = "BIDBOT_BID",
 }
 
 export interface Notification {

@@ -154,7 +154,7 @@ export default function Listing(props: ListingProps) {
                 ) : null}
               </tbody>
             </table>
-            <BidHistory {...props} defaultShowHistory={!isBiddable} />
+            <BidHistory {...props} defaultShowHistory={!isBiddable && !!activeUser} />
             {isBiddable ? (
               <Button primary onClick={toggleShowBid} className="bid-button">
                 {showBidOptions ? "Cancel" : "Place Bid"}
