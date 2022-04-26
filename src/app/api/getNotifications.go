@@ -3,10 +3,20 @@ package api
 import (
 	"agora/src/app/database"
 	"agora/src/app/notification"
+	"github.com/shopspring/decimal"
 	log "github.com/sirupsen/logrus"
-	"gorm.io/gorm"
 	"net/http"
 )
+
+type NotificationAPI struct {
+	ID         uint32            `json:"id,omitempty"`
+	ReceiverID uint32            `json:"receiverId,omitempty"`
+	SenderID   uint32            `json:"senderId,omitempty"`
+	ItemID     uint32            `json:"itemId,omitempty"`
+	Name       string            `json:"itemName"`
+	Price      decimal.Decimal   `json:"price,omitempty"`
+	NoteType   notification.Note `json:"noteType,omitempty"`
+}
 
 func (h Handle) GetNotifications(w http.ResponseWriter, r *http.Request) {
 	{
@@ -16,28 +26,19 @@ func (h Handle) GetNotifications(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
-		receiver_id := session.Values["id"].(uint32)
-		var notifications []database.Notification
-		if err := h.Db.Where(&database.Notification{ReceiverID: receiver_id}).Find(&notifications).Error; err != nil {
-			log.WithError(err).Error("Failed to make query to get notifications.")
-			w.WriteHeader(http.StatusInternalServerError)
-			return
+		receiverId := session.Values["id"].(uint32)
+		var result []NotificationAPI
+		if err := h.Db.Model(&database.Notification{}).Select(
+			"notifications.id, "+
+				"notifications.receiver_id, "+
+				"notifications.sender_id, "+
+				"notifications.item_id, "+
+				"items.name, "+
+				"notifications.price, "+
+				"notifications.note_type").Joins(
+			"left join items on items.id = notifications.item_id").Where(
+			"notifications.receiver_id = ?", receiverId).Scan(&result).Error; err != nil {
 		}
-		SafeEncode(w, notifications)
-		w.WriteHeader(http.StatusOK)
+		SafeEncode(w, result)
 	}
-}
-
-func createNotification(db *gorm.DB, receiverId uint32, highestBid *database.Bid, noteType notification.Note) error {
-	notification := database.Notification{
-		ReceiverID: receiverId,
-		SenderID:   highestBid.BidderID,
-		ItemID:     highestBid.ItemID,
-		Price:      highestBid.BidPrice,
-		NoteType:   noteType,
-	}
-	if err := db.Create(&notification).Error; err != nil {
-		return err
-	}
-	return nil
 }
