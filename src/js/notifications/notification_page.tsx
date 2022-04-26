@@ -8,6 +8,7 @@ import { useCallback, useDispatch, useSelector } from "../base/react_base"
 import { AppState, Notification, NotificationType } from "../base/reducers"
 import { updateNotification } from "../base/actions"
 import { safeParseFloat } from "../base/util"
+import { apiCall as updateSeenNotifications } from "../api/update_seen_notifications"
 
 const iconMap = new Map<NotificationType, IconProp>([
   [NotificationType.WON, "thumbs-up"],
@@ -99,6 +100,11 @@ function LineItem(props: Notification) {
 
   const dismiss = useCallback(() => {
     dispatch(updateNotification({ seen: true }, id))
+    updateSeenNotifications(
+      { noteIds: [id] },
+      () => {},
+      () => {},
+    )
   }, [dispatch, id])
 
   const onClick = () => {
@@ -153,15 +159,13 @@ function LineItem(props: Notification) {
 
 export default function NotificationPage() {
   const notifications = useSelector((state: AppState) => state.notifications)
-  const reverseNotifs = [...notifications]
-  reverseNotifs.reverse()
 
   return (
     <Row>
       <Col xs={2} />
       <Col xs={8}>
         <h1 className="column-heading-centered">Notifications</h1>
-        {reverseNotifs.map((notification: Notification) => (
+        {notifications.map((notification: Notification) => (
           <LineItem {...notification} key={notification.id} />
         ))}
       </Col>

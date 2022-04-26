@@ -150,7 +150,7 @@ function Base(props: BaseProps) {
         (notificationResponse: GetNotificationsResponse) => {
           dispatch(
             setData({
-              notifications: notificationResponse,
+              notifications: notificationResponse || [],
             }),
           )
         },
