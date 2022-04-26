@@ -8,8 +8,9 @@ const (
 )
 
 type Filters struct {
-	SortBy    SortMethod `json:"sort,omitempty"`
-	Condition string     `json:"condition,omitempty"`
-	Category  string     `json:"category,omitempty"`
-	Search    string     `json:"search,omitempty"`
+	SortBy          SortMethod `json:"sort,omitempty"`
+	Condition       string     `json:"condition,omitempty"`
+	Category        string     `json:"category,omitempty"`
+	Search          string     `json:"search,omitempty"`
+	SellerItemsOnly bool       `json:"sellerItemsOnly,omitempty"`
 }

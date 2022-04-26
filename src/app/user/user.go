@@ -3,6 +3,7 @@ package user
 import (
 	"agora/src/app/database"
 	"agora/src/app/item"
+	"github.com/gorilla/sessions"
 	"net/http"
 
 	log "github.com/sirupsen/logrus"
@@ -42,4 +43,16 @@ func PopulateUser(user *database.User, r *http.Request) error {
 		user.Image = image_location
 	}
 	return nil
+}
+
+func GetAuthorizedUserId(store *sessions.CookieStore, r *http.Request) (uint32, error) {
+	userId := uint32(0)
+	session, err := store.Get(r, "user-auth")
+	if err != nil {
+		return userId, err
+	}
+	if session.Values["id"] != nil {
+		userId = session.Values["id"].(uint32)
+	}
+	return userId, nil
 }
