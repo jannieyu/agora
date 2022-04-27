@@ -9,6 +9,93 @@ import { apiCall as getBids, Response as GetBidsResponse, ItemBid } from "../api
 import { apiCall as getBidBots, Response as GetBidBotsResponse, BidBot } from "../api/get_bid_bots"
 import BidModal from "./bid_modal"
 
+type AutomaticBidProps = BidBot & {
+  anyDeactivated: boolean
+}
+
+function AutomaticBid(props: AutomaticBidProps) {
+  const {
+    highestItemBid,
+    highestBotBid,
+    itemId,
+    itemName,
+    itemImage,
+    maxBid,
+    active,
+    anyDeactivated,
+  } = props
+
+  const { user } = useSelector((state: AppState) => state)
+
+  const price = safeParseFloat(highestItemBid)
+  const minIncrement = calculateIncrement(price)
+
+  const highestItemBidStr = `$${safeParseFloat(highestItemBid).toFixed(2)}`
+  const highestUserBidStr = `$${safeParseFloat(highestBotBid).toFixed(2)}`
+  const maxBidStr = `$${safeParseFloat(maxBid).toFixed(2)}`
+
+  const [showBidModal, setShowBidModal] = useState<boolean>(false)
+
+  const openPlaceBidModal = useCallback(() => {
+    setShowBidModal(true)
+  }, [])
+
+  const hideBidModal = useCallback(() => {
+    setShowBidModal(false)
+  }, [])
+
+  return (
+    <div className="my_bids auto_bids align-items-center justify-space-between">
+      <BidModal
+        show={showBidModal}
+        onHide={hideBidModal}
+        price={price}
+        numBids={1}
+        bidderId={user.id}
+        itemId={itemId}
+        minIncrement={minIncrement}
+        handleSuccess={() => {}}
+        isAutomatic
+      />
+      <Col xs={2}>
+        <img src={`/${itemImage}`} alt="Listing Preview" />
+      </Col>
+      <div>
+        <b>{itemName}</b>
+      </div>
+      <div>
+        <div>Your Top Bid:</div>
+        <strong>{highestUserBidStr}</strong>
+      </div>
+      <div>
+        <div>Top Overall Bid:</div>
+        <strong>{highestItemBidStr}</strong>
+      </div>
+      <div>
+        <div>Bot Upper Limit:</div>
+        <strong>{maxBidStr}</strong>
+      </div>
+      <div>
+        <div>Status</div>
+        {active ? (
+          <strong className="winning">Active</strong>
+        ) : (
+          <strong className="losing">Deactivated</strong>
+        )}
+      </div>
+      {anyDeactivated ? (
+        <Col xs={2}>
+          {!active ? (
+            <Button positive onClick={openPlaceBidModal}>
+              Place Bid
+            </Button>
+          ) : null}
+        </Col>
+      ) : null}
+    </div>
+  )
+}
+
 type ManualBidProps = ItemBid & {
   anyLosing: boolean
 }
@@ -56,11 +143,11 @@ function ManualBid(props: ManualBidProps) {
         <b>{itemName}</b>
       </Col>
       <Col xs={2}>
-        <div>Your Highest Bid:</div>
+        <div>Your Top Bid:</div>
         <strong>{highestUserBidStr}</strong>
       </Col>
       <Col xs={2}>
-        <div>Highest Overall Bid:</div>
+        <div>Top Overall Bid:</div>
         <strong>{highestItemBidStr}</strong>
       </Col>
       <Col xs={2}>
@@ -82,10 +169,6 @@ function ManualBid(props: ManualBidProps) {
       ) : null}
     </Row>
   )
-}
-
-function AutomaticBid() {
-  return <div />
 }
 
 export default function MyBids() {
@@ -117,7 +200,11 @@ export default function MyBids() {
     <ManualBid key={bid.itemId} {...bid} anyLosing={anyLosing} />
   ))
 
-  const autoBids = bidBots.map((bid: BidBot) => <AutomaticBid key={bid.id} {...bid} />)
+  const anyDeactivated = bidBots.some((bidBot: BidBot) => !bidBot.active)
+
+  const autoBids = bidBots.map((bidBot: BidBot) => (
+    <AutomaticBid key={bidBot.id} {...bidBot} anyDeactivated={anyDeactivated} />
+  ))
 
   const panes = [
     {
