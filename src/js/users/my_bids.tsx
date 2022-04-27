@@ -63,7 +63,7 @@ function ManualBid(props: ManualBidProps) {
         <strong>{highestItemBidStr}</strong>
       </Col>
       <Col xs={2}>
-        <div>Status?</div>
+        <div>Status</div>
         {winning ? (
           <strong className="winning">Winning</strong>
         ) : (
