@@ -73,7 +73,18 @@ function BidHistory(props: ListingProps) {
 }
 
 export default function Listing(props: ListingProps) {
-  const { category, name, highestBid, condition, image, description, seller, id, numBids } = props
+  const {
+    category,
+    name,
+    highestBid,
+    condition,
+    image,
+    description,
+    seller,
+    id,
+    numBids,
+    isLocal,
+  } = props
   const activeUser = useSelector((state: AppState) => state.user)
 
   const dispatch = useDispatch()
@@ -104,15 +115,15 @@ export default function Listing(props: ListingProps) {
     dispatch(setData({ isSignUp: true }))
   }, [dispatch])
 
+  const imageSrc = isLocal ? image : `/${image}`
+
   return (
     <Row>
       <Col xs="12">
         <div className="listing">
           {category ? <b className="category">{category}</b> : null}
           <div>
-            {image ? (
-              <img src={`/${image}`} alt="Listing Preview" className="listing-image" />
-            ) : null}
+            {image ? <img src={imageSrc} alt="Listing Preview" className="listing-image" /> : null}
           </div>
           <div className="listing-information">
             <h2>{name}</h2>
