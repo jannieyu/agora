@@ -8,8 +8,12 @@ import { calculateIncrement } from "../listings/util"
 import { apiCall as getBids, Response as GetBidsResponse, ItemBid } from "../api/get_bids"
 import BidModal from "./bid_modal"
 
-function ManualBid(props: ItemBid) {
-  const { highestItemBid, highestUserBid, itemId, itemName, itemImage } = props
+type ManualBidProps = ItemBid & {
+  anyLosing: boolean
+}
+
+function ManualBid(props: ManualBidProps) {
+  const { highestItemBid, highestUserBid, itemId, itemName, itemImage, anyLosing } = props
 
   const { user } = useSelector((state: AppState) => state)
 
@@ -29,6 +33,8 @@ function ManualBid(props: ItemBid) {
     setShowBidModal(false)
   }, [])
 
+  const winning = safeParseFloat(highestUserBid) === safeParseFloat(highestItemBid)
+
   return (
     <Row className="my_bids align-items-center">
       <BidModal
@@ -42,10 +48,10 @@ function ManualBid(props: ItemBid) {
         handleSuccess={() => {}}
         isAutomatic={false}
       />
-      <Col xs={2} align="center">
+      <Col xs={anyLosing ? 2 : 3} align="center">
         <img src={`/${itemImage}`} alt="Listing Preview" />
       </Col>
-      <Col xs={2}>
+      <Col xs={anyLosing ? 2 : 3}>
         <b>{itemName}</b>
       </Col>
       <Col xs={2}>
@@ -58,17 +64,21 @@ function ManualBid(props: ItemBid) {
       </Col>
       <Col xs={2}>
         <div>Status?</div>
-        {safeParseFloat(highestUserBid) === safeParseFloat(highestItemBid) ? (
+        {winning ? (
           <strong className="winning">Winning</strong>
         ) : (
           <strong className="losing">Losing</strong>
         )}
       </Col>
-      <Col xs={2}>
-        <Button positive onClick={openPlaceBidModal}>
-          Place Bid
-        </Button>
-      </Col>
+      {anyLosing ? (
+        <Col xs={2}>
+          {!winning ? (
+            <Button positive onClick={openPlaceBidModal}>
+              Place Bid
+            </Button>
+          ) : null}
+        </Col>
+      ) : null}
     </Row>
   )
 }
@@ -86,7 +96,13 @@ export default function MyBids() {
     )
   }, [])
 
-  const manualBids = bids.map((bid: ItemBid) => <ManualBid key={bid.itemId} {...bid} />)
+  const anyLosing = bids.some(
+    (bid: ItemBid) => safeParseFloat(bid.highestUserBid) < safeParseFloat(bid.highestItemBid),
+  )
+
+  const manualBids = bids.map((bid: ItemBid) => (
+    <ManualBid key={bid.itemId} {...bid} anyLosing={anyLosing} />
+  ))
 
   const panes = [
     {
