@@ -40,7 +40,7 @@ func (h Handle) AddBid(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 	}
 
-	if statusCode, err := bid.PlaceBid(bidderID, bidAPI.ItemID, bidPrice, h.Db); err != nil {
+	if statusCode, err := bid.PlaceBid(bidderID, bidAPI.ItemID, 0, bidPrice, h.Db); err != nil {
 		log.WithError(err).Error("Failed to place bid.")
 		w.WriteHeader(statusCode)
 		return
