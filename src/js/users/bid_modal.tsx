@@ -2,7 +2,7 @@ import * as React from "react"
 import { Modal } from "react-bootstrap"
 import { Message } from "semantic-ui-react"
 import { useCallback, useState } from "../base/react_base"
-import { RefinedBidFormProps, ManualBidForm, AutomaticBidForm } from "../listings/bid_form"
+import BidForm, { RefinedBidFormProps } from "../listings/bid_form"
 
 type BidModalProps = RefinedBidFormProps & {
   isAutomatic: boolean
@@ -11,7 +11,7 @@ type BidModalProps = RefinedBidFormProps & {
 }
 
 export default function BidModal(props: BidModalProps) {
-  const { isAutomatic, show, onHide } = props
+  const { price, isAutomatic, show, onHide } = props
 
   const [successMessage, setSuccessMessage] = useState<string>("")
 
@@ -19,17 +19,11 @@ export default function BidModal(props: BidModalProps) {
     setSuccessMessage(message)
   }, [])
 
-  const bidForms = isAutomatic ? (
-    <AutomaticBidForm {...props} handleSuccess={handleSuccess} />
-  ) : (
-    <ManualBidForm {...props} handleSuccess={handleSuccess} />
-  )
-
   return (
     <Modal
       show={show}
       onHide={onHide}
-      size="sm"
+      size="lg"
       aria-labelledby="contained-modal-title-vcenter"
       centered
     >
@@ -37,7 +31,16 @@ export default function BidModal(props: BidModalProps) {
         <Modal.Title id="contained-modal-title-vcenter">Place Bid</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        {successMessage ? <Message success>{successMessage}</Message> : bidForms}
+        {successMessage ? (
+          <Message success>{successMessage}</Message>
+        ) : (
+          <BidForm
+            {...props}
+            priceStr={`${price}`}
+            handleSuccess={handleSuccess}
+            defaultAutomatic={isAutomatic}
+          />
+        )}
       </Modal.Body>
     </Modal>
   )
