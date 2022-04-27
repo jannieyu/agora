@@ -54,7 +54,7 @@ export default function Card(props: CardProps) {
     >
       <h2>{name}</h2>
       <div>
-        <img src={image} alt="Listing Preview" className="card-image" />
+        <img src={`/${image}`} alt="Listing Preview" className="card-image" />
       </div>
       <div className="card-metadata">
         <div>

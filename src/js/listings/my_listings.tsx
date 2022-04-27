@@ -1,14 +1,10 @@
 import * as React from "react"
 import { Row, Col } from "react-bootstrap"
 import { Icon } from "semantic-ui-react"
-import { useSearchParams } from "react-router-dom"
+import { Link, useSearchParams } from "react-router-dom"
 import { useCallback, useEffect, useMemo, useSelector, useState } from "../base/react_base"
-import {
-  apiCall as getSearchItems,
-  Response as SearchItemResponse,
-  SearchItem,
-} from "../api/get_search_items"
-import { AppState } from "../base/reducers"
+import { apiCall as getSearchItems, Response as SearchItemResponse } from "../api/get_search_items"
+import { AppState, SearchItem } from "../base/reducers"
 import ListingModal from "./listing_modal"
 import ConfirmationModal from "../base/confirmation_modal"
 import { ListingProps } from "./types"
@@ -20,7 +16,7 @@ type LineItemProps = ListingProps & {
 }
 
 function LineItem(props: LineItemProps) {
-  const { id, image, description, name, highestBid, numBids, setSearchParams, setDeleteId } = props
+  const { id, image, name, highestBid, numBids, setSearchParams, setDeleteId } = props
 
   const priceStr = `$${safeParseFloat(highestBid).toFixed(2)}`
 
@@ -117,9 +113,18 @@ export default function MyListings() {
       />
       <ConfirmationModal show={!!deleteId} onHide={closeConfirmDeleteModal} itemId={deleteId} />
       <Row>
-        <h1 className="column-heading-centered">Your Listings</h1>
+        <h1 className="column-heading-centered">My Listings</h1>
         <Col xs={2} />
-        <Col xs={8}>{lineItems}</Col>
+        <Col xs={8}>
+          {lineItems.length ? (
+            lineItems
+          ) : (
+            <div className="column-heading-centered">
+              You do not have any listings yet. Consider{" "}
+              <Link to="/create_listing">creating one</Link> now!
+            </div>
+          )}
+        </Col>
         <Col xs={2} />
       </Row>
     </>

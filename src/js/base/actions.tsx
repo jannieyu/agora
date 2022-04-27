@@ -1,5 +1,4 @@
-import { BidHistory, SearchItem } from "../api/get_search_items"
-import { ActionType, ActionPayload, Notification } from "./reducers"
+import { BidHistory, SearchItem, ActionType, ActionPayload, Notification } from "./reducers"
 
 export const setData = (data: ActionPayload) => ({
   type: ActionType.SET_DATA,

@@ -300,6 +300,7 @@ function ListingForm() {
             id={0}
             createdAt={currTime}
             bids={[]}
+            isLocal
           />
         </Col>
       </Row>

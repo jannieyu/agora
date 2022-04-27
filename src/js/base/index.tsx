@@ -26,6 +26,7 @@ import LoginModal from "./login_modal"
 import About from "./about"
 import UserProfile from "../users/user_profile"
 import MyListings from "../listings/my_listings"
+import MyBids from "../users/my_bids"
 import NotificationPage from "../notifications/notification_page"
 import NewListing from "../listings/new_listing"
 import "./styles.scss"
@@ -47,7 +48,7 @@ interface BaseProps {
 }
 
 // Paths that the user must be logged in to see
-const LOGGED_IN_PATHS = new Set(["/create_listing", "/notifications", "/my_listings"])
+const LOGGED_IN_PATHS = new Set(["/create_listing", "/notifications", "/my_listings", "/my_bids"])
 
 function PageNotFound() {
   return (
@@ -125,7 +126,11 @@ function Base(props: BaseProps) {
   }, [navigate, user])
 
   const onClickMyListings = useCallback(() => {
-    navigate(`my_listings`)
+    navigate("my_listings")
+  }, [navigate])
+
+  const onClickMyBids = useCallback(() => {
+    navigate("my_bids")
   }, [navigate])
 
   const onClickNotifications = useCallback(() => {
@@ -216,7 +221,7 @@ function Base(props: BaseProps) {
                   }
                 >
                   <Dropdown.Menu>
-                    <Dropdown.Item text="My Bids" onClick={onClickMyProfile} />
+                    <Dropdown.Item text="My Bids" onClick={onClickMyBids} />
                     <Dropdown.Item onClick={onClickNotifications}>
                       <div className="notif-dropdown">
                         Notifications{" "}
@@ -267,6 +272,7 @@ const ROUTES = {
   user_profile: UserProfile,
   notifications: NotificationPage,
   my_listings: MyListings,
+  my_bids: MyBids,
 }
 
 const store = configureStore({ reducer: rootReducer })

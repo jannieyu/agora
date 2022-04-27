@@ -59,12 +59,12 @@
     cursor: pointer;
 }
 
+.my_bids,
 .my_listing {
     margin-top: 1rem;
     margin-bottom: 1rem;
 
     position: relative;
-    cursor: pointer;
 
     img {
         max-height: 8rem;
@@ -84,13 +84,22 @@
         right: 1rem;
         top: 1rem;
     }
+
+    .winning {
+        color: green;
+    }
+
+    .losing {
+        color: red;
+    }
 }
 
 .my_listing:hover {
-    background-color: #f4f4f4
+    background-color: #f4f4f4;
+    cursor: pointer;
 }
 
-.my_listing, .card {
+.my_listing, .my_bids, .card {
     border-width: 2px;
     border-radius: 10px;
     border-color: #ccc;

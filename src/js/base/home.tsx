@@ -7,14 +7,13 @@ import { useCallback, useDispatch, useEffect, useMemo, useSelector, useState } f
 import {
   apiCall as getSearchItems,
   Response as GetSearchItemsResponse,
-  SearchItem,
 } from "../api/get_search_items"
 import { ListingProps } from "../listings/types"
 import Card from "../listings/card"
 import ListingModal from "../listings/listing_modal"
 import ConfirmationModal from "./confirmation_modal"
 import { ActionType, OnChangeObject } from "./types"
-import { AppState } from "./reducers"
+import { AppState, SearchItem } from "./reducers"
 import { setData } from "./actions"
 import { safeParseFloat } from "./util"
 

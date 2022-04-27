@@ -4,12 +4,11 @@ import { Accordion, Button, Message, Icon, Transition } from "semantic-ui-react"
 import { DateTime } from "luxon"
 import { Link } from "react-router-dom"
 import { useCallback, useDispatch, useSelector, useState } from "../base/react_base"
-import { AppState } from "../base/reducers"
+import { AppState, BidHistory as BidHistoryT } from "../base/reducers"
 import { setData } from "../base/actions"
 import { safeParseFloat } from "../base/util"
 import { isValidPrice } from "./util"
 import { ListingProps } from "./types"
-import { BidHistory as BidHistoryT } from "../api/get_search_items"
 import BidForm from "./bid_form"
 
 function HistoricalBidDatum(bid: BidHistoryT) {
@@ -74,7 +73,18 @@ function BidHistory(props: ListingProps) {
 }
 
 export default function Listing(props: ListingProps) {
-  const { category, name, highestBid, condition, image, description, seller, id, numBids } = props
+  const {
+    category,
+    name,
+    highestBid,
+    condition,
+    image,
+    description,
+    seller,
+    id,
+    numBids,
+    isLocal,
+  } = props
   const activeUser = useSelector((state: AppState) => state.user)
 
   const dispatch = useDispatch()
@@ -105,15 +115,15 @@ export default function Listing(props: ListingProps) {
     dispatch(setData({ isSignUp: true }))
   }, [dispatch])
 
+  const imageSrc = isLocal ? image : `/${image}`
+
   return (
     <Row>
       <Col xs="12">
         <div className="listing">
           {category ? <b className="category">{category}</b> : null}
           <div>
-            {image ? (
-              <img src={`/${image}`} alt="Listing Preview" className="listing-image" />
-            ) : null}
+            {image ? <img src={imageSrc} alt="Listing Preview" className="listing-image" /> : null}
           </div>
           <div className="listing-information">
             <h2>{name}</h2>
