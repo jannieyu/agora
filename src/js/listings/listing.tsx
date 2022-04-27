@@ -111,7 +111,9 @@ export default function Listing(props: ListingProps) {
         <div className="listing">
           {category ? <b className="category">{category}</b> : null}
           <div>
-            {image ? <img src={image} alt="Listing Preview" className="listing-image" /> : null}
+            {image ? (
+              <img src={`/${image}`} alt="Listing Preview" className="listing-image" />
+            ) : null}
           </div>
           <div className="listing-information">
             <h2>{name}</h2>
