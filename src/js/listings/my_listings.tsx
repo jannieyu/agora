@@ -20,7 +20,7 @@ type LineItemProps = ListingProps & {
 }
 
 function LineItem(props: LineItemProps) {
-  const { id, image, description, name, highestBid, numBids, setSearchParams, setDeleteId } = props
+  const { id, image, name, highestBid, numBids, setSearchParams, setDeleteId } = props
 
   const priceStr = `$${safeParseFloat(highestBid).toFixed(2)}`
 
