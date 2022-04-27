@@ -3,12 +3,8 @@ import { Row, Col } from "react-bootstrap"
 import { Icon } from "semantic-ui-react"
 import { useSearchParams } from "react-router-dom"
 import { useCallback, useEffect, useMemo, useSelector, useState } from "../base/react_base"
-import {
-  apiCall as getSearchItems,
-  Response as SearchItemResponse,
-  SearchItem,
-} from "../api/get_search_items"
-import { AppState } from "../base/reducers"
+import { apiCall as getSearchItems, Response as SearchItemResponse } from "../api/get_search_items"
+import { AppState, SearchItem } from "../base/reducers"
 import ListingModal from "./listing_modal"
 import ConfirmationModal from "../base/confirmation_modal"
 import { ListingProps } from "./types"

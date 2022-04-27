@@ -1,5 +1,4 @@
-import { BidHistory } from "../api/get_search_items"
-import { User } from "../base/reducers"
+import { BidHistory, User } from "../base/reducers"
 
 export interface ListingProps {
   category: string

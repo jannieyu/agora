@@ -4,12 +4,11 @@ import { Accordion, Button, Message, Icon, Transition } from "semantic-ui-react"
 import { DateTime } from "luxon"
 import { Link } from "react-router-dom"
 import { useCallback, useDispatch, useSelector, useState } from "../base/react_base"
-import { AppState } from "../base/reducers"
+import { AppState, BidHistory as BidHistoryT } from "../base/reducers"
 import { setData } from "../base/actions"
 import { safeParseFloat } from "../base/util"
 import { isValidPrice } from "./util"
 import { ListingProps } from "./types"
-import { BidHistory as BidHistoryT } from "../api/get_search_items"
 import BidForm from "./bid_form"
 
 function HistoricalBidDatum(bid: BidHistoryT) {
