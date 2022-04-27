@@ -38,6 +38,8 @@ function AutomaticBidForm(props: RefinedBidFormProps) {
     [setBidPrice],
   )
 
+  const minBid = price + minIncrement
+
   const handleSubmit = useCallback(() => {
     setSubmitting(true)
     addBidBotCall(
@@ -48,11 +50,13 @@ function AutomaticBidForm(props: RefinedBidFormProps) {
         const newBid = {
           bidderId,
           itemId,
-          bidPrice,
+          bidPrice: `${minBid}`,
           createdAt: DateTime.now().toISO(),
         }
 
-        dispatch(updateSearchItem({ highestBid: bidPrice, numBids: numBids + 1 }, itemId, newBid))
+        dispatch(
+          updateSearchItem({ highestBid: `${minBid}`, numBids: numBids + 1 }, itemId, newBid),
+        )
         handleSuccess(
           `The autobidder was successfullly confirgured to bid up to $${bidPrice}! You will be notified
           if another user's bid exceeds this price or if the auction ends and you win the item.`,
@@ -63,9 +67,7 @@ function AutomaticBidForm(props: RefinedBidFormProps) {
         setError(err.body as string)
       },
     )
-  }, [dispatch, itemId, bidPrice, numBids, handleSuccess, bidderId])
-
-  const minBid = price + minIncrement
+  }, [dispatch, itemId, bidPrice, numBids, handleSuccess, bidderId, minBid])
 
   const isValidBid = isValidPrice(bidPrice) && safeParseFloat(bidPrice) >= minBid
 

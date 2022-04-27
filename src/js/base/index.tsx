@@ -25,6 +25,7 @@ import Home from "./home"
 import LoginModal from "./login_modal"
 import About from "./about"
 import UserProfile from "../users/user_profile"
+import MyListings from "../listings/my_listings"
 import NotificationPage from "../notifications/notification_page"
 import NewListing from "../listings/new_listing"
 import "./styles.scss"
@@ -46,7 +47,7 @@ interface BaseProps {
 }
 
 // Paths that the user must be logged in to see
-const LOGGED_IN_PATHS = new Set(["/create_listing", "/notifications"])
+const LOGGED_IN_PATHS = new Set(["/create_listing", "/notifications", "/my_listings"])
 
 function PageNotFound() {
   return (
@@ -122,6 +123,10 @@ function Base(props: BaseProps) {
   const onClickMyProfile = useCallback(() => {
     navigate(`user_profile/?id=${user.id}`)
   }, [navigate, user])
+
+  const onClickMyListings = useCallback(() => {
+    navigate(`my_listings`)
+  }, [navigate])
 
   const onClickNotifications = useCallback(() => {
     navigate(`notifications`)
@@ -211,8 +216,7 @@ function Base(props: BaseProps) {
                   }
                 >
                   <Dropdown.Menu>
-                    <Dropdown.Item text="Create Listing" onClick={onCreateListing} />
-                    <Dropdown.Item text="My Profile" onClick={onClickMyProfile} />
+                    <Dropdown.Item text="My Bids" onClick={onClickMyProfile} />
                     <Dropdown.Item onClick={onClickNotifications}>
                       <div className="notif-dropdown">
                         Notifications{" "}
@@ -229,6 +233,10 @@ function Base(props: BaseProps) {
                       </div>
                     </Dropdown.Item>
                     <Dropdown.Divider />
+                    <Dropdown.Item text="Create Listing" onClick={onCreateListing} />
+                    <Dropdown.Item text="My Listings" onClick={onClickMyListings} />
+                    <Dropdown.Divider />
+                    <Dropdown.Item text="Account" onClick={onClickMyProfile} />
                     <Dropdown.Item onClick={onLogout} text="Log Out" />
                   </Dropdown.Menu>
                 </Dropdown>
@@ -258,6 +266,7 @@ const ROUTES = {
   create_listing: NewListing,
   user_profile: UserProfile,
   notifications: NotificationPage,
+  my_listings: MyListings,
 }
 
 const store = configureStore({ reducer: rootReducer })
