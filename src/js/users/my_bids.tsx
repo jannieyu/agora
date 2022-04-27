@@ -6,6 +6,7 @@ import { useCallback, useEffect, useSelector, useState } from "../base/react_bas
 import { safeParseFloat } from "../base/util"
 import { calculateIncrement } from "../listings/util"
 import { apiCall as getBids, Response as GetBidsResponse, ItemBid } from "../api/get_bids"
+import { apiCall as getBidBots, Response as GetBidBotsResponse, BidBot } from "../api/get_bid_bots"
 import BidModal from "./bid_modal"
 
 type ManualBidProps = ItemBid & {
@@ -83,14 +84,26 @@ function ManualBid(props: ManualBidProps) {
   )
 }
 
+function AutomaticBid() {
+  return <div />
+}
+
 export default function MyBids() {
   const [bids, setBids] = useState<ItemBid[]>([])
+  const [bidBots, setBidBots] = useState<BidBot[]>([])
 
   useEffect(() => {
     getBids(
       {},
       (bidsResponse: GetBidsResponse) => {
         setBids(bidsResponse)
+      },
+      () => {},
+    )
+    getBidBots(
+      {},
+      (bidBotsResponse: GetBidBotsResponse) => {
+        setBidBots(bidBotsResponse)
       },
       () => {},
     )
@@ -104,14 +117,29 @@ export default function MyBids() {
     <ManualBid key={bid.itemId} {...bid} anyLosing={anyLosing} />
   ))
 
+  const autoBids = bidBots.map((bid: BidBot) => <AutomaticBid key={bid.id} {...bid} />)
+
   const panes = [
     {
       menuItem: "Manual Bids",
-      render: () => <div>{manualBids}</div>,
+      render: () => (
+        <div>
+          {manualBids.length ? (
+            manualBids
+          ) : (
+            <div>
+              <br />
+              You have not created any manual bids yet.
+            </div>
+          )}
+        </div>
+      ),
     },
     {
       menuItem: "Automatic Bids",
-      render: () => <div>{manualBids}</div>,
+      render: () => (
+        <div>{autoBids.length ? autoBids : "You have not created any automatic bids yet."}</div>
+      ),
     },
   ]
 
