@@ -1,20 +1,47 @@
 import * as React from "react"
 import { Row, Col } from "react-bootstrap"
 import { Button, Tab } from "semantic-ui-react"
-import { useCallback, useEffect, useState } from "../base/react_base"
+import { AppState } from "../base/reducers"
+import { useCallback, useEffect, useSelector, useState } from "../base/react_base"
 import { safeParseFloat } from "../base/util"
+import { calculateIncrement } from "../listings/util"
 import { apiCall as getBids, Response as GetBidsResponse, ItemBid } from "../api/get_bids"
+import BidModal from "./bid_modal"
 
 function ManualBid(props: ItemBid) {
-  const { highestItemBid, highestUserBid, itemName, itemImage } = props
+  const { highestItemBid, highestUserBid, itemId, itemName, itemImage } = props
+
+  const { user } = useSelector((state: AppState) => state)
+
+  const price = safeParseFloat(highestItemBid)
+  const minIncrement = calculateIncrement(price)
 
   const highestItemBidStr = `$${safeParseFloat(highestItemBid).toFixed(2)}`
   const highestUserBidStr = `$${safeParseFloat(highestUserBid).toFixed(2)}`
 
-  const onClick = useCallback(() => {}, [])
+  const [showBidModal, setShowBidModal] = useState<boolean>(false)
+
+  const openPlaceBidModal = useCallback(() => {
+    setShowBidModal(true)
+  }, [])
+
+  const hideBidModal = useCallback(() => {
+    setShowBidModal(false)
+  }, [])
 
   return (
-    <Row className="my_bids align-items-center" onClick={onClick}>
+    <Row className="my_bids align-items-center">
+      <BidModal
+        show={showBidModal}
+        onHide={hideBidModal}
+        price={price}
+        numBids={1}
+        bidderId={user.id}
+        itemId={itemId}
+        minIncrement={minIncrement}
+        handleSuccess={() => {}}
+        isAutomatic={false}
+      />
       <Col xs={2} align="center">
         <img src={`/${itemImage}`} alt="Listing Preview" />
       </Col>
@@ -38,7 +65,9 @@ function ManualBid(props: ItemBid) {
         )}
       </Col>
       <Col xs={2}>
-        <Button positive>Place Bid</Button>
+        <Button positive onClick={openPlaceBidModal}>
+          Place Bid
+        </Button>
       </Col>
     </Row>
   )

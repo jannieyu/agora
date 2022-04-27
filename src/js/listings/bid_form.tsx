@@ -12,7 +12,7 @@ import DollarInput from "./dollar_input"
 import { apiCall as addBidCall } from "../api/add_bid"
 import { apiCall as addBidBotCall } from "../api/add_bid_bot"
 
-interface RefinedBidFormProps {
+export interface RefinedBidFormProps {
   price: number
   minIncrement: number
   numBids: number
@@ -21,7 +21,7 @@ interface RefinedBidFormProps {
   bidderId: number
 }
 
-function AutomaticBidForm(props: RefinedBidFormProps) {
+export function AutomaticBidForm(props: RefinedBidFormProps) {
   const { price, numBids, itemId, handleSuccess, bidderId, minIncrement } = props
 
   const dispatch = useDispatch()
@@ -121,7 +121,7 @@ function AutomaticBidForm(props: RefinedBidFormProps) {
   )
 }
 
-function ManualBidForm(props: RefinedBidFormProps) {
+export function ManualBidForm(props: RefinedBidFormProps) {
   const { price, minIncrement, numBids, itemId, handleSuccess, bidderId } = props
 
   const dispatch = useDispatch()
