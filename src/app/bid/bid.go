@@ -11,7 +11,7 @@ import (
 	"net/http"
 )
 
-func PlaceBid(bidderID uint32, itemID uint32, bidPrice decimal.Decimal, db *gorm.DB) (int, error) {
+func PlaceBid(bidderID uint32, itemID uint32, bidBotID uint32, bidPrice decimal.Decimal, db *gorm.DB) (int, error) {
 	if isValidBidder, err := checkValidBidder(bidderID, itemID, db); err != nil {
 		return http.StatusBadRequest, err
 	} else if !isValidBidder {
@@ -30,6 +30,7 @@ func PlaceBid(bidderID uint32, itemID uint32, bidPrice decimal.Decimal, db *gorm
 	bid := database.Bid{
 		BidderID: bidderID,
 		ItemID:   itemID,
+		BotID:    bidBotID,
 		BidPrice: bidPrice,
 	}
 

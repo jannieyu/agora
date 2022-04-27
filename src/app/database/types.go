@@ -12,6 +12,7 @@ type Bid struct {
 	ItemID    uint32          `json:"itemId,omitempty"`
 	BidPrice  decimal.Decimal `json:"bidPrice,omitempty" gorm:"type:decimal(6,2);"`
 	CreatedAt time.Time       `json:"createdAt,omitempty" gorm:"autoCreateTime"`
+	BotID     uint32          `json:"botId,omitempty"`
 }
 
 type BidBot struct {
@@ -19,8 +20,10 @@ type BidBot struct {
 	OwnerID uint32          `json:"ownerId,omitempty"`
 	ItemID  uint32          `json:"itemId,omitempty"`
 	MaxBid  decimal.Decimal `json:"maxBid,omitempty" gorm:"type:decimal(6,2);"`
+	Bids    []Bid           `json:"bids,omitempty" gorm:"foreignkey:BotID"`
 	Active  bool            `json:"active,omitempty"`
 }
+
 type Notification struct {
 	ID         uint32            `json:"id,omitempty" gorm:"primarykey"`
 	ReceiverID uint32            `json:"receiverId,omitempty"`
