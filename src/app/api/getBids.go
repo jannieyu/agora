@@ -3,9 +3,10 @@ package api
 import (
 	"agora/src/app/database"
 	"agora/src/app/user"
+	"net/http"
+
 	"github.com/shopspring/decimal"
 	log "github.com/sirupsen/logrus"
-	"net/http"
 )
 
 type ItemBidsAPI struct {
@@ -14,6 +15,7 @@ type ItemBidsAPI struct {
 	Image          string          `json:"itemImage,omitempty"`
 	HighestBid     decimal.Decimal `json:"highestItemBid,omitempty"`
 	HighestUserBid decimal.Decimal `json:"highestUserBid,omitempty"`
+	NumBids        uint32          `json:"numBids,omitempty"`
 }
 
 func (h Handle) GetBids(w http.ResponseWriter, r *http.Request) {
@@ -34,7 +36,8 @@ func (h Handle) GetBids(w http.ResponseWriter, r *http.Request) {
 			"items.name, "+
 			"items.highest_bid, "+
 			"items.image, "+
-			"max(bids.bid_price) as highest_user_bid").Group(
+			"max(bids.bid_price) as highest_user_bid, "+
+			"items.num_bids").Group(
 		"items.id").Joins(
 		"left join items on items.id = bids.item_id").Where(
 		"bids.bidder_id = ?", bidderId).Find(&result).Error; err != nil {
