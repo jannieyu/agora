@@ -60,14 +60,15 @@
 }
 
 .my_listing {
-    margin-top: 2rem;
-    margin-bottom: 2rem;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
 
     position: relative;
     cursor: pointer;
 
     img {
-        height: 10rem;
+        max-height: 8rem;
+        max-width: 100%;
         padding-top: 1rem;
         padding-bottom: 1rem;
     }

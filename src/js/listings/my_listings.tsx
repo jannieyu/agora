@@ -52,13 +52,14 @@ function LineItem(props: LineItemProps) {
       <Col xs={3} align="center">
         <img src={`/${image}`} alt="Listing Preview" />
       </Col>
-      <Col xs={6}>
-        <div>
+      <Col xs={5}>
+        <div style={{ display: "flex", justifyContent: "space-between" }}>
           <b>{name}</b>
+          <strong>{`${numBids} bids`}</strong>
         </div>
-        <div>{description}</div>
       </Col>
-      <Col xs={3} align="center">
+      <Col xs={1} />
+      <Col xs={3}>
         <div>{numBids === 0 ? "No Bids" : "Highest Bid:"}</div>
         <div>
           <b>{priceStr}</b>
