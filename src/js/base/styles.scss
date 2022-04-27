@@ -59,36 +59,6 @@
     cursor: pointer;
 }
 
-.my-bids-table {
-    width: 100%;
-
-    th {
-        background-color: #ccc;
-    }
-
-    th, td {
-        text-align: center;
-        border: solid 1px black;
-    }
-
-    td {
-        padding: 0.5rem;
-    }
-
-    tbody > tr:hover {
-        background-color: #f4f4f4;
-        cursor: pointer;
-    }
-    img {
-        max-width: 100%;
-        max-height: 6rem;
-    }
-
-    .item-view {
-        display: inline-grid;
-    }
-}
-
 .my_listing {
     margin-top: 1rem;
     margin-bottom: 1rem;
@@ -113,6 +83,14 @@
         position: absolute;
         right: 1rem;
         top: 1rem;
+    }
+
+    .winning {
+        color: green;
+    }
+
+    .losing {
+        color: red;
     }
 }
 

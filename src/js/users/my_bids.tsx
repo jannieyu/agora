@@ -1,9 +1,45 @@
 import * as React from "react"
 import { Row, Col } from "react-bootstrap"
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { useEffect, useState } from "../base/react_base"
+import { Tab } from "semantic-ui-react"
+import { useCallback, useEffect, useState } from "../base/react_base"
 import { safeParseFloat } from "../base/util"
 import { apiCall as getBids, Response as GetBidsResponse, ItemBid } from "../api/get_bids"
+
+function ManualBid(props: ItemBid) {
+  const { highestItemBid, highestUserBid, itemName, itemImage } = props
+
+  const highestItemBidStr = `$${safeParseFloat(highestItemBid).toFixed(2)}`
+  const highestUserBidStr = `$${safeParseFloat(highestUserBid).toFixed(2)}`
+
+  const onClick = useCallback(() => {}, [])
+
+  return (
+    <Row className="my_listing align-items-center" onClick={onClick}>
+      <Col xs={3} align="center">
+        <img src={`/${itemImage}`} alt="Listing Preview" />
+      </Col>
+      <Col xs={3}>
+        <b>{itemName}</b>
+      </Col>
+      <Col xs={2}>
+        <div>Your Highest Bid:</div>
+        <strong>{highestUserBidStr}</strong>
+      </Col>
+      <Col xs={2}>
+        <div>Highest Overall Bid:</div>
+        <strong>{highestItemBidStr}</strong>
+      </Col>
+      <Col xs={2}>
+        <div>Status?</div>
+        {safeParseFloat(highestUserBid) === safeParseFloat(highestItemBid) ? (
+          <strong className="winning">Winning</strong>
+        ) : (
+          <strong className="losing">Losing</strong>
+        )}
+      </Col>
+    </Row>
+  )
+}
 
 export default function MyBids() {
   const [bids, setBids] = useState<ItemBid[]>([])
@@ -18,28 +54,18 @@ export default function MyBids() {
     )
   }, [])
 
-  const tableRows = bids.map((bid: ItemBid) => (
-    <tr
-      key={bid.itemId}
-      className={`${bid.highestItemBid > bid.highestUserBid ? "losing" : "winning"}`}
-    >
-      <td>
-        <div className="item-view">
-          <img src={`/${bid.itemImage}`} alt="Listing" />
-          <b>{bid.itemName}</b>
-        </div>
-      </td>
-      <td>{`$${safeParseFloat(bid.highestUserBid).toFixed(2)}`}</td>
-      <td>{`$${safeParseFloat(bid.highestItemBid).toFixed(2)}`}</td>
-      <td>
-        {safeParseFloat(bid.highestUserBid) === safeParseFloat(bid.highestItemBid) ? (
-          <FontAwesomeIcon icon="thumbs-up" size="3x" color="green" />
-        ) : (
-          <FontAwesomeIcon icon="thumbs-down" size="3x" color="red" />
-        )}
-      </td>
-    </tr>
-  ))
+  const manualBids = bids.map((bid: ItemBid) => <ManualBid key={bid.itemId} {...bid} />)
+
+  const panes = [
+    {
+      menuItem: "Manual Bids",
+      render: () => <div>{manualBids}</div>,
+    },
+    {
+      menuItem: "Automatic Bids",
+      render: () => <div>{manualBids}</div>,
+    },
+  ]
 
   return (
     <Row>
@@ -47,17 +73,7 @@ export default function MyBids() {
       <Col xs={2} />
       <Col xs={8} align="center">
         <br />
-        <table className="my-bids-table">
-          <thead>
-            <tr>
-              <th>Item</th>
-              <th>My Highest Bid</th>
-              <th>Highest Overall Bid</th>
-              <th>Winning?</th>
-            </tr>
-          </thead>
-          <tbody>{tableRows}</tbody>
-        </table>
+        <Tab panes={panes} />
       </Col>
       <Col xs={2} />
     </Row>
