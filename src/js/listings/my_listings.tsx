@@ -113,7 +113,7 @@ export default function MyListings() {
       />
       <ConfirmationModal show={!!deleteId} onHide={closeConfirmDeleteModal} itemId={deleteId} />
       <Row>
-        <h1 className="column-heading-centered">Your Listings</h1>
+        <h1 className="column-heading-centered">My Listings</h1>
         <Col xs={2} />
         <Col xs={8}>
           {lineItems.length ? (

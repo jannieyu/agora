@@ -145,7 +145,7 @@ export default function MyBids() {
 
   return (
     <Row>
-      <h1 className="column-heading-centered">Your Bids</h1>
+      <h1 className="column-heading-centered">My Bids</h1>
       <Col xs={2} />
       <Col xs={8} align="center">
         <br />
