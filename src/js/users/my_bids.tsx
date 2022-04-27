@@ -1,6 +1,6 @@
 import * as React from "react"
 import { Row, Col } from "react-bootstrap"
-import { Tab } from "semantic-ui-react"
+import { Button, Tab } from "semantic-ui-react"
 import { useCallback, useEffect, useState } from "../base/react_base"
 import { safeParseFloat } from "../base/util"
 import { apiCall as getBids, Response as GetBidsResponse, ItemBid } from "../api/get_bids"
@@ -14,11 +14,11 @@ function ManualBid(props: ItemBid) {
   const onClick = useCallback(() => {}, [])
 
   return (
-    <Row className="my_listing align-items-center" onClick={onClick}>
-      <Col xs={3} align="center">
+    <Row className="my_bids align-items-center" onClick={onClick}>
+      <Col xs={2} align="center">
         <img src={`/${itemImage}`} alt="Listing Preview" />
       </Col>
-      <Col xs={3}>
+      <Col xs={2}>
         <b>{itemName}</b>
       </Col>
       <Col xs={2}>
@@ -36,6 +36,9 @@ function ManualBid(props: ItemBid) {
         ) : (
           <strong className="losing">Losing</strong>
         )}
+      </Col>
+      <Col xs={2}>
+        <Button positive>Place Bid</Button>
       </Col>
     </Row>
   )
