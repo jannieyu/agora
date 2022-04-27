@@ -1,7 +1,7 @@
 import * as React from "react"
 import { Row, Col } from "react-bootstrap"
 import { Icon } from "semantic-ui-react"
-import { useSearchParams } from "react-router-dom"
+import { Link, useSearchParams } from "react-router-dom"
 import { useCallback, useEffect, useMemo, useSelector, useState } from "../base/react_base"
 import { apiCall as getSearchItems, Response as SearchItemResponse } from "../api/get_search_items"
 import { AppState, SearchItem } from "../base/reducers"
@@ -115,7 +115,16 @@ export default function MyListings() {
       <Row>
         <h1 className="column-heading-centered">Your Listings</h1>
         <Col xs={2} />
-        <Col xs={8}>{lineItems}</Col>
+        <Col xs={8}>
+          {lineItems.length ? (
+            lineItems
+          ) : (
+            <div className="column-heading-centered">
+              You do not have any listings yet. Consider{" "}
+              <Link to="/create_listing">creating one</Link> now!
+            </div>
+          )}
+        </Col>
         <Col xs={2} />
       </Row>
     </>
