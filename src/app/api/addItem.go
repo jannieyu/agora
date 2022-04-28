@@ -3,29 +3,51 @@ package api
 import (
 	"agora/src/app/database"
 	i "agora/src/app/item"
+	"agora/src/app/user"
 	"net/http"
 	"strconv"
+	"strings"
 
 	log "github.com/sirupsen/logrus"
 )
 
-func (h Handle) AddItem(w http.ResponseWriter, r *http.Request) {
-	session, err := h.Store.Get(r, "user-auth")
+func (h Handle) AddOrUpdateItem(w http.ResponseWriter, r *http.Request) {
+	sellerID, err := user.GetAuthorizedUserId(h.Store, r)
 	if err != nil {
-		log.WithError(err).Error("Failed to get cookie session at logout.")
+		log.WithError(err).Error("Failed to get cookie session for login status check.")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
 	}
+	if sellerID == 0 {
+		log.Error("Cannot add or update item to unauthenticated user.")
+		w.WriteHeader(http.StatusForbidden)
+		return
+	}
+	var itemId uint32
+	if strings.EqualFold(r.FormValue("id"), "") {
+		itemId = 0
+	} else {
+		idVal, err := strconv.Atoi(r.FormValue("id"))
+		if err != nil {
+			log.WithError(err).Error("Failed to retrieve item id.")
+			w.WriteHeader(http.StatusInternalServerError)
+		}
+		itemId = uint32(idVal)
+	}
+
 	var item database.Item
-	sellerID := session.Values["id"].(uint32)
-	if err := i.PopulateItem(&item, r, sellerID, true); err != nil {
+	if err := h.Db.Where("id = ?", itemId).Limit(1).Find(&item).Error; err != nil {
+		log.WithError(err).Error("Failed to retrieve existing item (if any) from database.")
+	}
+	item.SellerID = sellerID
+
+	if err := i.PopulateItem(&item, r); err != nil {
 		log.WithError(err).Error("Failed to parse item data.")
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	item.HighestBid = item.StartingPrice
-	item.NumBids = 0
-
-	if err := h.Db.Create(&item).Error; err != nil {
-		log.WithError(err).Error("Failed to add new item to database.")
+	if err := h.Db.Save(&item).Error; err != nil {
+		log.WithError(err).Error("Failed to add or update item to database.")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}

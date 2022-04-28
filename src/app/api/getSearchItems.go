@@ -84,5 +84,4 @@ func (h Handle) GetSearchItems(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	SafeEncode(w, items)
-	//w.WriteHeader(http.StatusOK)
 }

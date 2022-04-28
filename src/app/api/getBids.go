@@ -40,7 +40,7 @@ func (h Handle) GetBids(w http.ResponseWriter, r *http.Request) {
 			"items.num_bids").Group(
 		"items.id").Joins(
 		"left join items on items.id = bids.item_id").Where(
-		"bids.bidder_id = ?", bidderId).Find(&result).Error; err != nil {
+		"bids.bidder_id = ? AND bids.bot_id = ?", bidderId, 0).Find(&result).Error; err != nil {
 		log.WithError(err).Error("Failed to query user bid items.")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
