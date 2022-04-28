@@ -3,10 +3,11 @@ package api
 import (
 	"agora/src/app/database"
 	"agora/src/app/user"
+	"net/http"
+
 	"github.com/shopspring/decimal"
 	log "github.com/sirupsen/logrus"
 	"gorm.io/gorm"
-	"net/http"
 )
 
 type BidBotAPI struct {
@@ -36,7 +37,7 @@ func (h Handle) GetBidBots(w http.ResponseWriter, r *http.Request) {
 
 	if err := h.Db.Model(&database.BidBot{}).Preload("Bids", func(tx *gorm.DB) *gorm.DB {
 		return tx.Order("bids.id DESC")
-	}).Order("active DESC").Find(&result).Error; err != nil {
+	}).Where("owner_id = ?", bidderId).Order("active DESC").Find(&result).Error; err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}

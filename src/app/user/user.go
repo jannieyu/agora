@@ -51,8 +51,13 @@ func GetAuthorizedUserId(store *sessions.CookieStore, r *http.Request) (uint32, 
 	if err != nil {
 		return userId, err
 	}
-	if session.Values["id"] != nil {
-		userId = session.Values["id"].(uint32)
+
+	switch val := session.Values["id"].(type) {
+	case uint32:
+		userId = val
+	case int:
+		userId = uint32(val)
 	}
+
 	return userId, nil
 }

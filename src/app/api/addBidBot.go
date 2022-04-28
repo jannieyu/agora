@@ -11,7 +11,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func (h Handle) AddBidBot(w http.ResponseWriter, r *http.Request) {
+func (h Handle) AddOrUpdateBidBot(w http.ResponseWriter, r *http.Request) {
 	session, err := h.Store.Get(r, "user-auth")
 	if err != nil {
 		log.WithError(err).Error("Failed to get cookie session at logout.")
