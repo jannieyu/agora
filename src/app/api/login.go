@@ -8,14 +8,7 @@ import (
 
 	"github.com/gorilla/sessions"
 	log "github.com/sirupsen/logrus"
-	"golang.org/x/crypto/bcrypt"
 )
-
-func checkPasswordHash(password, hash string) bool {
-	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
-	log.Debug("Failure on checking password hash.", err)
-	return err == nil
-}
 
 func (h Handle) Login(w http.ResponseWriter, r *http.Request) {
 	session, err := h.Store.Get(r, "user-auth")
@@ -62,7 +55,7 @@ func (h Handle) Login(w http.ResponseWriter, r *http.Request) {
 		}
 	} else {
 		if userExists {
-			userAuthenticated = checkPasswordHash(loginCredentials.Password, user.Pword)
+			userAuthenticated = u.CheckPasswordHash(loginCredentials.Password, user.Pword)
 		}
 	}
 
