@@ -14,12 +14,7 @@ import (
 )
 
 func (h Handle) GetSearchItems(w http.ResponseWriter, r *http.Request) {
-	sellerId, err := user.GetAuthorizedUserId(h.Store, r)
-	if err != nil {
-		log.WithError(err).Error("Failed to get cookie session when authorized user id.")
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
+
 	urlParams := r.URL.Query()["data"][0]
 	var filters search.Filters
 	if err := json.Unmarshal([]byte(urlParams), &filters); err != nil {
@@ -29,8 +24,17 @@ func (h Handle) GetSearchItems(w http.ResponseWriter, r *http.Request) {
 	}
 
 	result := h.Db.Preload("Bids")
-	if filters.SellerItemsOnly && sellerId > 0 {
-		result = result.Where("seller_id = ?", sellerId)
+	if filters.SellerItemsOnly {
+		sellerId, err := user.GetAuthorizedUserId(h.Store, r)
+		if err != nil {
+			log.WithError(err).Error("Failed to get cookie session when authorized user id.")
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		if sellerId > 0 {
+			result = result.Where("seller_id = ?", sellerId)
+		}
+
 	} else {
 		result = user.PreloadSafeSellerInfo(result)
 	}
@@ -80,5 +84,4 @@ func (h Handle) GetSearchItems(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	SafeEncode(w, items)
-	//w.WriteHeader(http.StatusOK)
 }

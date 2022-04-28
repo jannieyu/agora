@@ -3,6 +3,7 @@ package api
 import (
 	"agora/src/app/database"
 	"agora/src/app/notification"
+	"agora/src/app/user"
 	"github.com/shopspring/decimal"
 	log "github.com/sirupsen/logrus"
 	"net/http"
@@ -20,13 +21,12 @@ type NotificationAPI struct {
 }
 
 func (h Handle) GetNotifications(w http.ResponseWriter, r *http.Request) {
-	session, err := h.Store.Get(r, "user-auth")
+	receiverId, err := user.GetAuthorizedUserId(h.Store, r)
 	if err != nil {
 		log.WithError(err).Error("Failed to get cookie session for login status check.")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	receiverId := session.Values["id"].(uint32)
 	var result []NotificationAPI
 	if err := h.Db.Model(&database.Notification{}).Select(
 		"notifications.id, "+
