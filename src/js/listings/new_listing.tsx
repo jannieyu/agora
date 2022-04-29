@@ -430,6 +430,7 @@ function ListingForm() {
             createdAt={currTime}
             bids={bids || []}
             isLocal={!!image}
+            active
           />
         </Col>
       </Row>

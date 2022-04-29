@@ -17,7 +17,7 @@ type LineItemProps = ListingProps & {
 }
 
 function LineItem(props: LineItemProps) {
-  const { id, image, name, highestBid, numBids, setSearchParams, setDeleteId } = props
+  const { id, image, name, highestBid, numBids, active, setSearchParams, setDeleteId } = props
 
   const navigate = useNavigate()
 
@@ -44,21 +44,28 @@ function LineItem(props: LineItemProps) {
   )
 
   return (
-    <Row className="my_listing align-items-center" onClick={onClick}>
-      <div className="icon-bar">
-        <div>
-          <Icon name="edit" className="card-edit" onClick={onEdit} />
-          <Icon name="trash" className="card-trash" onClick={onDelete} />
+    <Row
+      className={`my_listing align-items-center ${active ? "active" : "delisted"}`}
+      onClick={onClick}
+    >
+      {active ? (
+        <div className="icon-bar">
+          <div>
+            <Icon name="edit" className="card-edit" onClick={onEdit} />
+            <Icon name="trash" className="card-trash" onClick={onDelete} />
+          </div>
         </div>
-      </div>
-
+      ) : null}
       <Col xs={3} align="center">
         <img src={`/${image}`} alt="Listing Preview" />
       </Col>
       <Col xs={5}>
         <div style={{ display: "flex", justifyContent: "space-between" }}>
-          <b>{name}</b>
-          <strong>{`${numBids} bids`}</strong>
+          <b>
+            <span>{name}</span>
+            {active ? null : <span className="red">&nbsp;(delisted)</span>}
+          </b>
+          <strong>{`${numBids} bid${numBids === 1 ? "" : "s"}`}</strong>
         </div>
       </Col>
       <Col xs={1} />

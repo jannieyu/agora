@@ -84,6 +84,7 @@ export default function Listing(props: ListingProps) {
     id,
     numBids,
     isLocal,
+    active,
   } = props
   const activeUser = useSelector((state: AppState) => state.user)
 
@@ -126,7 +127,10 @@ export default function Listing(props: ListingProps) {
             {image ? <img src={imageSrc} alt="Listing Preview" className="listing-image" /> : null}
           </div>
           <div className="listing-information">
-            <h2>{name}</h2>
+            <h2>
+              <span>{name}</span>
+              {active ? null : <span className="red">&nbsp;(delisted)</span>}
+            </h2>
             <table className="listing-metadata-table">
               <tbody>
                 {highestBid && isValidPrice(highestBid) ? (

@@ -60,6 +60,7 @@ export interface SearchItem {
   price: string
   seller: User
   sellerId: number
+  active: boolean
   bids: BidHistory[]
 }
 

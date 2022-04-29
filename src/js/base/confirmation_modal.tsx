@@ -2,7 +2,7 @@ import * as React from "react"
 import { Modal } from "react-bootstrap"
 import { Button, Form, Message } from "semantic-ui-react"
 import { useCallback, useState } from "./react_base"
-import { apiCall as deleteCall } from "../api/delete_item"
+import { apiCall as delistCall } from "../api/delist_item"
 
 interface ModalProps {
   onHide: () => void
@@ -23,8 +23,8 @@ export default function ConfirmationModal(props: ModalProps) {
   }, [onHide, setLoading, setHasError])
 
   const onDelete = useCallback(() => {
-    deleteCall(
-      { id: itemId },
+    delistCall(
+      { itemId },
       () => {
         hideAndReset()
       },
