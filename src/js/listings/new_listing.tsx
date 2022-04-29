@@ -255,7 +255,7 @@ function ListingForm() {
       method: "POST",
       body: formData,
     })
-    if (response.status === 201) {
+    if (response.status >= 200 && response.status <= 299) {
       setSubmitting(false)
       setShowSuccessModal(true)
       setShowFailureModal(false)
