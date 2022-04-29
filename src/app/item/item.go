@@ -76,6 +76,7 @@ func PopulateItem(item *database.Item, r *http.Request) error {
 		}
 		item.StartingPrice = startingPrice
 		item.HighestBid = item.StartingPrice
+		item.Active = true
 	}
 
 	if image_location, err := ProcessImage(r, ITEMS_FOLDER); err != nil {

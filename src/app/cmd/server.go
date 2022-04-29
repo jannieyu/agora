@@ -40,12 +40,15 @@ func main() {
 	r.HandleFunc("/api/update_user", h.UpdateUser)
 	r.HandleFunc("/api/get_item", h.GetItem)
 	r.HandleFunc("/api/add_item", h.AddOrUpdateItem)
-	r.HandleFunc("/api/delete_item", h.DeleteItem)
+	r.HandleFunc("/api/delist_item", h.DelistItem)
 	r.HandleFunc("/api/get_search_items", h.GetSearchItems)
+
 	r.HandleFunc("/api/add_bid", h.AddBid)
 	r.HandleFunc("/api/get_bids", h.GetBids)
+
 	r.HandleFunc("/api/add_bid_bot", h.AddOrUpdateBidBot)
 	r.HandleFunc("/api/get_bid_bots", h.GetBidBots)
+
 	r.HandleFunc("/api/get_notifications", h.GetNotifications)
 	r.HandleFunc("/api/update_seen_notifications", h.UpdateSeenNotifications)
 

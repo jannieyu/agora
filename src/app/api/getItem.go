@@ -18,7 +18,7 @@ func (h Handle) GetItem(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var item []database.Item
-	if err := h.Db.Where("id = ?", payload.ItemId).Find(&item).Error; err != nil {
+	if err := h.Db.Preload("Bids").Where("id = ?", payload.ItemId).Find(&item).Error; err != nil {
 		log.WithError(err).Error("Failed to query info info.")
 		w.WriteHeader(http.StatusInternalServerError)
 		return

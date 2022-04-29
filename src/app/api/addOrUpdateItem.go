@@ -41,13 +41,13 @@ func (h Handle) AddOrUpdateItem(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-
-	if item.ID > 0 && item.SellerID != sellerID {
+	if item.ID == 0 {
+		item.SellerID = sellerID
+	} else if item.SellerID != sellerID {
 		log.WithError(err).Error("Cannot update item; user doesn't match seller.")
 		w.WriteHeader(http.StatusForbidden)
 		return
 	}
-	item.SellerID = sellerID
 
 	if err := i.PopulateItem(&item, r); err != nil {
 		log.WithError(err).Error("Failed to parse item data.")
