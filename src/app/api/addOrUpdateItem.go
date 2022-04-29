@@ -38,8 +38,16 @@ func (h Handle) AddOrUpdateItem(w http.ResponseWriter, r *http.Request) {
 	var item database.Item
 	if err := h.Db.Where("id = ?", itemId).Limit(1).Find(&item).Error; err != nil {
 		log.WithError(err).Error("Failed to retrieve existing item (if any) from database.")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
 	}
-	item.SellerID = sellerID
+	if item.ID == 0 {
+		item.SellerID = sellerID
+	} else if item.SellerID != sellerID {
+		log.WithError(err).Error("Cannot update item; user doesn't match seller.")
+		w.WriteHeader(http.StatusForbidden)
+		return
+	}
 
 	if err := i.PopulateItem(&item, r); err != nil {
 		log.WithError(err).Error("Failed to parse item data.")
@@ -54,7 +62,11 @@ func (h Handle) AddOrUpdateItem(w http.ResponseWriter, r *http.Request) {
 	if err := h.Index.Index(strconv.FormatUint(uint64(item.ID), 10), item); err != nil {
 		log.WithError(err).Error("Failed to index item.")
 	}
-	w.WriteHeader(http.StatusCreated)
+	if itemId > 0 {
+		w.WriteHeader(http.StatusOK)
+	} else {
+		w.WriteHeader(http.StatusCreated)
+	}
 	SafeEncode(w, "{}")
 	log.Info("Completed item upload.")
 }

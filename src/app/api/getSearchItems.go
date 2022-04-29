@@ -32,11 +32,12 @@ func (h Handle) GetSearchItems(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		if sellerId > 0 {
-			result = result.Where("seller_id = ?", sellerId)
+			result = result.Where("seller_id = ?", sellerId).Order("active DESC")
 		}
 
 	} else {
 		result = user.PreloadSafeSellerInfo(result)
+		result = result.Where("active = ?", true)
 	}
 
 	switch filters.SortBy {
