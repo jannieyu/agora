@@ -297,7 +297,7 @@ function ListingForm() {
 
   const currTime = DateTime.now().toISO()
 
-  if (sellerId && user?.id && sellerId !== user.id) {
+  if (sellerId && sellerId !== user?.id) {
     return <Unauthorized loggedIn={!!user} />
   }
 
