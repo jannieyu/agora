@@ -64,11 +64,7 @@ func PopulateItem(item *database.Item, r *http.Request) error {
 		item.Description = r.FormValue("description")
 	}
 
-	if !strings.EqualFold(r.FormValue("price"), "") && item.ID > 0 {
-		return errors.New("Cannot update starting price value.")
-	}
-
-	if item.ID == 0 {
+	if item.ID == 0 || (item.ID > 0 && item.NumBids == 0) {
 		startingPrice, err := ConvertStringPriceToDecimal(r.FormValue("price"))
 		if err != nil {
 			log.WithError(err).Error("Failed to parse starting price value.")
@@ -77,6 +73,8 @@ func PopulateItem(item *database.Item, r *http.Request) error {
 		item.StartingPrice = startingPrice
 		item.HighestBid = item.StartingPrice
 		item.Active = true
+	} else if !strings.EqualFold(r.FormValue("price"), "") {
+		return errors.New("Failed to enter starting price value; can only make changes if item is new or listed item has zero bids.")
 	}
 
 	if image_location, err := ProcessImage(r, ITEMS_FOLDER); err != nil {
