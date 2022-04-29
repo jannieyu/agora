@@ -13,7 +13,14 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func ProcessImage(r *http.Request) (string, error) {
+type imageFolder string
+
+const (
+	ITEMS_FOLDER imageFolder = "items/"
+	USERS_FOLDER imageFolder = "users/"
+)
+
+func ProcessImage(r *http.Request, folder imageFolder) (string, error) {
 	file, header, err := r.FormFile("image")
 	if err != nil {
 		return "", err
@@ -32,7 +39,7 @@ func ProcessImage(r *http.Request) (string, error) {
 	}(file)
 
 	t := strconv.FormatInt(time.Now().Unix(), 10)
-	filename := "images/" + t + "-" + header.Filename
+	filename := "images/" + string(folder) + t + "-" + header.Filename
 	diskLocation := "../../static/" + filename
 
 	if err := ioutil.WriteFile(diskLocation, data, 0777); err != nil {
@@ -59,8 +66,7 @@ func PopulateItem(item *database.Item, r *http.Request) error {
 		item.HighestBid = item.StartingPrice
 	}
 
-	image_location, err := ProcessImage(r)
-	if err != nil {
+	if image_location, err := ProcessImage(r, ITEMS_FOLDER); err != nil {
 		if item.ID == 0 {
 			return err
 		} else {

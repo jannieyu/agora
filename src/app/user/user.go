@@ -3,8 +3,10 @@ package user
 import (
 	"agora/src/app/database"
 	"agora/src/app/item"
+	"errors"
 	"github.com/gorilla/sessions"
 	"net/http"
+	"strings"
 
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/crypto/bcrypt"
@@ -16,6 +18,12 @@ func HashPassword(password string) (string, error) {
 	return string(bytes), err
 }
 
+func CheckPasswordHash(password, hash string) bool {
+	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
+	log.Debug("Failure on checking password hash.", err)
+	return err == nil
+}
+
 func PreloadSafeSellerInfo(db *gorm.DB) *gorm.DB {
 	return db.Preload("Seller", func(tx *gorm.DB) *gorm.DB {
 		return tx.Select("id", "first_name", "last_name", "email")
@@ -23,21 +31,35 @@ func PreloadSafeSellerInfo(db *gorm.DB) *gorm.DB {
 }
 
 func PopulateUser(user *database.User, r *http.Request) error {
-	user.FirstName = r.FormValue("first_name")
-	user.LastName = r.FormValue("last_name")
-	user.Email = r.FormValue("email")
-	hash, err := HashPassword(r.FormValue("pword"))
-	if err != nil {
-		log.WithError(err).Error("Failed to hash passcode.")
-		return err
-	} else {
-		user.Pword = hash
+	if !strings.EqualFold(r.FormValue("firstName"), "") {
+		user.FirstName = r.FormValue("firstName")
+	}
+	if !strings.EqualFold(r.FormValue("lastName"), "") {
+		user.LastName = r.FormValue("lastName")
+	}
+	if !strings.EqualFold(r.FormValue("email"), "") {
+		user.Email = r.FormValue("email")
+	}
+	if !strings.EqualFold(r.FormValue("newPword"), "") {
+		if !CheckPasswordHash(r.FormValue("oldPword"), user.Pword) {
+			return errors.New("Failed password change; empty or incorrect old password.")
+		}
+		if CheckPasswordHash(r.FormValue("newPword"), user.Pword) {
+			return errors.New("Failed password change; new and old password are the same.")
+		}
+		newHash, err := HashPassword(r.FormValue("newPword"))
+		if err != nil {
+			log.WithError(err).Error("Failed to hash passcode.")
+			return err
+		}
+		user.Pword = newHash
+	}
+	if !strings.EqualFold(r.FormValue("bio"), "") {
+		user.Bio = r.FormValue("bio")
 	}
 
-	user.Bio = r.FormValue("bio")
-
-	if image_location, err := item.ProcessImage(r); err != nil {
-		log.WithError(err).Error("Failed to process user image.")
+	if image_location, err := item.ProcessImage(r, item.USERS_FOLDER); err != nil {
+		log.Info("No user profile image was given.")
 		return err
 	} else {
 		user.Image = image_location
