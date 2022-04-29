@@ -2,6 +2,7 @@ package item
 
 import (
 	"agora/src/app/database"
+	"errors"
 	"io/ioutil"
 	"mime/multipart"
 	"net/http"
@@ -50,18 +51,29 @@ func ProcessImage(r *http.Request, folder imageFolder) (string, error) {
 }
 
 func PopulateItem(item *database.Item, r *http.Request) error {
+	if !strings.EqualFold(r.FormValue("name"), "") {
+		item.Name = r.FormValue("name")
+	}
+	if !strings.EqualFold(r.FormValue("category"), "") {
+		item.Category = r.FormValue("category")
+	}
+	if !strings.EqualFold(r.FormValue("condition"), "") {
+		item.Condition = r.FormValue("condition")
+	}
+	if !strings.EqualFold(r.FormValue("description"), "") {
+		item.Description = r.FormValue("description")
+	}
 
-	item.Name = r.FormValue("name")
-	item.Category = r.FormValue("category")
-	item.Condition = r.FormValue("condition")
-	item.Description = r.FormValue("description")
-	startingPrice, err := ConvertStringPriceToDecimal(r.FormValue("price"))
-	if err != nil {
-		log.WithError(err).Error("Failed to parse starting price value.")
-		return err
+	if !strings.EqualFold(r.FormValue("price"), "") && item.ID > 0 {
+		return errors.New("Cannot update starting price value.")
 	}
 
 	if item.ID == 0 {
+		startingPrice, err := ConvertStringPriceToDecimal(r.FormValue("price"))
+		if err != nil {
+			log.WithError(err).Error("Failed to parse starting price value.")
+			return err
+		}
 		item.StartingPrice = startingPrice
 		item.HighestBid = item.StartingPrice
 	}
