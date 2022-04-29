@@ -1,5 +1,7 @@
 import * as React from "react"
 import { Row, Col } from "react-bootstrap"
+import ReactCrop, { Crop } from "react-image-crop"
+import "react-image-crop/dist/ReactCrop.css"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { useEffect, useSelector, useState } from "../base/react_base"
 import { apiCall as getUser, Response as GetUserResponse } from "../api/get_user"
@@ -7,6 +9,7 @@ import { AppState, User } from "../base/reducers"
 
 export default function UserProfile() {
   const [user, setUser] = useState<User | null>(null)
+  const [crop, setCrop] = useState<Crop>()
 
   const activeUser = useSelector((state: AppState) => state.user)
 
@@ -34,7 +37,9 @@ export default function UserProfile() {
       <h1 className="column-heading-centered">My Account</h1>
       <Col xs={3} />
       <Col xs={6}>
-        <img alt="profile" src={`/${user?.image}`} style={{ maxWidth: "100%" }} />
+        <ReactCrop crop={crop} onChange={(c) => setCrop(c)}>
+          <img alt="profile" src={`/${user?.image}`} style={{ maxWidth: "100%" }} />
+        </ReactCrop>
         <div className="profile-metadata">
           <h2>
             <span contentEditable="true" spellCheck="false">
