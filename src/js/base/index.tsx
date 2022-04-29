@@ -42,6 +42,7 @@ import {
 } from "../api/get_notifications"
 import { rootReducer, AppState } from "./reducers"
 import { setData, clearListingState } from "./actions"
+import Unauthorized from "./unauthorized"
 
 interface BaseProps {
   children: React.ReactElement | React.ReactElement[]
@@ -62,18 +63,6 @@ function PageNotFound() {
       <h1>404: Page Not Found</h1>
       <p>
         The page you requested does not exist. Please return to the <Link to="/">home page</Link>.
-      </p>
-    </>
-  )
-}
-
-function Unauthorized() {
-  return (
-    <>
-      <h1>Unauthorized</h1>
-      <p>
-        You are not authorized to view this page. Please log in or return to the{" "}
-        <Link to="/">home page</Link>.
       </p>
     </>
   )
@@ -267,7 +256,9 @@ function Base(props: BaseProps) {
         </Container>
       </Navbar>
       <Container>
-        <div className="content-base">{requiresAuth && !user ? <Unauthorized /> : children}</div>
+        <div className="content-base">
+          {requiresAuth && !user ? <Unauthorized loggedIn={!!user} /> : children}
+        </div>
       </Container>
     </>
   )

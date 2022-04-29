@@ -22,6 +22,7 @@ import { OnChangeObject } from "../base/types"
 import { safeParseInt } from "../base/util"
 import { apiCall as getItem, Response as GetItemResponse } from "../api/get_item"
 import DollarInput from "./dollar_input"
+import Unauthorized from "../base/unauthorized"
 
 interface SubmissionModalProps {
   onHide: () => void
@@ -89,8 +90,17 @@ function SubmissionModal(props: SubmissionModalProps) {
 function ListingForm() {
   const { user, listingState } = useSelector((state: AppState) => state)
 
-  const { name, startingPrice, category, condition, description, imageURL, bids, highestBid } =
-    listingState
+  const {
+    name,
+    startingPrice,
+    category,
+    condition,
+    description,
+    imageURL,
+    bids,
+    highestBid,
+    sellerId,
+  } = listingState
 
   const dispatch = useDispatch()
   const navigate = useNavigate()
@@ -122,6 +132,7 @@ function ListingForm() {
             description: item.description,
             bids: item.bids,
             highestBid: item.highestBid,
+            sellerId: item.sellerId,
           }),
         )
       },
@@ -285,6 +296,10 @@ function ListingForm() {
   const dropzoneAreaClass = imageError ? "droparea-error" : "droparea-text"
 
   const currTime = DateTime.now().toISO()
+
+  if (sellerId && user?.id && sellerId !== user.id) {
+    return <Unauthorized loggedIn={!!user} />
+  }
 
   return (
     <>

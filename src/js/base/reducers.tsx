@@ -44,6 +44,7 @@ export interface ListingState {
   imageURL: string
   bids: BidHistory[]
   highestBid: string
+  sellerId: number
 }
 export interface SearchItem {
   category: string
@@ -56,6 +57,7 @@ export interface SearchItem {
   name: string
   price: string
   seller: User
+  sellerId: number
   bids: BidHistory[]
 }
 
