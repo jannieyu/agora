@@ -48,7 +48,13 @@ interface BaseProps {
 }
 
 // Paths that the user must be logged in to see
-const LOGGED_IN_PATHS = new Set(["/create_listing", "/notifications", "/my_listings", "/my_bids"])
+const LOGGED_IN_PATHS = new Set([
+  "/create_listing",
+  "/notifications",
+  "/my_listings",
+  "/my_bids",
+  "/update_listing",
+])
 
 function PageNotFound() {
   return (
@@ -269,6 +275,7 @@ function Base(props: BaseProps) {
 const ROUTES = {
   about: About,
   create_listing: NewListing,
+  update_listing: NewListing,
   user_profile: UserProfile,
   notifications: NotificationPage,
   my_listings: MyListings,

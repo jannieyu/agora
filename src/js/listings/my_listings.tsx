@@ -1,6 +1,7 @@
 import * as React from "react"
 import { Row, Col } from "react-bootstrap"
 import { Icon } from "semantic-ui-react"
+import { useNavigate } from "react-router"
 import { Link, useSearchParams } from "react-router-dom"
 import { useCallback, useEffect, useMemo, useSelector, useState } from "../base/react_base"
 import { apiCall as getSearchItems, Response as SearchItemResponse } from "../api/get_search_items"
@@ -18,15 +19,21 @@ type LineItemProps = ListingProps & {
 function LineItem(props: LineItemProps) {
   const { id, image, name, highestBid, numBids, setSearchParams, setDeleteId } = props
 
+  const navigate = useNavigate()
+
   const priceStr = `$${safeParseFloat(highestBid).toFixed(2)}`
 
   const onClick = useCallback(() => {
     setSearchParams({ id })
   }, [setSearchParams, id])
 
-  const onEdit = useCallback((e: React.FormEvent<HTMLInputElement>) => {
-    e.stopPropagation()
-  }, [])
+  const onEdit = useCallback(
+    (e: React.FormEvent<HTMLInputElement>) => {
+      e.stopPropagation()
+      navigate(`/update_listing/?id=${id}`)
+    },
+    [id, navigate],
+  )
 
   const onDelete = useCallback(
     (e: React.FormEvent<HTMLInputElement>) => {

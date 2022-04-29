@@ -1,11 +1,13 @@
 import * as React from "react"
 import { Row, Col, OverlayTrigger, Modal, Popover } from "react-bootstrap"
 import { useNavigate } from "react-router"
+import { useSearchParams } from "react-router-dom"
 import { Button, Form, Input } from "semantic-ui-react"
 import { DateTime } from "luxon"
 import Dropzone from "react-dropzone"
-import { useCallback, useSelector, useState } from "../base/react_base"
+import { useCallback, useDispatch, useMemo, useSelector, useState } from "../base/react_base"
 import { AppState } from "../base/reducers"
+import { updateListingState } from "../base/actions"
 import { conditions, categories } from "./constants"
 import Listing from "./listing"
 import { isValidPrice } from "./util"
@@ -16,13 +18,17 @@ interface SubmissionModalProps {
   onHide: () => void
   show: boolean
   wasSuccess: boolean
+  clearState: () => void
 }
 
 function SubmissionModal(props: SubmissionModalProps) {
-  const { onHide, show, wasSuccess } = props
+  const { onHide, show, wasSuccess, clearState } = props
   const navigate = useNavigate()
 
-  const returnHome = () => navigate("/")
+  const returnHome = () => {
+    clearState()
+    navigate("/")
+  }
 
   return (
     <Modal
@@ -55,19 +61,21 @@ function SubmissionModal(props: SubmissionModalProps) {
 }
 
 function ListingForm() {
-  const activeUser = useSelector((state: AppState) => state.user)
+  const { user, listingState } = useSelector((state: AppState) => state)
 
-  const [name, setName] = useState<string>("")
-  const [startingPrice, setStartingPrice] = useState<string>("")
-  const [category, setCategory] = useState<string>("")
-  const [condition, setCondition] = useState<string>("")
-  const [description, setDescription] = useState<string>("")
-  const [imageURL, setImageURL] = useState<string>("")
+  const { name, startingPrice, category, condition, description, imageURL } = listingState
+
+  const dispatch = useDispatch()
+
   const [image, setImage] = useState<File | null>(null)
   const [submitting, setSubmitting] = useState<boolean>(false)
   const [showSuccessModal, setShowSuccessModal] = useState<boolean>(false)
   const [showFailureModal, setShowFailureModal] = useState<boolean>(false)
   const [imageError, setImageError] = useState<boolean>(false)
+
+  const [searchParams] = useSearchParams()
+  const params = useMemo(() => Object.fromEntries([...searchParams]), [searchParams])
+  const { id } = params
 
   const canSubmit =
     name &&
@@ -79,68 +87,81 @@ function ListingForm() {
     isValidPrice(startingPrice) &&
     !imageError
 
-  const handleChangeName = useCallback((e: React.FormEvent<HTMLInputElement>) => {
-    setName(e.currentTarget.value)
-  }, [])
+  const handleChangeName = useCallback(
+    (e: React.FormEvent<HTMLInputElement>) => {
+      dispatch(updateListingState({ name: e.currentTarget.value }))
+    },
+    [dispatch],
+  )
 
-  const handleChangeStartingPrice = useCallback((e: React.FormEvent<HTMLInputElement>) => {
-    setStartingPrice(e.currentTarget.value)
-  }, [])
+  const handleChangeStartingPrice = useCallback(
+    (e: React.FormEvent<HTMLInputElement>) => {
+      dispatch(updateListingState({ startingPrice: e.currentTarget.value }))
+    },
+    [dispatch],
+  )
 
   const handleChangeCategory = useCallback(
     (e: React.FormEvent<HTMLInputElement>, data: OnChangeObject) => {
-      setCategory(data.value)
+      dispatch(updateListingState({ category: data.value }))
     },
-    [],
+    [dispatch],
   )
 
   const handleChangeCondition = useCallback(
     (e: React.FormEvent<HTMLInputElement>, data: OnChangeObject) => {
-      setCondition(data.value)
+      dispatch(updateListingState({ condition: data.value }))
     },
-    [],
+    [dispatch],
   )
 
   const handleChangeDescription = useCallback(
     (e: React.ChangeEvent<HTMLTextAreaElement>, data: OnChangeObject) => {
-      setDescription(data.value)
+      dispatch(updateListingState({ description: data.value }))
     },
-    [],
+    [dispatch],
   )
 
   const reset = () => {
-    setName("")
-    setStartingPrice("")
-    setCategory("")
-    setCondition("")
-    setDescription("")
-    setImageURL("")
+    dispatch(
+      updateListingState({
+        name: "",
+        condition: "",
+        category: "",
+        description: "",
+        imageURL: "",
+        startingPrice: "",
+      }),
+    )
     setImage(null)
     setSubmitting(false)
     setShowSuccessModal(false)
     setShowFailureModal(false)
   }
 
-  const handleChangeImage = useCallback((files: File[]) => {
-    const imageFile = files[0]
-    if (
-      imageFile.name.endsWith(".png") ||
-      imageFile.name.endsWith(".jpg") ||
-      imageFile.name.endsWith(".gif")
-    ) {
-      setImageError(false)
-      const reader = new FileReader()
-      reader.onload = (e) => {
-        setImageURL(e.target.result as string)
+  const handleChangeImage = useCallback(
+    (files: File[]) => {
+      const imageFile = files[0]
+      if (
+        imageFile.name.endsWith(".png") ||
+        imageFile.name.endsWith(".jpg") ||
+        imageFile.name.endsWith(".gif")
+      ) {
+        setImageError(false)
+        const reader = new FileReader()
+        reader.onload = (e) => {
+          dispatch(updateListingState({ imageURL: e.target.result as string }))
+        }
+        reader.readAsDataURL(imageFile)
+        setImage(imageFile)
+      } else {
+        setImageError(true)
+        setImage(null)
+        dispatch(updateListingState({ imageURL: "" }))
       }
-      reader.readAsDataURL(imageFile)
-      setImage(imageFile)
-    } else {
-      setImageError(true)
-      setImage(null)
-      setImageURL("")
-    }
-  }, [])
+    },
+    [dispatch],
+  )
 
   const onSubmit = useCallback(async () => {
     const formData = new FormData()
@@ -150,6 +171,9 @@ function ListingForm() {
     formData.append("price", startingPrice)
     formData.append("description", description)
     formData.append("image", image, image.name)
+    if (id) {
+      formData.append("id", id)
+    }
 
     setSubmitting(true)
     const response = await fetch("/api/add_item", {
@@ -165,7 +189,7 @@ function ListingForm() {
       setShowSuccessModal(false)
       setShowFailureModal(true)
     }
-  }, [name, category, condition, startingPrice, description, image])
+  }, [name, category, condition, startingPrice, description, image, id])
 
   const submitBtn = (
     <Button type="submit" disabled={!canSubmit} loading={submitting} onClick={onSubmit} positive>
@@ -204,6 +228,7 @@ function ListingForm() {
         onHide={reset}
         show={showSuccessModal || showFailureModal}
         wasSuccess={showSuccessModal}
+        clearState={reset}
       />
       <Row>
         <Col xs="6">
@@ -296,7 +321,7 @@ function ListingForm() {
             numBids={0}
             category={category}
             image={imageURL}
-            seller={activeUser}
+            seller={user}
             id={0}
             createdAt={currTime}
             bids={[]}

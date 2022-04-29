@@ -5,6 +5,15 @@ export interface User {
   id: number
 }
 
+export interface ListingState {
+  name: string
+  startingPrice: string
+  category: string
+  condition: string
+  description: string
+  imageURL: string
+}
+
 export enum NotificationType {
   OUTBID = "OUTBID",
   WON = "WON",
@@ -56,6 +65,7 @@ const initialState = {
   isSignUp: true as boolean,
   searchItems: [] as SearchItem[],
   notifications: [] as Notification[],
+  listingState: {} as ListingState,
 }
 
 export type AppState = typeof initialState
@@ -65,6 +75,7 @@ export enum ActionType {
   UPDATE_SEARCH_ITEM = "UPDATE_SEARCH_ITEM",
   CREATE_NOTIFICATION = "CREATE_NOTIFICATION",
   UPDATE_NOTIFICATION = "UPDATE_NOTIFICATION",
+  UPDATE_LISTING_STATE = "UPDATE_LISTING_STATE",
 }
 
 export type SearchItemAction = {
@@ -78,7 +89,12 @@ export type NotificationAction = {
   notificationId: number
 }
 
-export type ActionPayload = Partial<AppState> | SearchItemAction | Notification | NotificationAction
+export type ActionPayload =
+  | Partial<AppState>
+  | SearchItemAction
+  | Notification
+  | NotificationAction
+  | Partial<ListingState>
 
 export interface Action {
   type: ActionType
@@ -124,6 +140,13 @@ export const rootReducer = (state: AppState = initialState, action: Action) => {
               }
             : notification,
         ),
+      }
+    }
+    case ActionType.UPDATE_LISTING_STATE: {
+      const listingState = action.payload as ListingState
+      return {
+        ...state,
+        listingState: { ...state.listingState, ...listingState },
       }
     }
     default: {
