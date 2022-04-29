@@ -290,6 +290,38 @@ function ListingForm() {
     </OverlayTrigger>
   )
 
+  const canChangeStartingPrice = !id || bids?.length === 0
+
+  const startingPriceDropdown = (
+    <Form.Field
+      control={DollarInput}
+      label="Starting Price"
+      placeholder="4.99"
+      onChange={handleChangeStartingPrice}
+      error={!!startingPrice && !isValidPrice(startingPrice)}
+      value={startingPrice || ""}
+      disabled={!canChangeStartingPrice}
+    />
+  )
+
+  const wrappedStartingPriceDropdown = canChangeStartingPrice ? (
+    startingPriceDropdown
+  ) : (
+    <OverlayTrigger
+      placement="top"
+      trigger={["hover", "focus"]}
+      overlay={
+        <Popover>
+          <Popover.Body>
+            The starting price cannot be modified once a bid has been placed.
+          </Popover.Body>
+        </Popover>
+      }
+    >
+      <span>{startingPriceDropdown}</span>
+    </OverlayTrigger>
+  )
+
   const dropzoneAreaMessage = imageError
     ? "Error uploading image: file type not supported"
     : "Drag and drop an image of the listed item, or click to upload"
@@ -326,16 +358,7 @@ function ListingForm() {
                   value={name || ""}
                 />
               </Col>
-              <Col xs="6">
-                <Form.Field
-                  control={DollarInput}
-                  label="Starting Price"
-                  placeholder="4.99"
-                  onChange={handleChangeStartingPrice}
-                  error={!!startingPrice && !isValidPrice(startingPrice)}
-                  value={startingPrice || ""}
-                />
-              </Col>
+              <Col xs="6">{wrappedStartingPriceDropdown}</Col>
             </Row>
             <br />
             <Row>
