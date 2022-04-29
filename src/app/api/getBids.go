@@ -16,6 +16,7 @@ type ItemBidsAPI struct {
 	HighestBid     decimal.Decimal `json:"highestItemBid,omitempty"`
 	HighestUserBid decimal.Decimal `json:"highestUserBid,omitempty"`
 	NumBids        uint32          `json:"numBids,omitempty"`
+	ActiveItem     bool            `json:"activeItem"`
 }
 
 func (h Handle) GetBids(w http.ResponseWriter, r *http.Request) {
@@ -37,10 +38,11 @@ func (h Handle) GetBids(w http.ResponseWriter, r *http.Request) {
 			"items.highest_bid, "+
 			"items.image, "+
 			"max(bids.bid_price) as highest_user_bid, "+
-			"items.num_bids").Group(
+			"items.num_bids, "+
+			"items.active as active_item").Group(
 		"items.id").Joins(
 		"left join items on items.id = bids.item_id").Where(
-		"bids.bidder_id = ? AND bids.bot_id = ?", bidderId, 0).Find(&result).Error; err != nil {
+		"bids.bidder_id = ? AND bids.bot_id = ?", bidderId, 0).Order("items.active DESC").Find(&result).Error; err != nil {
 		log.WithError(err).Error("Failed to query user bid items.")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
