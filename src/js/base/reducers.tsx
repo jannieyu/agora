@@ -1,8 +1,10 @@
 export interface User {
+  id: number
   firstName: string
   lastName: string
   email: string
-  id: number
+  bio?: string
+  image?: string
 }
 
 export enum NotificationType {
