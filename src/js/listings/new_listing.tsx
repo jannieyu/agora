@@ -5,13 +5,22 @@ import { useSearchParams } from "react-router-dom"
 import { Button, Form, Input } from "semantic-ui-react"
 import { DateTime } from "luxon"
 import Dropzone from "react-dropzone"
-import { useCallback, useDispatch, useMemo, useSelector, useState } from "../base/react_base"
+import {
+  useCallback,
+  useDispatch,
+  useEffect,
+  useMemo,
+  useSelector,
+  useState,
+} from "../base/react_base"
 import { AppState } from "../base/reducers"
 import { updateListingState } from "../base/actions"
 import { conditions, categories } from "./constants"
 import Listing from "./listing"
 import { isValidPrice } from "./util"
 import { OnChangeObject } from "../base/types"
+import { safeParseInt } from "../base/util"
+import { apiCall as getItem, Response as GetItemResponse } from "../api/get_item"
 import DollarInput from "./dollar_input"
 
 interface SubmissionModalProps {
@@ -19,16 +28,33 @@ interface SubmissionModalProps {
   show: boolean
   wasSuccess: boolean
   clearState: () => void
+  id: string
+  fetchItem: () => void
 }
 
 function SubmissionModal(props: SubmissionModalProps) {
-  const { onHide, show, wasSuccess, clearState } = props
+  const { onHide, show, wasSuccess, clearState, id, fetchItem } = props
   const navigate = useNavigate()
 
   const returnHome = () => {
     clearState()
     navigate("/")
   }
+
+  const goAgain = useCallback(() => {
+    clearState()
+    if (wasSuccess) {
+      navigate("/create_listing")
+    } else if (id) {
+      fetchItem()
+    }
+  }, [clearState, navigate, wasSuccess, id, fetchItem])
+
+  const successMessage = `Your listing was ${id ? "updated" : "created"} successfully! Create ${
+    id ? "a new" : "another"
+  } listing or return home.`
+
+  const createMessage = `Create ${id ? "a new" : "another"} Listing`
 
   return (
     <Modal
@@ -47,13 +73,13 @@ function SubmissionModal(props: SubmissionModalProps) {
         <Row>
           <Col xs="12" align="center">
             {wasSuccess
-              ? "Your listing was created successfully! Create another listing or return home."
+              ? successMessage
               : "There was an error creating your listing. We are very sorry for the inconvenience. Please consider trying again or returning home."}
           </Col>
         </Row>
       </Modal.Body>
       <Modal.Footer>
-        <Button onClick={onHide}>{wasSuccess ? "Create Another Listing" : "Try Again"}</Button>
+        <Button onClick={goAgain}>{wasSuccess ? createMessage : "Try Again"}</Button>
         <Button onClick={returnHome}>Return Home</Button>
       </Modal.Footer>
     </Modal>
@@ -63,9 +89,11 @@ function SubmissionModal(props: SubmissionModalProps) {
 function ListingForm() {
   const { user, listingState } = useSelector((state: AppState) => state)
 
-  const { name, startingPrice, category, condition, description, imageURL } = listingState
+  const { name, startingPrice, category, condition, description, imageURL, bids, highestBid } =
+    listingState
 
   const dispatch = useDispatch()
+  const navigate = useNavigate()
 
   const [image, setImage] = useState<File | null>(null)
   const [submitting, setSubmitting] = useState<boolean>(false)
@@ -77,13 +105,45 @@ function ListingForm() {
   const params = useMemo(() => Object.fromEntries([...searchParams]), [searchParams])
   const { id } = params
 
+  const fetchItem = useCallback(() => {
+    getItem(
+      {
+        itemId: safeParseInt(id),
+      },
+      (items: GetItemResponse) => {
+        const item = items[0]
+        dispatch(
+          updateListingState({
+            name: item.name,
+            startingPrice: item.price,
+            condition: item.condition,
+            category: item.category,
+            imageURL: item.image,
+            description: item.description,
+            bids: item.bids,
+            highestBid: item.highestBid,
+          }),
+        )
+      },
+      () => {
+        navigate("/")
+      },
+    )
+  }, [id, dispatch, navigate])
+
+  useEffect(() => {
+    if (id) {
+      fetchItem()
+    }
+  }, [dispatch, id, navigate, fetchItem])
+
   const canSubmit =
     name &&
     startingPrice &&
     category &&
     condition &&
     description &&
-    image &&
+    imageURL &&
     isValidPrice(startingPrice) &&
     !imageError
 
@@ -131,6 +191,8 @@ function ListingForm() {
         description: "",
         imageURL: "",
         startingPrice: "",
+        bids: [],
+        highestBid: "",
       }),
     )
     setImage(null)
@@ -170,7 +232,9 @@ function ListingForm() {
     formData.append("condition", condition)
     formData.append("price", startingPrice)
     formData.append("description", description)
-    formData.append("image", image, image.name)
+    if (image) {
+      formData.append("image", image, image.name)
+    }
     if (id) {
       formData.append("id", id)
     }
@@ -229,6 +293,8 @@ function ListingForm() {
         show={showSuccessModal || showFailureModal}
         wasSuccess={showSuccessModal}
         clearState={reset}
+        id={id}
+        fetchItem={fetchItem}
       />
       <Row>
         <Col xs="6">
@@ -242,7 +308,7 @@ function ListingForm() {
                   label="Listing Name"
                   placeholder="Used Phys 1a Textbook"
                   onChange={handleChangeName}
-                  value={name}
+                  value={name || ""}
                 />
               </Col>
               <Col xs="6">
@@ -252,7 +318,7 @@ function ListingForm() {
                   placeholder="4.99"
                   onChange={handleChangeStartingPrice}
                   error={!!startingPrice && !isValidPrice(startingPrice)}
-                  value={startingPrice}
+                  value={startingPrice || ""}
                 />
               </Col>
             </Row>
@@ -266,7 +332,7 @@ function ListingForm() {
                   selection
                   options={categories}
                   onChange={handleChangeCategory}
-                  value={category}
+                  value={category || ""}
                 />
               </Col>
               <Col xs="6">
@@ -277,7 +343,7 @@ function ListingForm() {
                   selection
                   options={conditions}
                   onChange={handleChangeCondition}
-                  value={condition}
+                  value={condition || ""}
                 />
               </Col>
             </Row>
@@ -300,7 +366,7 @@ function ListingForm() {
                 placeholder="Enter a description of the product"
                 style={{ minHeight: 100, maxHeight: 400 }}
                 onChange={handleChangeDescription}
-                value={description}
+                value={description || ""}
               />
             </Row>
             <br />
@@ -314,7 +380,7 @@ function ListingForm() {
           <br />
           <Listing
             name={name}
-            highestBid={startingPrice}
+            highestBid={highestBid || startingPrice}
             price={startingPrice}
             condition={condition}
             description={description}
@@ -324,8 +390,8 @@ function ListingForm() {
             seller={user}
             id={0}
             createdAt={currTime}
-            bids={[]}
-            isLocal
+            bids={bids || []}
+            isLocal={!!image}
           />
         </Col>
       </Row>

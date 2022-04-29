@@ -61,7 +61,7 @@ function BidHistory(props: ListingProps) {
               <HistoricalBidDatum {...bid} key={bid.createdAt} />
             ))}
             <tr>
-              <td>{price ? `$${safeParseFloat(price)?.toFixed(2)}` : ""}</td>
+              <td>{price ? `${safeParseFloat(price)?.toFixed(2)}` : ""}</td>
               <td>{day}</td>
               <td>{hour}</td>
             </tr>

@@ -35,3 +35,5 @@ export const updateListingState = (data: Partial<ListingState>) => ({
   type: ActionType.UPDATE_LISTING_STATE,
   payload: data,
 })
+
+export const clearListingState = () => ({ type: ActionType.CLEAR_LISTING_STATE })

@@ -41,7 +41,7 @@ import {
   Response as GetNotificationsResponse,
 } from "../api/get_notifications"
 import { rootReducer, AppState } from "./reducers"
-import { setData } from "./actions"
+import { setData, clearListingState } from "./actions"
 
 interface BaseProps {
   children: React.ReactElement | React.ReactElement[]
@@ -124,8 +124,9 @@ function Base(props: BaseProps) {
   }, [dispatch, navigate, requiresAuth])
 
   const onCreateListing = useCallback(() => {
+    dispatch(clearListingState())
     navigate("create_listing")
-  }, [navigate])
+  }, [dispatch, navigate])
 
   const onClickMyProfile = useCallback(() => {
     navigate(`user_profile/?id=${user.id}`)

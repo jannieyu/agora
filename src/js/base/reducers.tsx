@@ -5,15 +5,6 @@ export interface User {
   id: number
 }
 
-export interface ListingState {
-  name: string
-  startingPrice: string
-  category: string
-  condition: string
-  description: string
-  imageURL: string
-}
-
 export enum NotificationType {
   OUTBID = "OUTBID",
   WON = "WON",
@@ -44,6 +35,16 @@ export interface BidHistory {
   createdAt: string
 }
 
+export interface ListingState {
+  name: string
+  startingPrice: string
+  category: string
+  condition: string
+  description: string
+  imageURL: string
+  bids: BidHistory[]
+  highestBid: string
+}
 export interface SearchItem {
   category: string
   condition: string
@@ -76,6 +77,7 @@ export enum ActionType {
   CREATE_NOTIFICATION = "CREATE_NOTIFICATION",
   UPDATE_NOTIFICATION = "UPDATE_NOTIFICATION",
   UPDATE_LISTING_STATE = "UPDATE_LISTING_STATE",
+  CLEAR_LISTING_STATE = "CLEAR_LISTING_STATE",
 }
 
 export type SearchItemAction = {
@@ -147,6 +149,12 @@ export const rootReducer = (state: AppState = initialState, action: Action) => {
       return {
         ...state,
         listingState: { ...state.listingState, ...listingState },
+      }
+    }
+    case ActionType.CLEAR_LISTING_STATE: {
+      return {
+        ...state,
+        listingState: {},
       }
     }
     default: {
