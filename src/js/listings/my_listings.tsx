@@ -99,7 +99,7 @@ export default function MyListings() {
     setDeleteId(null)
   }, [])
 
-  useEffect(() => {
+  const fetchItems = () => {
     getSearchItems(
       { sellerItemsOnly: true },
       (results: SearchItemResponse) => {
@@ -107,6 +107,10 @@ export default function MyListings() {
       },
       () => {},
     )
+  }
+
+  useEffect(() => {
+    fetchItems()
   }, [])
 
   const lineItems = (myListings as ListingProps[]).map((listing) => (
@@ -118,6 +122,10 @@ export default function MyListings() {
     />
   ))
 
+  const delistFollowup = useCallback(() => {
+    fetchItems()
+  }, [])
+
   return (
     <>
       <ListingModal
@@ -125,7 +133,12 @@ export default function MyListings() {
         onHide={deselectItem}
         selectedItem={{ ...selectedItem, seller: user }}
       />
-      <ConfirmationModal show={!!deleteId} onHide={closeConfirmDeleteModal} itemId={deleteId} />
+      <ConfirmationModal
+        show={!!deleteId}
+        onHide={closeConfirmDeleteModal}
+        itemId={deleteId}
+        delistFollowup={delistFollowup}
+      />
       <Row>
         <h1 className="column-heading-centered">My Listings</h1>
         <Col xs={2} />

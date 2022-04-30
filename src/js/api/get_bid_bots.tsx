@@ -9,6 +9,7 @@ export type BidBot = {
   maxBid: string
   highestBotBid: string
   active: boolean
+  activeItem: boolean
 }
 
 export type Arguments = {}

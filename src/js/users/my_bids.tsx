@@ -1,16 +1,20 @@
 import * as React from "react"
+import { useSearchParams } from "react-router-dom"
 import { Row, Col } from "react-bootstrap"
 import { Button, Tab } from "semantic-ui-react"
-import { AppState } from "../base/reducers"
-import { useCallback, useEffect, useSelector, useState } from "../base/react_base"
-import { safeParseFloat } from "../base/util"
+import ListingModal from "../listings/listing_modal"
+import { AppState, SearchItem } from "../base/reducers"
+import { useCallback, useEffect, useMemo, useSelector, useState } from "../base/react_base"
+import { safeParseFloat, safeParseInt } from "../base/util"
 import { calculateIncrement } from "../listings/util"
 import { apiCall as getBids, Response as GetBidsResponse, ItemBid } from "../api/get_bids"
 import { apiCall as getBidBots, Response as GetBidBotsResponse, BidBot } from "../api/get_bid_bots"
+import { apiCall as getItem, Response as GetItemResponse } from "../api/get_item"
 import BidModal from "./bid_modal"
 
 type AutomaticBidProps = BidBot & {
   anyDeactivated: boolean
+  setSearchParams: (arg: unknown) => void
 }
 
 function AutomaticBid(props: AutomaticBidProps) {
@@ -23,6 +27,8 @@ function AutomaticBid(props: AutomaticBidProps) {
     maxBid,
     active,
     anyDeactivated,
+    activeItem,
+    setSearchParams,
   } = props
 
   const { user } = useSelector((state: AppState) => state)
@@ -36,7 +42,9 @@ function AutomaticBid(props: AutomaticBidProps) {
 
   const [showBidModal, setShowBidModal] = useState<boolean>(false)
 
-  const openPlaceBidModal = useCallback(() => {
+  const openPlaceBidModal = useCallback((e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    e.stopPropagation()
+    e.preventDefault()
     setShowBidModal(true)
   }, [])
 
@@ -44,8 +52,20 @@ function AutomaticBid(props: AutomaticBidProps) {
     setShowBidModal(false)
   }, [])
 
+  const onClick = useCallback(() => {
+    setSearchParams({ id: itemId })
+  }, [setSearchParams, itemId])
+
   return (
-    <div className="my_bids auto_bids align-items-center justify-space-between">
+    <div
+      onClick={onClick}
+      onKeyDown={onClick}
+      role="button"
+      tabIndex={0}
+      className={`my_bids auto_bids align-items-center justify-space-between ${
+        activeItem ? "active" : "delisted"
+      }`}
+    >
       <BidModal
         show={showBidModal}
         onHide={hideBidModal}
@@ -77,15 +97,15 @@ function AutomaticBid(props: AutomaticBidProps) {
       </div>
       <div>
         <div>Status</div>
-        {active ? (
+        {active && activeItem ? (
           <strong className="winning">Active</strong>
         ) : (
-          <strong className="losing">Deactivated</strong>
+          <strong className="losing">{activeItem ? "Deactivated" : "Item Delisted"}</strong>
         )}
       </div>
       {anyDeactivated ? (
         <Col xs={2}>
-          {!active ? (
+          {!active && activeItem ? (
             <Button positive onClick={openPlaceBidModal}>
               Place Bid
             </Button>
@@ -98,10 +118,20 @@ function AutomaticBid(props: AutomaticBidProps) {
 
 type ManualBidProps = ItemBid & {
   anyLosing: boolean
+  setSearchParams: (arg: unknown) => void
 }
 
 function ManualBid(props: ManualBidProps) {
-  const { highestItemBid, highestUserBid, itemId, itemName, itemImage, anyLosing } = props
+  const {
+    highestItemBid,
+    highestUserBid,
+    itemId,
+    itemName,
+    itemImage,
+    activeItem,
+    anyLosing,
+    setSearchParams,
+  } = props
 
   const { user } = useSelector((state: AppState) => state)
 
@@ -113,7 +143,9 @@ function ManualBid(props: ManualBidProps) {
 
   const [showBidModal, setShowBidModal] = useState<boolean>(false)
 
-  const openPlaceBidModal = useCallback(() => {
+  const openPlaceBidModal = useCallback((e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    e.stopPropagation()
+    e.preventDefault()
     setShowBidModal(true)
   }, [])
 
@@ -123,8 +155,15 @@ function ManualBid(props: ManualBidProps) {
 
   const winning = safeParseFloat(highestUserBid) === safeParseFloat(highestItemBid)
 
+  const onClick = useCallback(() => {
+    setSearchParams({ id: itemId })
+  }, [setSearchParams, itemId])
+
   return (
-    <Row className="my_bids align-items-center">
+    <Row
+      className={`my_bids align-items-center ${activeItem ? "active" : "delisted"}`}
+      onClick={onClick}
+    >
       <BidModal
         show={showBidModal}
         onHide={hideBidModal}
@@ -152,15 +191,15 @@ function ManualBid(props: ManualBidProps) {
       </Col>
       <Col xs={2}>
         <div>Status</div>
-        {winning ? (
+        {winning && activeItem ? (
           <strong className="winning">Winning</strong>
         ) : (
-          <strong className="losing">Losing</strong>
+          <strong className="losing">{activeItem ? "Losing" : "Item Delisted"}</strong>
         )}
       </Col>
       {anyLosing ? (
         <Col xs={2}>
-          {!winning ? (
+          {!winning && activeItem ? (
             <Button positive onClick={openPlaceBidModal}>
               Place Bid
             </Button>
@@ -174,6 +213,14 @@ function ManualBid(props: ManualBidProps) {
 export default function MyBids() {
   const [bids, setBids] = useState<ItemBid[]>([])
   const [bidBots, setBidBots] = useState<BidBot[]>([])
+  const [selectedItem, setSelectedItem] = useState<SearchItem | null>(null)
+
+  const [searchParams, setSearchParams] = useSearchParams()
+  const params = useMemo(() => Object.fromEntries([...searchParams]), [searchParams])
+
+  const deselectItem = useCallback(() => {
+    setSearchParams({})
+  }, [setSearchParams])
 
   useEffect(() => {
     getBids(
@@ -186,24 +233,49 @@ export default function MyBids() {
     getBidBots(
       {},
       (bidBotsResponse: GetBidBotsResponse) => {
-        setBidBots(bidBotsResponse)
+        const sortedBots = [
+          ...bidBotsResponse.filter((bot) => bot.activeItem),
+          ...bidBotsResponse.filter((bot) => !bot.activeItem),
+        ]
+
+        setBidBots(sortedBots)
       },
       () => {},
     )
   }, [])
 
+  useEffect(() => {
+    if (params.id) {
+      getItem(
+        { itemId: safeParseInt(params.id) },
+        (response: GetItemResponse) => {
+          setSelectedItem(response[0])
+        },
+        () => {},
+      )
+    } else {
+      setSelectedItem(null)
+    }
+  }, [params])
+
   const anyLosing = bids.some(
-    (bid: ItemBid) => safeParseFloat(bid.highestUserBid) < safeParseFloat(bid.highestItemBid),
+    (bid: ItemBid) =>
+      bid.activeItem && safeParseFloat(bid.highestUserBid) < safeParseFloat(bid.highestItemBid),
   )
 
   const manualBids = bids.map((bid: ItemBid) => (
-    <ManualBid key={bid.itemId} {...bid} anyLosing={anyLosing} />
+    <ManualBid key={bid.itemId} {...bid} anyLosing={anyLosing} setSearchParams={setSearchParams} />
   ))
 
-  const anyDeactivated = bidBots.some((bidBot: BidBot) => !bidBot.active)
+  const anyDeactivated = bidBots.some((bidBot: BidBot) => bidBot.activeItem && !bidBot.active)
 
   const autoBids = bidBots.map((bidBot: BidBot) => (
-    <AutomaticBid key={bidBot.id} {...bidBot} anyDeactivated={anyDeactivated} />
+    <AutomaticBid
+      key={bidBot.id}
+      {...bidBot}
+      anyDeactivated={anyDeactivated}
+      setSearchParams={setSearchParams}
+    />
   ))
 
   const panes = [
@@ -231,14 +303,17 @@ export default function MyBids() {
   ]
 
   return (
-    <Row>
-      <h1 className="column-heading-centered">My Bids</h1>
-      <Col xs={2} />
-      <Col xs={8} align="center">
-        <br />
-        <Tab panes={panes} />
-      </Col>
-      <Col xs={2} />
-    </Row>
+    <>
+      <ListingModal show={!!selectedItem} onHide={deselectItem} selectedItem={selectedItem} />
+      <Row>
+        <h1 className="column-heading-centered">My Bids</h1>
+        <Col xs={2} />
+        <Col xs={8} align="center">
+          <br />
+          <Tab panes={panes} />
+        </Col>
+        <Col xs={2} />
+      </Row>
+    </>
   )
 }

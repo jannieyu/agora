@@ -93,7 +93,7 @@ export default function Listing(props: ListingProps) {
   const [showBidOptions, setShowBidOptions] = useState<boolean>(false)
   const [successMessage, setSuccessMessage] = useState<string>("")
 
-  const isBiddable = !!activeUser?.id && activeUser?.id !== seller?.id && !successMessage
+  const isBiddable = !!activeUser?.id && activeUser?.id !== seller?.id && !successMessage && active
 
   const handleSuccess = useCallback((message: string) => {
     setShowBidOptions(false)

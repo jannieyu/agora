@@ -6,12 +6,13 @@ import { apiCall as delistCall } from "../api/delist_item"
 
 interface ModalProps {
   onHide: () => void
+  delistFollowup: (itemId: number) => void
   show: boolean
   itemId: number
 }
 
 export default function ConfirmationModal(props: ModalProps) {
-  const { show, onHide, itemId } = props
+  const { show, onHide, itemId, delistFollowup } = props
 
   const [loading, setLoading] = useState<boolean>(false)
   const [hasError, setHasError] = useState<boolean>(false)
@@ -22,17 +23,18 @@ export default function ConfirmationModal(props: ModalProps) {
     setHasError(false)
   }, [onHide, setLoading, setHasError])
 
-  const onDelete = useCallback(() => {
+  const onDelist = useCallback(() => {
     delistCall(
       { itemId },
       () => {
+        delistFollowup(itemId)
         hideAndReset()
       },
       () => {
         setHasError(true)
       },
     )
-  }, [hideAndReset, setHasError, itemId])
+  }, [hideAndReset, setHasError, itemId, delistFollowup])
 
   return (
     <Modal
@@ -46,8 +48,8 @@ export default function ConfirmationModal(props: ModalProps) {
         <Modal.Title id="contained-modal-title-vcenter">Delist Item</Modal.Title>
       </Modal.Header>
       <Form className="login-form" error={hasError} loading={loading}>
-        <p>Please confirm that you would like to delist this item.</p>
-        <Button type="submit" onClick={onDelete} negative>
+        <p>Please confirm that you would like to delist this item. This action is irreversible.</p>
+        <Button type="submit" onClick={onDelist} negative>
           Delist Item
         </Button>
         <Message error header="Error" content="The item could not be delisted." />
