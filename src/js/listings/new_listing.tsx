@@ -228,13 +228,15 @@ function ListingForm() {
     formData.append("name", name)
     formData.append("category", category)
     formData.append("condition", condition)
-    formData.append("price", startingPrice)
     formData.append("description", description)
     if (image) {
       formData.append("image", image, image.name)
     }
     if (id) {
       formData.append("id", id)
+    }
+    if (bids?.length === 0 || !id) {
+      formData.append("price", startingPrice)
     }
 
     setSubmitting(true)
@@ -251,11 +253,11 @@ function ListingForm() {
       setShowSuccessModal(false)
       setShowFailureModal(true)
     }
-  }, [name, category, condition, startingPrice, description, image, id])
+  }, [name, category, condition, startingPrice, description, image, id, bids?.length])
 
   const submitBtn = (
     <Button type="submit" disabled={!canSubmit} loading={submitting} onClick={onSubmit} positive>
-      Finish and List
+      {id ? "Update Item" : "Finish and List"}
     </Button>
   )
 

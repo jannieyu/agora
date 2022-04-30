@@ -272,3 +272,20 @@
 .red {
     color: red;
 }
+
+.user-profile {
+    .edit-icon {
+        display: flex;
+        justify-content: right;
+        position: relative;
+        right: 1rem;
+        top: 4em;
+    }
+
+    .edit-icon > svg {
+        background-color: white;
+        border-radius: 0.1875em;
+        border: solid 0.1875em white;
+        cursor: pointer;
+    }
+}
