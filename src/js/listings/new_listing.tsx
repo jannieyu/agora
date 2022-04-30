@@ -369,7 +369,10 @@ function ListingForm() {
             </Row>
             <br />
             <Row>
-              <Dropzone onDrop={handleChangeImage} accept=".jpg,.png">
+              <Dropzone
+                onDrop={handleChangeImage}
+                accept={{ "image/*": [".jpeg", ".png", ".gif"] }}
+              >
                 {({ getRootProps, getInputProps }) => (
                   <div {...getRootProps()}>
                     <div className="droparea">
