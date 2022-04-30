@@ -61,7 +61,7 @@ function BidHistory(props: ListingProps) {
               <HistoricalBidDatum {...bid} key={bid.createdAt} />
             ))}
             <tr>
-              <td>{price}</td>
+              <td>{price ? `${safeParseFloat(price)?.toFixed(2)}` : ""}</td>
               <td>{day}</td>
               <td>{hour}</td>
             </tr>
@@ -84,6 +84,7 @@ export default function Listing(props: ListingProps) {
     id,
     numBids,
     isLocal,
+    active,
   } = props
   const activeUser = useSelector((state: AppState) => state.user)
 
@@ -92,7 +93,7 @@ export default function Listing(props: ListingProps) {
   const [showBidOptions, setShowBidOptions] = useState<boolean>(false)
   const [successMessage, setSuccessMessage] = useState<string>("")
 
-  const isBiddable = !!activeUser?.id && activeUser?.id !== seller?.id && !successMessage
+  const isBiddable = !!activeUser?.id && activeUser?.id !== seller?.id && !successMessage && active
 
   const handleSuccess = useCallback((message: string) => {
     setShowBidOptions(false)
@@ -126,7 +127,10 @@ export default function Listing(props: ListingProps) {
             {image ? <img src={imageSrc} alt="Listing Preview" className="listing-image" /> : null}
           </div>
           <div className="listing-information">
-            <h2>{name}</h2>
+            <h2>
+              <span>{name}</span>
+              {active ? null : <span className="red">&nbsp;(delisted)</span>}
+            </h2>
             <table className="listing-metadata-table">
               <tbody>
                 {highestBid && isValidPrice(highestBid) ? (

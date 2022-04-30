@@ -92,11 +92,20 @@
     .losing {
         color: red;
     }
+
+    cursor: pointer;
 }
 
-.my_listing:hover {
+.active:hover {
     background-color: #f4f4f4;
-    cursor: pointer;
+}
+
+.delisted {
+    background-color: #ccc;
+}
+
+.delisted:hover {
+    background-color: #d4d4d4;
 }
 
 .my_listing, .my_bids, .card {
@@ -264,3 +273,6 @@
     color: #4183c4;
 }
 
+.red {
+    color: red;
+}

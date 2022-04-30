@@ -2,9 +2,11 @@ package api
 
 import (
 	"agora/src/app/database"
+	"agora/src/app/user"
 	"encoding/json"
-	log "github.com/sirupsen/logrus"
 	"net/http"
+
+	log "github.com/sirupsen/logrus"
 )
 
 func (h Handle) GetItem(w http.ResponseWriter, r *http.Request) {
@@ -18,7 +20,9 @@ func (h Handle) GetItem(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var item []database.Item
-	if err := h.Db.Preload("Bids").Where("id = ?", payload.ItemId).Find(&item).Error; err != nil {
+	result := h.Db.Preload("Bids")
+	result = user.PreloadSafeSellerInfo(result)
+	if err := result.Where("id = ?", payload.ItemId).Find(&item).Error; err != nil {
 		log.WithError(err).Error("Failed to query info info.")
 		w.WriteHeader(http.StatusInternalServerError)
 		return

@@ -1,6 +1,7 @@
 import * as React from "react"
 import { Row, Col } from "react-bootstrap"
 import { Icon } from "semantic-ui-react"
+import { useNavigate } from "react-router"
 import { Link, useSearchParams } from "react-router-dom"
 import { useCallback, useEffect, useMemo, useSelector, useState } from "../base/react_base"
 import { apiCall as getSearchItems, Response as SearchItemResponse } from "../api/get_search_items"
@@ -16,7 +17,9 @@ type LineItemProps = ListingProps & {
 }
 
 function LineItem(props: LineItemProps) {
-  const { id, image, name, highestBid, numBids, setSearchParams, setDeleteId } = props
+  const { id, image, name, highestBid, numBids, active, setSearchParams, setDeleteId } = props
+
+  const navigate = useNavigate()
 
   const priceStr = `$${safeParseFloat(highestBid).toFixed(2)}`
 
@@ -24,9 +27,13 @@ function LineItem(props: LineItemProps) {
     setSearchParams({ id })
   }, [setSearchParams, id])
 
-  const onEdit = useCallback((e: React.FormEvent<HTMLInputElement>) => {
-    e.stopPropagation()
-  }, [])
+  const onEdit = useCallback(
+    (e: React.FormEvent<HTMLInputElement>) => {
+      e.stopPropagation()
+      navigate(`/update_listing/?id=${id}`)
+    },
+    [id, navigate],
+  )
 
   const onDelete = useCallback(
     (e: React.FormEvent<HTMLInputElement>) => {
@@ -37,21 +44,28 @@ function LineItem(props: LineItemProps) {
   )
 
   return (
-    <Row className="my_listing align-items-center" onClick={onClick}>
-      <div className="icon-bar">
-        <div>
-          <Icon name="edit" className="card-edit" onClick={onEdit} />
-          <Icon name="trash" className="card-trash" onClick={onDelete} />
+    <Row
+      className={`my_listing align-items-center ${active ? "active" : "delisted"}`}
+      onClick={onClick}
+    >
+      {active ? (
+        <div className="icon-bar">
+          <div>
+            <Icon name="edit" className="card-edit" onClick={onEdit} />
+            <Icon name="trash" className="card-trash" onClick={onDelete} />
+          </div>
         </div>
-      </div>
-
+      ) : null}
       <Col xs={3} align="center">
         <img src={`/${image}`} alt="Listing Preview" />
       </Col>
       <Col xs={5}>
         <div style={{ display: "flex", justifyContent: "space-between" }}>
-          <b>{name}</b>
-          <strong>{`${numBids} bids`}</strong>
+          <b>
+            <span>{name}</span>
+            {active ? null : <span className="red">&nbsp;(delisted)</span>}
+          </b>
+          <strong>{`${numBids} bid${numBids === 1 ? "" : "s"}`}</strong>
         </div>
       </Col>
       <Col xs={1} />
@@ -85,7 +99,7 @@ export default function MyListings() {
     setDeleteId(null)
   }, [])
 
-  useEffect(() => {
+  const fetchItems = () => {
     getSearchItems(
       { sellerItemsOnly: true },
       (results: SearchItemResponse) => {
@@ -93,6 +107,10 @@ export default function MyListings() {
       },
       () => {},
     )
+  }
+
+  useEffect(() => {
+    fetchItems()
   }, [])
 
   const lineItems = (myListings as ListingProps[]).map((listing) => (
@@ -104,6 +122,10 @@ export default function MyListings() {
     />
   ))
 
+  const delistFollowup = useCallback(() => {
+    fetchItems()
+  }, [])
+
   return (
     <>
       <ListingModal
@@ -111,7 +133,12 @@ export default function MyListings() {
         onHide={deselectItem}
         selectedItem={{ ...selectedItem, seller: user }}
       />
-      <ConfirmationModal show={!!deleteId} onHide={closeConfirmDeleteModal} itemId={deleteId} />
+      <ConfirmationModal
+        show={!!deleteId}
+        onHide={closeConfirmDeleteModal}
+        itemId={deleteId}
+        delistFollowup={delistFollowup}
+      />
       <Row>
         <h1 className="column-heading-centered">My Listings</h1>
         <Col xs={2} />

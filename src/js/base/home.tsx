@@ -194,6 +194,7 @@ function Home() {
         show={!!deletingItemId}
         onHide={closeConfirmDeleteModal}
         itemId={deletingItemId}
+        delistFollowup={() => {}}
       />
       <ListingModal show={!!selectedItem} onHide={deselectItem} selectedItem={selectedItem} />
       <Row>

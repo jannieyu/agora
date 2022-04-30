@@ -18,6 +18,8 @@ const iconMap = new Map<NotificationType, IconProp>([
   [NotificationType.ITEM_SOLD, "sack-dollar"],
   [NotificationType.BIDBOT_BID, "arrow-up"],
   [NotificationType.BIDBOT_DEACTIVATED, "face-frown"],
+  [NotificationType.ITEM_DELISTED, "face-angry"],
+  [NotificationType.BIDBOT_DEACTIVATED_ITEM_DELISTED, "face-angry"],
 ])
 
 const colorMap = new Map([
@@ -28,6 +30,8 @@ const colorMap = new Map([
   [NotificationType.ITEM_SOLD, "green"],
   [NotificationType.BIDBOT_BID, "green"],
   [NotificationType.BIDBOT_DEACTIVATED, "red"],
+  [NotificationType.ITEM_DELISTED, "red"],
+  [NotificationType.BIDBOT_DEACTIVATED_ITEM_DELISTED, "red"],
 ])
 
 function LineItem(props: Notification) {
@@ -93,6 +97,15 @@ function LineItem(props: Notification) {
             another bid if you are still interested in this item!
           </div>
         )
+      case NotificationType.ITEM_DELISTED:
+        return <div>{itemName} was delisted by its seller. We apologize for the inconvenience.</div>
+      case NotificationType.BIDBOT_DEACTIVATED_ITEM_DELISTED:
+        return (
+          <div>
+            {itemName} was delisted by its seller and your automatic bidder has been deactivated. We
+            apologize for the inconvenience.
+          </div>
+        )
       default:
         return <div />
     }
@@ -109,8 +122,8 @@ function LineItem(props: Notification) {
 
   const onClick = () => {
     dismiss()
-    let destination = `/?itemId=${itemId}`
-    if (noteType === NotificationType.ITEM_BID_ON) {
+    let destination = `/my_bids/?id=${itemId}`
+    if (noteType === NotificationType.ITEM_BID_ON || noteType === NotificationType.ITEM_SOLD) {
       destination = `/my_listings/?id=${itemId}`
     }
     navigate(destination)

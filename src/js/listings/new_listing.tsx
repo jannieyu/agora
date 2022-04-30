@@ -1,28 +1,61 @@
 import * as React from "react"
 import { Row, Col, OverlayTrigger, Modal, Popover } from "react-bootstrap"
 import { useNavigate } from "react-router"
+import { useSearchParams } from "react-router-dom"
 import { Button, Form, Input } from "semantic-ui-react"
 import { DateTime } from "luxon"
 import Dropzone from "react-dropzone"
-import { useCallback, useSelector, useState } from "../base/react_base"
+import {
+  useCallback,
+  useDispatch,
+  useEffect,
+  useMemo,
+  useSelector,
+  useState,
+} from "../base/react_base"
 import { AppState } from "../base/reducers"
+import { updateListingState } from "../base/actions"
 import { conditions, categories } from "./constants"
 import Listing from "./listing"
 import { isValidPrice } from "./util"
 import { OnChangeObject } from "../base/types"
+import { safeParseInt } from "../base/util"
+import { apiCall as getItem, Response as GetItemResponse } from "../api/get_item"
 import DollarInput from "./dollar_input"
+import Unauthorized from "../base/unauthorized"
 
 interface SubmissionModalProps {
   onHide: () => void
   show: boolean
   wasSuccess: boolean
+  clearState: () => void
+  id: string
+  fetchItem: () => void
 }
 
 function SubmissionModal(props: SubmissionModalProps) {
-  const { onHide, show, wasSuccess } = props
+  const { onHide, show, wasSuccess, clearState, id, fetchItem } = props
   const navigate = useNavigate()
 
-  const returnHome = () => navigate("/")
+  const returnHome = () => {
+    clearState()
+    navigate("/")
+  }
+
+  const goAgain = useCallback(() => {
+    clearState()
+    if (wasSuccess) {
+      navigate("/create_listing")
+    } else if (id) {
+      fetchItem()
+    }
+  }, [clearState, navigate, wasSuccess, id, fetchItem])
+
+  const successMessage = `Your listing was ${id ? "updated" : "created"} successfully! Create ${
+    id ? "a new" : "another"
+  } listing or return home.`
+
+  const createMessage = `Create ${id ? "a new" : "another"} Listing`
 
   return (
     <Modal
@@ -41,13 +74,13 @@ function SubmissionModal(props: SubmissionModalProps) {
         <Row>
           <Col xs="12" align="center">
             {wasSuccess
-              ? "Your listing was created successfully! Create another listing or return home."
+              ? successMessage
               : "There was an error creating your listing. We are very sorry for the inconvenience. Please consider trying again or returning home."}
           </Col>
         </Row>
       </Modal.Body>
       <Modal.Footer>
-        <Button onClick={onHide}>{wasSuccess ? "Create Another Listing" : "Try Again"}</Button>
+        <Button onClick={goAgain}>{wasSuccess ? createMessage : "Try Again"}</Button>
         <Button onClick={returnHome}>Return Home</Button>
       </Modal.Footer>
     </Modal>
@@ -55,19 +88,65 @@ function SubmissionModal(props: SubmissionModalProps) {
 }
 
 function ListingForm() {
-  const activeUser = useSelector((state: AppState) => state.user)
+  const { user, listingState } = useSelector((state: AppState) => state)
 
-  const [name, setName] = useState<string>("")
-  const [startingPrice, setStartingPrice] = useState<string>("")
-  const [category, setCategory] = useState<string>("")
-  const [condition, setCondition] = useState<string>("")
-  const [description, setDescription] = useState<string>("")
-  const [imageURL, setImageURL] = useState<string>("")
+  const {
+    name,
+    startingPrice,
+    category,
+    condition,
+    description,
+    imageURL,
+    bids,
+    highestBid,
+    sellerId,
+  } = listingState
+
+  const dispatch = useDispatch()
+  const navigate = useNavigate()
+
   const [image, setImage] = useState<File | null>(null)
   const [submitting, setSubmitting] = useState<boolean>(false)
   const [showSuccessModal, setShowSuccessModal] = useState<boolean>(false)
   const [showFailureModal, setShowFailureModal] = useState<boolean>(false)
   const [imageError, setImageError] = useState<boolean>(false)
+
+  const [searchParams] = useSearchParams()
+  const params = useMemo(() => Object.fromEntries([...searchParams]), [searchParams])
+  const { id } = params
+
+  const fetchItem = useCallback(() => {
+    getItem(
+      {
+        itemId: safeParseInt(id),
+      },
+      (items: GetItemResponse) => {
+        const item = items[0]
+        dispatch(
+          updateListingState({
+            name: item.name,
+            startingPrice: item.price,
+            condition: item.condition,
+            category: item.category,
+            imageURL: item.image,
+            description: item.description,
+            bids: item.bids,
+            highestBid: item.highestBid,
+            sellerId: item.sellerId,
+          }),
+        )
+      },
+      () => {
+        navigate("/")
+      },
+    )
+  }, [id, dispatch, navigate])
+
+  useEffect(() => {
+    if (id) {
+      fetchItem()
+    }
+  }, [dispatch, id, navigate, fetchItem])
 
   const canSubmit =
     name &&
@@ -75,72 +154,87 @@ function ListingForm() {
     category &&
     condition &&
     description &&
-    image &&
+    imageURL &&
     isValidPrice(startingPrice) &&
     !imageError
 
-  const handleChangeName = useCallback((e: React.FormEvent<HTMLInputElement>) => {
-    setName(e.currentTarget.value)
-  }, [])
+  const handleChangeName = useCallback(
+    (e: React.FormEvent<HTMLInputElement>) => {
+      dispatch(updateListingState({ name: e.currentTarget.value }))
+    },
+    [dispatch],
+  )
 
-  const handleChangeStartingPrice = useCallback((e: React.FormEvent<HTMLInputElement>) => {
-    setStartingPrice(e.currentTarget.value)
-  }, [])
+  const handleChangeStartingPrice = useCallback(
+    (e: React.FormEvent<HTMLInputElement>) => {
+      dispatch(updateListingState({ startingPrice: e.currentTarget.value }))
+    },
+    [dispatch],
+  )
 
   const handleChangeCategory = useCallback(
     (e: React.FormEvent<HTMLInputElement>, data: OnChangeObject) => {
-      setCategory(data.value)
+      dispatch(updateListingState({ category: data.value }))
     },
-    [],
+    [dispatch],
   )
 
   const handleChangeCondition = useCallback(
     (e: React.FormEvent<HTMLInputElement>, data: OnChangeObject) => {
-      setCondition(data.value)
+      dispatch(updateListingState({ condition: data.value }))
     },
-    [],
+    [dispatch],
   )
 
   const handleChangeDescription = useCallback(
     (e: React.ChangeEvent<HTMLTextAreaElement>, data: OnChangeObject) => {
-      setDescription(data.value)
+      dispatch(updateListingState({ description: data.value }))
     },
-    [],
+    [dispatch],
   )
 
   const reset = () => {
-    setName("")
-    setStartingPrice("")
-    setCategory("")
-    setCondition("")
-    setDescription("")
-    setImageURL("")
+    dispatch(
+      updateListingState({
+        name: "",
+        condition: "",
+        category: "",
+        description: "",
+        imageURL: "",
+        startingPrice: "",
+        bids: [],
+        highestBid: "",
+      }),
+    )
     setImage(null)
     setSubmitting(false)
     setShowSuccessModal(false)
     setShowFailureModal(false)
   }
 
-  const handleChangeImage = useCallback((files: File[]) => {
-    const imageFile = files[0]
-    if (
-      imageFile.name.endsWith(".png") ||
-      imageFile.name.endsWith(".jpg") ||
-      imageFile.name.endsWith(".gif")
-    ) {
-      setImageError(false)
-      const reader = new FileReader()
-      reader.onload = (e) => {
-        setImageURL(e.target.result as string)
+  const handleChangeImage = useCallback(
+    (files: File[]) => {
+      const imageFile = files[0]
+      if (
+        imageFile.name.endsWith(".png") ||
+        imageFile.name.endsWith(".jpg") ||
+        imageFile.name.endsWith(".gif")
+      ) {
+        setImageError(false)
+        const reader = new FileReader()
+        reader.onload = (e) => {
+          dispatch(updateListingState({ imageURL: e.target.result as string }))
+        }
+        reader.readAsDataURL(imageFile)
+        setImage(imageFile)
+      } else {
+        setImageError(true)
+        setImage(null)
+        dispatch(updateListingState({ imageURL: "" }))
       }
-      reader.readAsDataURL(imageFile)
-      setImage(imageFile)
-    } else {
-      setImageError(true)
-      setImage(null)
-      setImageURL("")
-    }
-  }, [])
+    },
+    [dispatch],
+  )
 
   const onSubmit = useCallback(async () => {
     const formData = new FormData()
@@ -149,14 +243,19 @@ function ListingForm() {
     formData.append("condition", condition)
     formData.append("price", startingPrice)
     formData.append("description", description)
-    formData.append("image", image, image.name)
+    if (image) {
+      formData.append("image", image, image.name)
+    }
+    if (id) {
+      formData.append("id", id)
+    }
 
     setSubmitting(true)
     const response = await fetch("/api/add_item", {
       method: "POST",
       body: formData,
     })
-    if (response.status === 201) {
+    if (response.status >= 200 && response.status <= 299) {
       setSubmitting(false)
       setShowSuccessModal(true)
       setShowFailureModal(false)
@@ -165,7 +264,7 @@ function ListingForm() {
       setShowSuccessModal(false)
       setShowFailureModal(true)
     }
-  }, [name, category, condition, startingPrice, description, image])
+  }, [name, category, condition, startingPrice, description, image, id])
 
   const submitBtn = (
     <Button type="submit" disabled={!canSubmit} loading={submitting} onClick={onSubmit} positive>
@@ -191,6 +290,38 @@ function ListingForm() {
     </OverlayTrigger>
   )
 
+  const canChangeStartingPrice = !id || bids?.length === 0
+
+  const startingPriceDropdown = (
+    <Form.Field
+      control={DollarInput}
+      label="Starting Price"
+      placeholder="4.99"
+      onChange={handleChangeStartingPrice}
+      error={!!startingPrice && !isValidPrice(startingPrice)}
+      value={startingPrice || ""}
+      disabled={!canChangeStartingPrice}
+    />
+  )
+
+  const wrappedStartingPriceDropdown = canChangeStartingPrice ? (
+    startingPriceDropdown
+  ) : (
+    <OverlayTrigger
+      placement="top"
+      trigger={["hover", "focus"]}
+      overlay={
+        <Popover>
+          <Popover.Body>
+            The starting price cannot be modified once a bid has been placed.
+          </Popover.Body>
+        </Popover>
+      }
+    >
+      <span>{startingPriceDropdown}</span>
+    </OverlayTrigger>
+  )
+
   const dropzoneAreaMessage = imageError
     ? "Error uploading image: file type not supported"
     : "Drag and drop an image of the listed item, or click to upload"
@@ -198,12 +329,19 @@ function ListingForm() {
 
   const currTime = DateTime.now().toISO()
 
+  if (sellerId && sellerId !== user?.id) {
+    return <Unauthorized loggedIn={!!user} />
+  }
+
   return (
     <>
       <SubmissionModal
         onHide={reset}
         show={showSuccessModal || showFailureModal}
         wasSuccess={showSuccessModal}
+        clearState={reset}
+        id={id}
+        fetchItem={fetchItem}
       />
       <Row>
         <Col xs="6">
@@ -217,19 +355,10 @@ function ListingForm() {
                   label="Listing Name"
                   placeholder="Used Phys 1a Textbook"
                   onChange={handleChangeName}
-                  value={name}
+                  value={name || ""}
                 />
               </Col>
-              <Col xs="6">
-                <Form.Field
-                  control={DollarInput}
-                  label="Starting Price"
-                  placeholder="4.99"
-                  onChange={handleChangeStartingPrice}
-                  error={!!startingPrice && !isValidPrice(startingPrice)}
-                  value={startingPrice}
-                />
-              </Col>
+              <Col xs="6">{wrappedStartingPriceDropdown}</Col>
             </Row>
             <br />
             <Row>
@@ -241,7 +370,7 @@ function ListingForm() {
                   selection
                   options={categories}
                   onChange={handleChangeCategory}
-                  value={category}
+                  value={category || ""}
                 />
               </Col>
               <Col xs="6">
@@ -252,7 +381,7 @@ function ListingForm() {
                   selection
                   options={conditions}
                   onChange={handleChangeCondition}
-                  value={condition}
+                  value={condition || ""}
                 />
               </Col>
             </Row>
@@ -275,7 +404,7 @@ function ListingForm() {
                 placeholder="Enter a description of the product"
                 style={{ minHeight: 100, maxHeight: 400 }}
                 onChange={handleChangeDescription}
-                value={description}
+                value={description || ""}
               />
             </Row>
             <br />
@@ -289,18 +418,19 @@ function ListingForm() {
           <br />
           <Listing
             name={name}
-            highestBid={startingPrice}
+            highestBid={highestBid || startingPrice}
             price={startingPrice}
             condition={condition}
             description={description}
             numBids={0}
             category={category}
             image={imageURL}
-            seller={activeUser}
+            seller={user}
             id={0}
             createdAt={currTime}
-            bids={[]}
-            isLocal
+            bids={bids || []}
+            isLocal={!!image}
+            active
           />
         </Col>
       </Row>

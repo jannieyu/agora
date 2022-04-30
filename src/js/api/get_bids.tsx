@@ -6,6 +6,7 @@ export type ItemBid = {
   itemImage: string
   highestItemBid: string
   highestUserBid: string
+  activeItem: boolean
 }
 
 export type Arguments = {}
