@@ -109,7 +109,6 @@ function ListingForm() {
   const [submitting, setSubmitting] = useState<boolean>(false)
   const [showSuccessModal, setShowSuccessModal] = useState<boolean>(false)
   const [showFailureModal, setShowFailureModal] = useState<boolean>(false)
-  const [imageError, setImageError] = useState<boolean>(false)
 
   const [searchParams] = useSearchParams()
   const params = useMemo(() => Object.fromEntries([...searchParams]), [searchParams])
@@ -155,8 +154,7 @@ function ListingForm() {
     condition &&
     description &&
     imageURL &&
-    isValidPrice(startingPrice) &&
-    !imageError
+    isValidPrice(startingPrice)
 
   const handleChangeName = useCallback(
     (e: React.FormEvent<HTMLInputElement>) => {
@@ -215,23 +213,12 @@ function ListingForm() {
   const handleChangeImage = useCallback(
     (files: File[]) => {
       const imageFile = files[0]
-      if (
-        imageFile.name.endsWith(".png") ||
-        imageFile.name.endsWith(".jpg") ||
-        imageFile.name.endsWith(".gif")
-      ) {
-        setImageError(false)
-        const reader = new FileReader()
-        reader.onload = (e) => {
-          dispatch(updateListingState({ imageURL: e.target.result as string }))
-        }
-        reader.readAsDataURL(imageFile)
-        setImage(imageFile)
-      } else {
-        setImageError(true)
-        setImage(null)
-        dispatch(updateListingState({ imageURL: "" }))
+      const reader = new FileReader()
+      reader.onload = (e) => {
+        dispatch(updateListingState({ imageURL: e.target.result as string }))
       }
+      reader.readAsDataURL(imageFile)
+      setImage(imageFile)
     },
     [dispatch],
   )
@@ -322,11 +309,6 @@ function ListingForm() {
     </OverlayTrigger>
   )
 
-  const dropzoneAreaMessage = imageError
-    ? "Error uploading image: file type not supported"
-    : "Drag and drop an image of the listed item, or click to upload"
-  const dropzoneAreaClass = imageError ? "droparea-error" : "droparea-text"
-
   const currTime = DateTime.now().toISO()
 
   if (sellerId && sellerId !== user?.id) {
@@ -387,12 +369,15 @@ function ListingForm() {
             </Row>
             <br />
             <Row>
-              <Dropzone onDrop={handleChangeImage}>
+              <Dropzone onDrop={handleChangeImage} accept=".jpg,.png">
                 {({ getRootProps, getInputProps }) => (
                   <div {...getRootProps()}>
                     <div className="droparea">
                       <input {...getInputProps()} />
-                      <b className={dropzoneAreaClass}>{image?.name || dropzoneAreaMessage}</b>
+                      <b className="droparea-text">
+                        {image?.name ||
+                          "Drag and drop an image of the listed item, or click to upload"}
+                      </b>
                     </div>
                   </div>
                 )}
