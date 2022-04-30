@@ -131,6 +131,7 @@ export default function MyBids() {
   const [bids, setBids] = useState<ItemBid[]>([])
   const [bidBots, setBidBots] = useState<BidBot[]>([])
   const [selectedItem, setSelectedItem] = useState<SearchItem | null>(null)
+  const [activeIndex, setActiveIndex] = useState<number>(0)
 
   const [searchParams, setSearchParams] = useSearchParams()
   const params = useMemo(() => Object.fromEntries([...searchParams]), [searchParams])
@@ -163,8 +164,17 @@ export default function MyBids() {
 
   useEffect(() => {
     if (params.id) {
+      const itemId = safeParseInt(params.id)
+      const isFirstTab = bids.some((bid) => bid.itemId === itemId)
+
+      if (isFirstTab) {
+        setActiveIndex(0)
+      } else {
+        setActiveIndex(1)
+      }
+
       getItem(
-        { itemId: safeParseInt(params.id) },
+        { itemId },
         (response: GetItemResponse) => {
           setSelectedItem(response[0])
         },
@@ -173,7 +183,7 @@ export default function MyBids() {
     } else {
       setSelectedItem(null)
     }
-  }, [params])
+  }, [params, bids])
 
   const manualBids = bids.map((bid: ItemBid) => (
     <ManualBid key={bid.itemId} {...bid} setSearchParams={setSearchParams} />
@@ -182,6 +192,8 @@ export default function MyBids() {
   const autoBids = bidBots.map((bidBot: BidBot) => (
     <AutomaticBid key={bidBot.id} {...bidBot} setSearchParams={setSearchParams} />
   ))
+
+  const handleTabChange = (e: React.FormEvent, { aI }) => setActiveIndex(aI)
 
   const panes = [
     {
@@ -215,7 +227,7 @@ export default function MyBids() {
         <Col xs={2} />
         <Col xs={8} align="center">
           <br />
-          <Tab panes={panes} />
+          <Tab panes={panes} activeIndex={activeIndex} onTabChange={handleTabChange} />
         </Col>
         <Col xs={2} />
       </Row>
