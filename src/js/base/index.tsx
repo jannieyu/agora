@@ -186,8 +186,8 @@ function Base(props: BaseProps) {
                 About
               </Link>
             </Nav.Item>
-            {user ? (
-              <div className="login">
+            <div className="login">
+              {user ? (
                 <Dropdown
                   icon="bars"
                   floating
@@ -241,17 +241,17 @@ function Base(props: BaseProps) {
                     <Dropdown.Item onClick={onLogout} text="Log Out" />
                   </Dropdown.Menu>
                 </Dropdown>
-              </div>
-            ) : (
-              <span className="login">
-                <Button onClick={onLogin} color="green">
-                  Log In
-                </Button>
-                <Button onClick={onSignUp} color="orange">
-                  Sign Up
-                </Button>
-              </span>
-            )}
+              ) : (
+                <>
+                  <Button onClick={onLogin} color="green">
+                    Log In
+                  </Button>
+                  <Button onClick={onSignUp} color="orange">
+                    Sign Up
+                  </Button>
+                </>
+              )}
+            </div>
           </Nav>
         </Container>
       </Navbar>
