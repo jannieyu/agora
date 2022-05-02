@@ -329,7 +329,7 @@ function ListingForm() {
       />
       <Row>
         <Col xs="6">
-          <h1 className="column-heading-centered">Enter Listing Details</h1>
+          <h1 className="text-centered">Enter Listing Details</h1>
           <br />
           <Form>
             <Row>
@@ -404,7 +404,7 @@ function ListingForm() {
           </Form>
         </Col>
         <Col xs="6">
-          <h1 className="column-heading-centered">Preview (Buyer View)</h1>
+          <h1 className="text-centered">Preview (Buyer View)</h1>
           <br />
           <Listing
             name={name}

@@ -223,7 +223,7 @@ export default function MyBids() {
     <>
       <ListingModal show={!!selectedItem} onHide={deselectItem} selectedItem={selectedItem} />
       <Row>
-        <h1 className="column-heading-centered">My Bids</h1>
+        <h1 className="text-centered">My Bids</h1>
         <Col xs={2} />
         <Col xs={8} align="center">
           <br />

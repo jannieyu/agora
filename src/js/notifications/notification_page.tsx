@@ -133,7 +133,7 @@ function LineItem(props: Notification) {
     <div className="notification">
       <div className={`notification-box ${seen ? "" : "unseen"}`}>
         <Row className="align-items-center">
-          <Col xs={1} className="column-heading-centered">
+          <Col xs={1} className="text-centered">
             {!seen ? <FontAwesomeIcon icon="circle" color="rgb(24, 118, 242)" /> : null}
           </Col>
           <Col xs={1}>
@@ -154,7 +154,7 @@ function LineItem(props: Notification) {
             {lineItemContent}
           </Col>
 
-          <Col xs={2} className="column-heading-centered">
+          <Col xs={2} className="text-centered">
             {!seen ? (
               <Button size="mini" basic color="black" onClick={dismiss}>
                 Dismiss
@@ -174,7 +174,7 @@ export default function NotificationPage() {
     <Row>
       <Col xs={2} />
       <Col xs={8}>
-        <h1 className="column-heading-centered">Notifications</h1>
+        <h1 className="text-centered">Notifications</h1>
         {notifications.map((notification: Notification) => (
           <LineItem {...notification} key={notification.id} />
         ))}

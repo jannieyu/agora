@@ -140,13 +140,13 @@ export default function MyListings() {
         delistFollowup={delistFollowup}
       />
       <Row>
-        <h1 className="column-heading-centered">My Listings</h1>
+        <h1 className="text-centered">My Listings</h1>
         <Col xs={2} />
         <Col xs={8}>
           {lineItems.length ? (
             lineItems
           ) : (
-            <div className="column-heading-centered">
+            <div className="text-centered">
               You do not have any listings yet. Consider{" "}
               <Link to="/create_listing">creating one</Link> now!
             </div>
