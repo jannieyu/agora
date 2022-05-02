@@ -4,7 +4,7 @@ import { Button } from "semantic-ui-react"
 import Dropzone from "react-dropzone"
 import ReactCrop, { centerCrop, makeAspectCrop, Crop, PixelCrop } from "react-image-crop"
 import { useCallback, useRef, useState } from "../base/react_base"
-import useDebounceEffect from "./use_debounce_effect"
+import { useDebounceEffect } from "../base/util"
 import getCroppedImg from "./get_cropped_image"
 
 import "react-image-crop/dist/ReactCrop.css"
