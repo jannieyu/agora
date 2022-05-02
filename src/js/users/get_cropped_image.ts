@@ -1,9 +1,9 @@
 import { Crop } from "react-image-crop"
 
-const getCroppedImg = (imageURL: string, pixelCrop: Crop, fileName: string) => {
+const getCroppedImg = (imageURL: string, pixelCrop: Crop) => {
   const canvas = document.createElement("canvas")
   const image = new Image()
-  const promise = new Promise((resolve: () => void, reject) => {
+  const promise = new Promise<void>((resolve) => {
     image.onload = () => {
       canvas.width = (pixelCrop.width * image.width) / 100
       canvas.height = (pixelCrop.height * image.height) / 100
@@ -25,9 +25,8 @@ const getCroppedImg = (imageURL: string, pixelCrop: Crop, fileName: string) => {
     image.src = imageURL
   }).then(
     () =>
-      new Promise((resolve, reject) => {
+      new Promise((resolve) => {
         canvas.toBlob((blob) => {
-          blob.name = fileName
           resolve(blob)
         }, "image/jpeg")
       }),
