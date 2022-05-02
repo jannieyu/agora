@@ -1,5 +1,5 @@
 import * as React from "react"
-import { useCallback, useEffect, useMemo, useState } from "react"
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { render } from "react-dom"
 import { configureStore } from "@reduxjs/toolkit"
 import { Provider, useDispatch, useSelector } from "react-redux"
@@ -14,6 +14,7 @@ export {
   useTranslation,
   configureStore,
   useEffect,
+  useRef,
   useState,
   Provider,
 }

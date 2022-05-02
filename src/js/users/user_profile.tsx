@@ -1,6 +1,6 @@
 import * as React from "react"
 import { useSearchParams } from "react-router-dom"
-import { useEffect, useMemo, useSelector, useState } from "../base/react_base"
+import { useCallback, useEffect, useMemo, useSelector, useState } from "../base/react_base"
 import { safeParseInt } from "../base/util"
 import { AppState, User } from "../base/reducers"
 import { apiCall as getUser, Response as GetUserResponse } from "../api/get_user"
@@ -16,7 +16,7 @@ export default function UserProfile() {
 
   const [user, setUser] = useState<User | null>(null)
 
-  useEffect(() => {
+  const fetchUser = useCallback(() => {
     if (userId) {
       getUser(
         { userId },
@@ -35,9 +35,13 @@ export default function UserProfile() {
     }
   }, [userId])
 
+  useEffect(() => {
+    fetchUser()
+  }, [fetchUser, userId])
+
   if (user) {
     if (userId === activeUser?.id) {
-      return <MyAccount originalUser={user} updateOriginalUser={setUser} />
+      return <MyAccount originalUser={user} updateOriginalUser={setUser} fetchUser={fetchUser} />
     }
     return <PublicProfile user={user} />
   }

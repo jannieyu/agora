@@ -1,22 +1,55 @@
 import * as React from "react"
-import { Row, Modal } from "react-bootstrap"
+import { Row, Col, Modal } from "react-bootstrap"
+import { Button } from "semantic-ui-react"
 import Dropzone from "react-dropzone"
-import { useCallback, useState } from "../base/react_base"
+import ReactCrop, { centerCrop, makeAspectCrop, Crop, PixelCrop } from "react-image-crop"
+import { useCallback, useRef, useState } from "../base/react_base"
+import useDebounceEffect from "./use_debounce_effect"
+import getCroppedImg from "./get_cropped_image"
+
+import "react-image-crop/dist/ReactCrop.css"
+
+function centerAspectCrop(mediaWidth: number, mediaHeight: number, aspect: number) {
+  return centerCrop(
+    makeAspectCrop(
+      {
+        unit: "%",
+        width: 90,
+      },
+      aspect,
+      mediaWidth,
+      mediaHeight,
+    ),
+    mediaWidth,
+    mediaHeight,
+  )
+}
 
 interface ImageUploadModalProps {
   show: boolean
   onHide: () => void
+  onSuccess: () => void
+  initialImageURL: string
 }
 
 export default function ImageUploadModal(props: ImageUploadModalProps) {
-  const { show, onHide } = props
+  const { show, onHide, onSuccess, initialImageURL } = props
 
+  const imgRef = useRef<HTMLImageElement>(null)
   const [image, setImage] = useState<File | null>(null)
   const [imageURL, setImageURL] = useState<string>("")
+  const [crop, setCrop] = useState<Crop>()
+  const [completedCrop, setCompletedCrop] = useState<PixelCrop>()
+  const [croppedImage, setCroppedImage] = useState<Blob | null>(null)
+  const [submitting, setSubmitting] = useState<boolean>(false)
 
   const hideAndReset = useCallback(() => {
     setImage(null)
+    setCroppedImage(null)
+    setCompletedCrop(null)
+    setCrop(null)
     setImageURL("")
+    setSubmitting(false)
     onHide()
   }, [onHide])
 
@@ -29,6 +62,49 @@ export default function ImageUploadModal(props: ImageUploadModalProps) {
     reader.readAsDataURL(imageFile)
     setImage(imageFile)
   }, [])
+
+  function onImageLoad(e: React.SyntheticEvent<HTMLImageElement>) {
+    const { width, height } = e.currentTarget
+    const newCrop = centerAspectCrop(width, height, 1)
+    setCrop(newCrop)
+    getCroppedImg(imageURL || initialImageURL, newCrop, "preview.jpg").then((res: Blob) => {
+      // If we want a preview URL:
+      // const blobUrl = URL.createObjectURL(res)
+      setCroppedImage(res)
+    })
+  }
+
+  useDebounceEffect(
+    async () => {
+      if (completedCrop) {
+        getCroppedImg(imageURL || `/${initialImageURL}`, crop, "preview.jpg").then((res: Blob) => {
+          // If we want a preview URL:
+          // const blobUrl = URL.createObjectURL(res)
+          setCroppedImage(res)
+        })
+      }
+    },
+    100,
+    [completedCrop],
+  )
+
+  const onSubmit = useCallback(async () => {
+    const formData = new FormData()
+    formData.append("hasImage", "true")
+    formData.append("image", croppedImage, image?.name || "cropped.jpg")
+
+    setSubmitting(true)
+    const response = await fetch("/api/update_user", {
+      method: "POST",
+      body: formData,
+    })
+    if (response.status >= 200 && response.status <= 299) {
+      onSuccess()
+      hideAndReset()
+    } else {
+      // TODO: set error state
+    }
+  }, [croppedImage, image?.name, onSuccess, hideAndReset])
 
   return (
     <Modal
@@ -46,17 +122,49 @@ export default function ImageUploadModal(props: ImageUploadModalProps) {
           <Dropzone onDrop={handleChangeImage} accept={{ "image/*": [".jpeg", ".png", ".gif"] }}>
             {({ getRootProps, getInputProps }) => (
               <div {...getRootProps()}>
-                <div className="droparea">
+                <div className="droparea-user">
                   <input {...getInputProps()} />
                   <b className="droparea-text">
-                    {image?.name || "Drag and drop an image of the listed item, or click to upload"}
+                    {image?.name || "Drag and drop a profile picture, or click to upload"}
                   </b>
                 </div>
               </div>
             )}
           </Dropzone>
         </Row>
-        <Row>{image && <img src={imageURL} alt="User Profile" />}</Row>
+        <br />
+        <Row className="align-items-center">
+          <Col xs={3} />
+          <Col align="center" xs={6}>
+            {(imageURL || initialImageURL) && (
+              <ReactCrop
+                crop={crop}
+                onChange={(_, percentCrop) => setCrop(percentCrop)}
+                onComplete={(c) => setCompletedCrop(c)}
+                aspect={1}
+                circularCrop
+              >
+                <img
+                  src={imageURL || `/${initialImageURL}`}
+                  alt="User Profile"
+                  onLoad={onImageLoad}
+                  ref={imgRef}
+                />
+              </ReactCrop>
+            )}
+          </Col>
+          <Col xs={3} />
+        </Row>
+        <br />
+        <Row>
+          {croppedImage && (
+            <Col xs={6}>
+              <Button loading={submitting} onClick={onSubmit} type="submit" positive>
+                Update Image
+              </Button>
+            </Col>
+          )}
+        </Row>
       </Modal.Body>
     </Modal>
   )

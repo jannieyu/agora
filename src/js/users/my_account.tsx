@@ -4,7 +4,7 @@ import { isEqual } from "lodash"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { Button, Form, Input, Message, TextArea } from "semantic-ui-react"
 import { User } from "../base/reducers"
-import { useCallback, useDispatch, useState } from "../base/react_base"
+import { useCallback, useDispatch, useEffect, useState } from "../base/react_base"
 import ImageUploadModal from "./image_upload_modal"
 import { setData } from "../base/actions"
 
@@ -53,10 +53,11 @@ function SubmissionModal(props: SubmissionModalProps) {
 interface MyAccountProps {
   originalUser: User
   updateOriginalUser: (user: User) => void
+  fetchUser: () => void
 }
 
 export default function MyAccount(props: MyAccountProps) {
-  const { originalUser, updateOriginalUser } = props
+  const { originalUser, updateOriginalUser, fetchUser } = props
 
   const [user, setUser] = useState<User>(originalUser)
   const [showImageUploadModal, setShowImageUploadModal] = useState<boolean>(false)
@@ -65,6 +66,10 @@ export default function MyAccount(props: MyAccountProps) {
   const [showFailureModal, setShowFailureModal] = useState<boolean>(false)
 
   const dispatch = useDispatch()
+
+  useEffect(() => {
+    setUser(originalUser)
+  }, [originalUser])
 
   const updateUser = useCallback(
     (newUser: User) => {
@@ -173,7 +178,12 @@ export default function MyAccount(props: MyAccountProps) {
         show={showSuccessModal || showFailureModal}
         wasSuccess={showSuccessModal}
       />
-      <ImageUploadModal show={showImageUploadModal} onHide={hideImageUploadModal} />
+      <ImageUploadModal
+        show={showImageUploadModal}
+        onHide={hideImageUploadModal}
+        onSuccess={fetchUser}
+        initialImageURL={user?.image || ""}
+      />
       <Row className="user-profile">
         <Col xs={3} />
         <Col xs={6}>
@@ -184,7 +194,6 @@ export default function MyAccount(props: MyAccountProps) {
             <img
               alt="profile"
               src={user?.image ? `/${user?.image}` : "/images/assets/default-user-icon.png"}
-              style={{ maxWidth: "100%" }}
             />
           </div>
           <br />

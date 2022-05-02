@@ -377,7 +377,7 @@ function ListingForm() {
               >
                 {({ getRootProps, getInputProps }) => (
                   <div {...getRootProps()}>
-                    <div className="droparea">
+                    <div className="droparea-listing">
                       <input {...getInputProps()} />
                       <b className="droparea-text">
                         {image?.name ||

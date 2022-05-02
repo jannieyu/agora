@@ -17,7 +17,6 @@ export default function PublicProfile(props: PublicProfileProps) {
           <img
             alt="profile"
             src={user?.image ? `/${user?.image}` : "/images/assets/default-user-icon.png"}
-            style={{ maxWidth: "100%" }}
           />
         </div>
         <br />
