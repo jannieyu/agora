@@ -4,9 +4,10 @@ import (
 	"agora/src/app/database"
 	"agora/src/app/item"
 	"errors"
-	"github.com/gorilla/sessions"
 	"net/http"
 	"strings"
+
+	"github.com/gorilla/sessions"
 
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/crypto/bcrypt"
@@ -57,13 +58,15 @@ func PopulateUser(user *database.User, r *http.Request) error {
 	if !strings.EqualFold(r.FormValue("bio"), "") {
 		user.Bio = r.FormValue("bio")
 	}
-
-	if image_location, err := item.ProcessImage(r, item.USERS_FOLDER); err != nil {
-		log.Info("No user profile image was given.")
-		return err
-	} else {
-		user.Image = image_location
+	if !strings.EqualFold(r.FormValue("image"), "") {
+		if image_location, err := item.ProcessImage(r, item.USERS_FOLDER); err != nil {
+			log.Info("No user profile image was given.")
+			return err
+		} else {
+			user.Image = image_location
+		}
 	}
+
 	return nil
 }
 

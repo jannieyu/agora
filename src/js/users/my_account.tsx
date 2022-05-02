@@ -1,11 +1,53 @@
 import * as React from "react"
-import { Row, Col, OverlayTrigger, Popover } from "react-bootstrap"
+import { Row, Col, OverlayTrigger, Popover, Modal } from "react-bootstrap"
 import { isEqual } from "lodash"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { Button, Form, Input, TextArea } from "semantic-ui-react"
+import { Button, Form, Input, Message, TextArea } from "semantic-ui-react"
 import { User } from "../base/reducers"
 import { useCallback, useState } from "../base/react_base"
 import ImageUploadModal from "./image_upload_modal"
+
+interface SubmissionModalProps {
+  onHide: () => void
+  show: boolean
+  wasSuccess: boolean
+}
+
+function SubmissionModal(props: SubmissionModalProps) {
+  const { onHide, show, wasSuccess } = props
+
+  const message = wasSuccess
+    ? "Your profile was updated successfully!"
+    : "We are sorry, we were unable to successfully update your profile."
+
+  const headerMsg = wasSuccess ? "Success!" : "Error"
+
+  return (
+    <Modal
+      show={show}
+      onHide={onHide}
+      size="lg"
+      aria-labelledby="contained-modal-title-vcenter"
+      centered
+    >
+      <Modal.Header closeButton>
+        <Modal.Title id="contained-modal-title-vcenter">{headerMsg}</Modal.Title>
+      </Modal.Header>
+      <Modal.Body>
+        <Row>
+          <Col xs="12" align="center">
+            <Message
+              error={!wasSuccess}
+              success={wasSuccess}
+              header={headerMsg}
+              content={message}
+            />
+          </Col>
+        </Row>
+      </Modal.Body>
+    </Modal>
+  )
+}
 
 interface MyAccountProps {
   unmodifiedUser: User
@@ -16,6 +58,14 @@ export default function MyAccount(props: MyAccountProps) {
 
   const [user, setUser] = useState<User>(unmodifiedUser)
   const [showImageUploadModal, setShowImageUploadModal] = useState<boolean>(false)
+  const [submitting, setSubmitting] = useState<boolean>(false)
+  const [showSuccessModal, setShowSuccessModal] = useState<boolean>(false)
+  const [showFailureModal, setShowFailureModal] = useState<boolean>(false)
+
+  const hideSubmissionModal = useCallback(() => {
+    setShowSuccessModal(false)
+    setShowFailureModal(false)
+  }, [])
 
   const hideImageUploadModal = useCallback(() => {
     setShowImageUploadModal(false)
@@ -56,8 +106,32 @@ export default function MyAccount(props: MyAccountProps) {
   const canSubmit =
     user?.firstName && user?.lastName && user?.email && !isEqual(user, unmodifiedUser)
 
+  const onSubmit = useCallback(async () => {
+    const formData = new FormData()
+    formData.append("firstName", user.firstName)
+    formData.append("lastName", user.lastName)
+    formData.append("email", user.email)
+    formData.append("bio", user.bio)
+    formData.append("image", "")
+
+    setSubmitting(true)
+    const response = await fetch("/api/update_user", {
+      method: "POST",
+      body: formData,
+    })
+    if (response.status >= 200 && response.status <= 299) {
+      setSubmitting(false)
+      setShowSuccessModal(true)
+      setShowFailureModal(false)
+    } else {
+      setSubmitting(false)
+      setShowSuccessModal(false)
+      setShowFailureModal(true)
+    }
+  }, [user])
+
   const submitBtn = (
-    <Button disabled={!canSubmit} type="submit" positive>
+    <Button disabled={!canSubmit} type="submit" loading={submitting} onClick={onSubmit} positive>
       Submit Changes
     </Button>
   )
@@ -82,6 +156,11 @@ export default function MyAccount(props: MyAccountProps) {
 
   return (
     <>
+      <SubmissionModal
+        onHide={hideSubmissionModal}
+        show={showSuccessModal || showFailureModal}
+        wasSuccess={showSuccessModal}
+      />
       <ImageUploadModal show={showImageUploadModal} onHide={hideImageUploadModal} />
       <Row className="user-profile">
         <Col xs={3} />
