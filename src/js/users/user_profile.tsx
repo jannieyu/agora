@@ -35,8 +35,11 @@ export default function UserProfile() {
     }
   }, [userId])
 
-  if (userId === activeUser?.id) {
-    return <MyAccount user={user} />
+  if (user) {
+    if (userId === activeUser?.id) {
+      return <MyAccount unmodifiedUser={user} />
+    }
+    return <PublicProfile user={user} />
   }
-  return <PublicProfile user={user} />
+  return <div />
 }
