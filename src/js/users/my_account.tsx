@@ -4,8 +4,9 @@ import { isEqual } from "lodash"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { Button, Form, Input, Message, TextArea } from "semantic-ui-react"
 import { User } from "../base/reducers"
-import { useCallback, useState } from "../base/react_base"
+import { useCallback, useDispatch, useState } from "../base/react_base"
 import ImageUploadModal from "./image_upload_modal"
+import { setData } from "../base/actions"
 
 interface SubmissionModalProps {
   onHide: () => void
@@ -50,17 +51,28 @@ function SubmissionModal(props: SubmissionModalProps) {
 }
 
 interface MyAccountProps {
-  unmodifiedUser: User
+  originalUser: User
+  updateOriginalUser: (user: User) => void
 }
 
 export default function MyAccount(props: MyAccountProps) {
-  const { unmodifiedUser } = props
+  const { originalUser, updateOriginalUser } = props
 
-  const [user, setUser] = useState<User>(unmodifiedUser)
+  const [user, setUser] = useState<User>(originalUser)
   const [showImageUploadModal, setShowImageUploadModal] = useState<boolean>(false)
   const [submitting, setSubmitting] = useState<boolean>(false)
   const [showSuccessModal, setShowSuccessModal] = useState<boolean>(false)
   const [showFailureModal, setShowFailureModal] = useState<boolean>(false)
+
+  const dispatch = useDispatch()
+
+  const updateUser = useCallback(
+    (newUser: User) => {
+      dispatch(setData({ user: newUser }))
+      updateOriginalUser(newUser)
+    },
+    [dispatch, updateOriginalUser],
+  )
 
   const hideSubmissionModal = useCallback(() => {
     setShowSuccessModal(false)
@@ -103,8 +115,7 @@ export default function MyAccount(props: MyAccountProps) {
     [user, setUser],
   )
 
-  const canSubmit =
-    user?.firstName && user?.lastName && user?.email && !isEqual(user, unmodifiedUser)
+  const canSubmit = user?.firstName && user?.lastName && user?.email && !isEqual(user, originalUser)
 
   const onSubmit = useCallback(async () => {
     const formData = new FormData()
@@ -123,12 +134,13 @@ export default function MyAccount(props: MyAccountProps) {
       setSubmitting(false)
       setShowSuccessModal(true)
       setShowFailureModal(false)
+      updateUser(user)
     } else {
       setSubmitting(false)
       setShowSuccessModal(false)
       setShowFailureModal(true)
     }
-  }, [user])
+  }, [user, updateUser])
 
   const submitBtn = (
     <Button disabled={!canSubmit} type="submit" loading={submitting} onClick={onSubmit} positive>

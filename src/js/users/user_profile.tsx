@@ -37,7 +37,7 @@ export default function UserProfile() {
 
   if (user) {
     if (userId === activeUser?.id) {
-      return <MyAccount unmodifiedUser={user} />
+      return <MyAccount originalUser={user} updateOriginalUser={setUser} />
     }
     return <PublicProfile user={user} />
   }
