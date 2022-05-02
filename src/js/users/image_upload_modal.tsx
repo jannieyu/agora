@@ -67,7 +67,7 @@ export default function ImageUploadModal(props: ImageUploadModalProps) {
     const { width, height } = e.currentTarget
     const newCrop = centerAspectCrop(width, height, 1)
     setCrop(newCrop)
-    getCroppedImg(imageURL || initialImageURL, newCrop, "preview.jpg").then((res: Blob) => {
+    getCroppedImg(imageURL || initialImageURL, newCrop).then((res: Blob) => {
       // If we want a preview URL:
       // const blobUrl = URL.createObjectURL(res)
       setCroppedImage(res)
@@ -77,7 +77,7 @@ export default function ImageUploadModal(props: ImageUploadModalProps) {
   useDebounceEffect(
     async () => {
       if (completedCrop) {
-        getCroppedImg(imageURL || `/${initialImageURL}`, crop, "preview.jpg").then((res: Blob) => {
+        getCroppedImg(imageURL || `/${initialImageURL}`, crop).then((res: Blob) => {
           // If we want a preview URL:
           // const blobUrl = URL.createObjectURL(res)
           setCroppedImage(res)
@@ -98,7 +98,7 @@ export default function ImageUploadModal(props: ImageUploadModalProps) {
       method: "POST",
       body: formData,
     })
-    if (response.status >= 200 && response.status <= 299) {
+    if (response.ok) {
       onSuccess()
       hideAndReset()
     } else {

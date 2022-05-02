@@ -135,7 +135,7 @@ export default function MyAccount(props: MyAccountProps) {
       method: "POST",
       body: formData,
     })
-    if (response.status >= 200 && response.status <= 299) {
+    if (response.ok) {
       setSubmitting(false)
       setShowSuccessModal(true)
       setShowFailureModal(false)
