@@ -58,13 +58,11 @@ func PopulateUser(user *database.User, r *http.Request) error {
 	if !strings.EqualFold(r.FormValue("bio"), "") {
 		user.Bio = r.FormValue("bio")
 	}
-	if !strings.EqualFold(r.FormValue("hasImage"), "") {
-		if image_location, err := item.ProcessImage(r, item.USERS_FOLDER); err != nil {
-			log.Info("No user profile image was given.")
-			return err
-		} else {
-			user.Image = image_location
-		}
+	if image_location, err := item.ProcessImage(r, item.USERS_FOLDER); err != nil {
+		log.Info("No user profile image was given.")
+		return err
+	} else {
+		user.Image = image_location
 	}
 
 	return nil

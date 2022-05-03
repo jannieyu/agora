@@ -90,7 +90,6 @@ export default function ImageUploadModal(props: ImageUploadModalProps) {
 
   const onSubmit = useCallback(async () => {
     const formData = new FormData()
-    formData.append("hasImage", "true")
     formData.append("image", croppedImage, image?.name || "cropped.jpg")
 
     setSubmitting(true)
