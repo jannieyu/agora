@@ -4,6 +4,7 @@ import (
 	"agora/src/app/bid"
 	"agora/src/app/database"
 	"agora/src/app/notification"
+	"agora/src/app/ws"
 	"errors"
 	"net/http"
 
@@ -29,7 +30,7 @@ func ValidateBidBot(db *gorm.DB, bidBot database.BidBot) (int, error) {
 	return http.StatusOK, nil
 }
 
-func runBotAgainstHighestBid(db *gorm.DB, bidBot *database.BidBot) (int, error) {
+func runBotAgainstHighestBid(db *gorm.DB, hub *ws.Hub, bidBot *database.BidBot) (int, error) {
 	var item database.Item
 	if err := db.Where(&database.Item{ID: bidBot.ItemID}).Find(&item).Error; err != nil {
 		log.WithError(err).Error("Failed to make query to get item of bid bot.")
@@ -49,11 +50,11 @@ func runBotAgainstHighestBid(db *gorm.DB, bidBot *database.BidBot) (int, error) 
 		return http.StatusInternalServerError, err
 	}
 	autoBidPrice := decimal.Min(item.HighestBid.Add(inc), bidBot.MaxBid)
-	if statusCode, err := bid.PlaceBid(bidBot.OwnerID, bidBot.ItemID, bidBot.ID, autoBidPrice, db); err != nil {
+	if statusCode, err := bid.PlaceBid(bidBot.OwnerID, bidBot.ItemID, bidBot.ID, autoBidPrice, db, hub); err != nil {
 		log.WithError(err).Error("Failed to place bid for bid bot ", bidBot.ID)
 		return statusCode, err
 	}
-	if err := bid.CreateNotification(db, database.Notification{
+	if err := bid.CreateNotification(db, hub, database.Notification{
 		ReceiverID: prevHighestBid.BidderID,
 		SenderID:   bidBot.OwnerID,
 		ItemID:     bidBot.ItemID,
@@ -62,7 +63,7 @@ func runBotAgainstHighestBid(db *gorm.DB, bidBot *database.BidBot) (int, error) 
 	}); err != nil {
 		return http.StatusInternalServerError, err
 	}
-	if err := bid.CreateNotification(db, database.Notification{
+	if err := bid.CreateNotification(db, hub, database.Notification{
 		ReceiverID: bidBot.OwnerID,
 		SenderID:   prevHighestBid.BidderID,
 		ItemID:     bidBot.ItemID,
@@ -73,7 +74,7 @@ func runBotAgainstHighestBid(db *gorm.DB, bidBot *database.BidBot) (int, error) 
 
 	return http.StatusOK, nil
 }
-func RunManualBidAgainstBot(db *gorm.DB, itemId uint32, bidderID uint32, bidPrice decimal.Decimal) (int, bool, error) {
+func RunManualBidAgainstBot(db *gorm.DB, hub *ws.Hub, itemId uint32, bidderID uint32, bidPrice decimal.Decimal) (int, bool, error) {
 	var bidBots []database.BidBot
 	if err := db.Where(&database.BidBot{ItemID: itemId, Active: true}).Find(&bidBots).Error; err != nil {
 		log.WithError(err).Error("Failed to make query to get active bid bots for item.")
@@ -88,11 +89,11 @@ func RunManualBidAgainstBot(db *gorm.DB, itemId uint32, bidderID uint32, bidPric
 		autoBidPrice := decimal.Min(bidPrice.Add(inc), bidBot.MaxBid)
 		if autoBidPrice.GreaterThanOrEqual(bidPrice) {
 			if bidBot.OwnerID != bidderID {
-				if statusCode, err := bid.PlaceBid(bidBot.OwnerID, bidBot.ItemID, bidBot.ID, autoBidPrice, db); err != nil {
+				if statusCode, err := bid.PlaceBid(bidBot.OwnerID, bidBot.ItemID, bidBot.ID, autoBidPrice, db, hub); err != nil {
 					log.WithError(err).Error("Failed to place bid for bid bot ", bidBot.ID)
 					return statusCode, true, err
 				}
-				err := bid.CreateNotification(db, database.Notification{
+				err := bid.CreateNotification(db, hub, database.Notification{
 					ReceiverID: bidderID,
 					SenderID:   bidBot.OwnerID,
 					ItemID:     bidBot.ItemID,
@@ -101,7 +102,7 @@ func RunManualBidAgainstBot(db *gorm.DB, itemId uint32, bidderID uint32, bidPric
 				if err != nil {
 					return http.StatusInternalServerError, true, err
 				}
-				err = bid.CreateNotification(db, database.Notification{
+				err = bid.CreateNotification(db, hub, database.Notification{
 					ReceiverID: bidBot.OwnerID,
 					SenderID:   bidderID,
 					ItemID:     bidBot.ItemID,
@@ -113,7 +114,7 @@ func RunManualBidAgainstBot(db *gorm.DB, itemId uint32, bidderID uint32, bidPric
 			}
 		}
 		if autoBidPrice.LessThanOrEqual(bidPrice) {
-			if err := deactivateBidBot(db, &bidBot, bidderID, bidPrice); err != nil {
+			if err := deactivateBidBot(db, hub, &bidBot, bidderID, bidPrice); err != nil {
 				log.WithError(err).Error("Failed to deactivate bid bot ", bidBot.ID)
 				return http.StatusBadRequest, true, err
 			}
@@ -124,17 +125,17 @@ func RunManualBidAgainstBot(db *gorm.DB, itemId uint32, bidderID uint32, bidPric
 	return http.StatusOK, true, nil
 }
 
-func updateBidBotWinner(db *gorm.DB, loserBidBot *database.BidBot, winnerBidBot *database.BidBot) (int, error) {
+func updateBidBotWinner(db *gorm.DB, hub *ws.Hub, loserBidBot *database.BidBot, winnerBidBot *database.BidBot) (int, error) {
 	inc, err := getBidBotIncrementPrice(db, loserBidBot.ItemID)
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}
 	autoBidPrice := decimal.Min(loserBidBot.MaxBid.Add(inc), winnerBidBot.MaxBid)
-	if statusCode, err := bid.PlaceBid(loserBidBot.OwnerID, loserBidBot.ItemID, loserBidBot.ID, loserBidBot.MaxBid, db); err != nil {
+	if statusCode, err := bid.PlaceBid(loserBidBot.OwnerID, loserBidBot.ItemID, loserBidBot.ID, loserBidBot.MaxBid, db, hub); err != nil {
 		log.WithError(err).Error("Failed to place bid for bid bot ", loserBidBot.ID)
 		return statusCode, err
 	}
-	if err := bid.CreateNotification(db, database.Notification{
+	if err := bid.CreateNotification(db, hub, database.Notification{
 		ReceiverID: loserBidBot.OwnerID,
 		SenderID:   winnerBidBot.OwnerID,
 		ItemID:     winnerBidBot.ItemID,
@@ -142,15 +143,15 @@ func updateBidBotWinner(db *gorm.DB, loserBidBot *database.BidBot, winnerBidBot 
 		NoteType:   notification.BIDBOT_BID}); err != nil {
 		return http.StatusInternalServerError, err
 	}
-	if err := deactivateBidBot(db, loserBidBot, winnerBidBot.OwnerID, autoBidPrice); err != nil {
+	if err := deactivateBidBot(db, hub, loserBidBot, winnerBidBot.OwnerID, autoBidPrice); err != nil {
 		log.WithError(err).Error("Failed to deactivate bid bot ", loserBidBot.ID)
 		return http.StatusInternalServerError, err
 	}
-	if statusCode, err := bid.PlaceBid(winnerBidBot.OwnerID, winnerBidBot.ItemID, winnerBidBot.ID, autoBidPrice, db); err != nil {
+	if statusCode, err := bid.PlaceBid(winnerBidBot.OwnerID, winnerBidBot.ItemID, winnerBidBot.ID, autoBidPrice, db, hub); err != nil {
 		log.WithError(err).Error("Failed to place bid for bid bot ", winnerBidBot.ID)
 		return statusCode, err
 	}
-	if err := bid.CreateNotification(db, database.Notification{
+	if err := bid.CreateNotification(db, hub, database.Notification{
 		ReceiverID: winnerBidBot.OwnerID,
 		SenderID:   loserBidBot.OwnerID,
 		ItemID:     winnerBidBot.ItemID,
@@ -161,12 +162,12 @@ func updateBidBotWinner(db *gorm.DB, loserBidBot *database.BidBot, winnerBidBot 
 	return http.StatusOK, nil
 }
 
-func updateBidBotTie(db *gorm.DB, loserBidBot *database.BidBot, winnerBidBot *database.BidBot) (int, error) {
-	if statusCode, err := bid.PlaceBid(winnerBidBot.OwnerID, winnerBidBot.ItemID, winnerBidBot.ID, winnerBidBot.MaxBid, db); err != nil {
+func updateBidBotTie(db *gorm.DB, hub *ws.Hub, loserBidBot *database.BidBot, winnerBidBot *database.BidBot) (int, error) {
+	if statusCode, err := bid.PlaceBid(winnerBidBot.OwnerID, winnerBidBot.ItemID, winnerBidBot.ID, winnerBidBot.MaxBid, db, hub); err != nil {
 		log.WithError(err).Error("Failed to place bid for bid bot")
 		return statusCode, err
 	}
-	if err := bid.CreateNotification(db, database.Notification{
+	if err := bid.CreateNotification(db, hub, database.Notification{
 		ReceiverID: winnerBidBot.OwnerID,
 		SenderID:   loserBidBot.OwnerID,
 		ItemID:     winnerBidBot.ItemID,
@@ -174,55 +175,55 @@ func updateBidBotTie(db *gorm.DB, loserBidBot *database.BidBot, winnerBidBot *da
 		NoteType:   notification.BIDBOT_BID}); err != nil {
 		return http.StatusInternalServerError, err
 	}
-	if err := deactivateBidBot(db, loserBidBot, winnerBidBot.OwnerID, winnerBidBot.MaxBid); err != nil {
+	if err := deactivateBidBot(db, hub, loserBidBot, winnerBidBot.OwnerID, winnerBidBot.MaxBid); err != nil {
 		log.WithError(err).Error("Failed to deactivate bid bot")
 		return http.StatusInternalServerError, err
 	}
-	if err := deactivateBidBot(db, winnerBidBot, winnerBidBot.OwnerID, winnerBidBot.MaxBid); err != nil {
+	if err := deactivateBidBot(db, hub, winnerBidBot, winnerBidBot.OwnerID, winnerBidBot.MaxBid); err != nil {
 		log.WithError(err).Error("Failed to deactivate bid bot")
 		return http.StatusInternalServerError, err
 	}
 	return http.StatusOK, nil
 }
 
-func RunBotAgainstBot(db *gorm.DB, newBidBot database.BidBot) (int, error) {
+func RunBotAgainstBot(db *gorm.DB, hub *ws.Hub, newBidBot database.BidBot) (int, error) {
 	var bidBots []database.BidBot
 	if err := db.Where(&database.BidBot{ItemID: newBidBot.ItemID, Active: true}).Not(&database.BidBot{ID: newBidBot.ID}).Find(&bidBots).Error; err != nil {
 		log.WithError(err).Error("Failed to make query to get active bid bots for item")
 		return http.StatusInternalServerError, err
 	}
 	if len(bidBots) == 0 {
-		if statusCode, err := runBotAgainstHighestBid(db, &newBidBot); err != nil {
+		if statusCode, err := runBotAgainstHighestBid(db, hub, &newBidBot); err != nil {
 			log.WithError(err).Error("Error running bot against current highest bid on item.")
 			return statusCode, err
 		}
 	} else {
 		oldBidBot := bidBots[0]
 		if oldBidBot.MaxBid.GreaterThan(newBidBot.MaxBid) {
-			return updateBidBotWinner(db, &newBidBot, &oldBidBot)
+			return updateBidBotWinner(db, hub, &newBidBot, &oldBidBot)
 		} else if oldBidBot.MaxBid.Equal(newBidBot.MaxBid) {
-			return updateBidBotTie(db, &newBidBot, &oldBidBot)
+			return updateBidBotTie(db, hub, &newBidBot, &oldBidBot)
 		} else {
-			return updateBidBotWinner(db, &oldBidBot, &newBidBot)
+			return updateBidBotWinner(db, hub, &oldBidBot, &newBidBot)
 		}
 	}
 	return http.StatusOK, nil
 
 }
 
-func deactivateBidBot(db *gorm.DB, bidBot *database.BidBot, newHighestBidderId uint32, newHighestBid decimal.Decimal) error {
+func deactivateBidBot(db *gorm.DB, hub *ws.Hub, bidBot *database.BidBot, newHighestBidderId uint32, newHighestBid decimal.Decimal) error {
 	bidBot.Active = false
 	if err := db.Save(&bidBot).Error; err != nil {
 		return err
 	}
-	if err := createBidBotDeactivateNotification(db, bidBot, newHighestBidderId, newHighestBid); err != nil {
+	if err := createBidBotDeactivateNotification(db, hub, bidBot, newHighestBidderId, newHighestBid); err != nil {
 		return err
 	}
 	log.Info("Deactivated bid bot ", bidBot.ID)
 	return nil
 }
 
-func createBidBotDeactivateNotification(db *gorm.DB, bidBot *database.BidBot, newHighestBidderId uint32, newHighestBid decimal.Decimal) error {
+func createBidBotDeactivateNotification(db *gorm.DB, hub *ws.Hub, bidBot *database.BidBot, newHighestBidderId uint32, newHighestBid decimal.Decimal) error {
 	notification := database.Notification{
 		ReceiverID: bidBot.OwnerID,
 		SenderID:   newHighestBidderId,
@@ -231,6 +232,9 @@ func createBidBotDeactivateNotification(db *gorm.DB, bidBot *database.BidBot, ne
 		NoteType:   notification.BIDBOT_DEACTIVATED,
 	}
 	if err := db.Create(&notification).Error; err != nil {
+		return err
+	}
+	if err := hub.BroadcastMessage([]uint32{notification.ReceiverID}, ws.BroadcastAPI{ws.NEW_NOTIFICATION}); err != nil {
 		return err
 	}
 	return nil

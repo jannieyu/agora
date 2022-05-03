@@ -5,6 +5,7 @@ import (
 	"agora/src/app/database"
 	"agora/src/app/notification"
 	"agora/src/app/user"
+	"agora/src/app/ws"
 	"encoding/json"
 	"fmt"
 	"github.com/shopspring/decimal"
@@ -61,7 +62,7 @@ func (h Handle) DelistItem(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := notifyDelistingToBidders(h.Db, item); err != nil {
+	if err := notifyDelistingToBidders(h.Db, h.Hub, item); err != nil {
 		log.WithError(err).Error("Failed to notify bidders of item delisting.")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
@@ -76,7 +77,7 @@ func (h Handle) DelistItem(w http.ResponseWriter, r *http.Request) {
 	log.Info("Completed item deletion.")
 }
 
-func notifyDelistingToBidders(db *gorm.DB, item database.Item) error {
+func notifyDelistingToBidders(db *gorm.DB, hub *ws.Hub, item database.Item) error {
 	var manualBids []database.Bid
 	if err := db.Where("item_id = ? AND bot_id = ?", item.ID, 0).Find(&manualBids).Error; err != nil {
 		return err
@@ -85,7 +86,7 @@ func notifyDelistingToBidders(db *gorm.DB, item database.Item) error {
 	var exists = struct{}{}
 	for _, b := range manualBids {
 		if _, ok := s[b.BidderID]; !ok {
-			if err := bid.CreateNotification(db, database.Notification{
+			if err := bid.CreateNotification(db, hub, database.Notification{
 				ReceiverID: b.BidderID,
 				SenderID:   item.SellerID,
 				ItemID:     item.ID,
@@ -103,7 +104,7 @@ func notifyDelistingToBidders(db *gorm.DB, item database.Item) error {
 	}
 	for _, b := range bidBots {
 		if _, ok := s[b.OwnerID]; !ok {
-			if err := bid.CreateNotification(db, database.Notification{
+			if err := bid.CreateNotification(db, hub, database.Notification{
 				ReceiverID: b.OwnerID,
 				SenderID:   item.SellerID,
 				ItemID:     b.ItemID,
@@ -112,7 +113,7 @@ func notifyDelistingToBidders(db *gorm.DB, item database.Item) error {
 				return err
 			}
 		}
-		if err := bid.CreateNotification(db, database.Notification{
+		if err := bid.CreateNotification(db, hub, database.Notification{
 			ReceiverID: b.OwnerID,
 			SenderID:   item.SellerID,
 			ItemID:     b.ItemID,

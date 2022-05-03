@@ -5,9 +5,19 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+type BroadcastType string
+
+const (
+	NEW_NOTIFICATION BroadcastType = "NEW_NOTIFICATION"
+)
+
 type WSMessage struct {
 	UserIds []uint32
 	Message []byte
+}
+
+type BroadcastAPI struct {
+	BroadcastType BroadcastType
 }
 
 // Hub maintains the set of active clients and broadcasts messages to the
