@@ -40,13 +40,13 @@ func (h Handle) AddBid(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 	}
 
-	if statusCode, err := bid.PlaceBid(bidderID, bidAPI.ItemID, 0, bidPrice, h.Db); err != nil {
+	if statusCode, err := bid.PlaceBid(bidderID, bidAPI.ItemID, 0, bidPrice, h.Db, h.Hub); err != nil {
 		log.WithError(err).Error("Failed to place bid.")
 		w.WriteHeader(statusCode)
 		return
 	}
 
-	statusCode, existingBot, err := bidBot.RunManualBidAgainstBot(h.Db, bidAPI.ItemID, bidderID, bidPrice)
+	statusCode, existingBot, err := bidBot.RunManualBidAgainstBot(h.Db, h.Hub, bidAPI.ItemID, bidderID, bidPrice)
 	if err != nil {
 		log.WithError(err).Error("Failed to run manual bid against bots.")
 		w.WriteHeader(statusCode)
@@ -54,7 +54,7 @@ func (h Handle) AddBid(w http.ResponseWriter, r *http.Request) {
 	}
 	if !existingBot {
 		if prevHighestBid.ID > 0 && prevHighestBid.BidderID != bidderID {
-			if err := bid.CreateNotification(h.Db, database.Notification{
+			if err := bid.CreateNotification(h.Db, h.Hub, database.Notification{
 				ReceiverID: prevHighestBid.BidderID,
 				SenderID:   bidderID,
 				ItemID:     bidAPI.ItemID,

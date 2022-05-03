@@ -3,6 +3,7 @@ package bid
 import (
 	"agora/src/app/database"
 	"agora/src/app/notification"
+	"agora/src/app/ws"
 	"errors"
 	"fmt"
 	"github.com/shopspring/decimal"
@@ -11,7 +12,7 @@ import (
 	"net/http"
 )
 
-func PlaceBid(bidderID uint32, itemID uint32, bidBotID uint32, bidPrice decimal.Decimal, db *gorm.DB) (int, error) {
+func PlaceBid(bidderID uint32, itemID uint32, bidBotID uint32, bidPrice decimal.Decimal, db *gorm.DB, hub *ws.Hub) (int, error) {
 	if isValidBidder, err := checkValidBidder(bidderID, itemID, db); err != nil {
 		return http.StatusBadRequest, err
 	} else if !isValidBidder {
@@ -44,7 +45,7 @@ func PlaceBid(bidderID uint32, itemID uint32, bidBotID uint32, bidPrice decimal.
 
 	}
 
-	if err := CreateNotification(db, database.Notification{
+	if err := CreateNotification(db, hub, database.Notification{
 		ReceiverID: item.SellerID,
 		SenderID:   bid.BidderID,
 		ItemID:     bid.ItemID,
@@ -57,9 +58,12 @@ func PlaceBid(bidderID uint32, itemID uint32, bidBotID uint32, bidPrice decimal.
 	return http.StatusOK, nil
 }
 
-func CreateNotification(db *gorm.DB, note database.Notification) error {
+func CreateNotification(db *gorm.DB, hub *ws.Hub, note database.Notification) error {
 	note.Seen = false
 	if err := db.Create(&note).Error; err != nil {
+		return err
+	}
+	if err := hub.BroadcastMessage([]uint32{note.ReceiverID}, ws.BroadcastAPI{ws.NEW_NOTIFICATION}); err != nil {
 		return err
 	}
 	return nil
