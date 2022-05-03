@@ -1,22 +1,25 @@
 import * as React from "react"
-import { Row, Col } from "react-bootstrap"
-import ReactCrop, { Crop } from "react-image-crop"
-import "react-image-crop/dist/ReactCrop.css"
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { useEffect, useSelector, useState } from "../base/react_base"
-import { apiCall as getUser, Response as GetUserResponse } from "../api/get_user"
+import { useSearchParams } from "react-router-dom"
+import { useCallback, useEffect, useMemo, useSelector, useState } from "../base/react_base"
+import { safeParseInt } from "../base/util"
 import { AppState, User } from "../base/reducers"
+import { apiCall as getUser, Response as GetUserResponse } from "../api/get_user"
+import MyAccount from "./my_account"
+import PublicProfile from "./public_profile"
 
 export default function UserProfile() {
-  const [user, setUser] = useState<User | null>(null)
-  const [crop, setCrop] = useState<Crop>()
-
   const activeUser = useSelector((state: AppState) => state.user)
 
-  useEffect(() => {
-    if (activeUser) {
+  const [searchParams] = useSearchParams()
+  const params = useMemo(() => Object.fromEntries([...searchParams]), [searchParams])
+  const userId = safeParseInt(params.id)
+
+  const [user, setUser] = useState<User | null>(null)
+
+  const fetchUser = useCallback(() => {
+    if (userId) {
       getUser(
-        null,
+        { userId },
         (response: GetUserResponse) => {
           setUser({
             email: response[0].email,
@@ -24,41 +27,23 @@ export default function UserProfile() {
             lastName: response[0].lastName,
             bio: response[0]?.bio || "",
             image: response[0]?.image || "",
-            id: activeUser.id,
+            id: userId,
           })
         },
         () => {},
       )
     }
-  }, [activeUser])
+  }, [userId])
 
-  return (
-    <Row>
-      <h1 className="column-heading-centered">My Account</h1>
-      <Col xs={3} />
-      <Col xs={6}>
-        <ReactCrop crop={crop} onChange={(c) => setCrop(c)}>
-          <img alt="profile" src={`/${user?.image}`} style={{ maxWidth: "100%" }} />
-        </ReactCrop>
-        <div className="profile-metadata">
-          <h2>
-            <span contentEditable="true" spellCheck="false">
-              {user?.firstName}
-            </span>{" "}
-            <span contentEditable="true" spellCheck="false">
-              {user?.lastName}
-            </span>{" "}
-            <span>
-              <FontAwesomeIcon icon="pen-to-square" size="xs" />
-            </span>
-          </h2>
-          <h3 contentEditable="true" spellCheck="false">{`${user?.email}`}</h3>
-          <p contentEditable="true" spellCheck="false">
-            {user?.bio}
-          </p>
-        </div>
-      </Col>
-      <Col xs={3} />
-    </Row>
-  )
+  useEffect(() => {
+    fetchUser()
+  }, [fetchUser, userId])
+
+  if (user) {
+    if (userId === activeUser?.id) {
+      return <MyAccount originalUser={user} updateOriginalUser={setUser} fetchUser={fetchUser} />
+    }
+    return <PublicProfile user={user} />
+  }
+  return <div />
 }

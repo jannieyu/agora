@@ -109,7 +109,6 @@ function ListingForm() {
   const [submitting, setSubmitting] = useState<boolean>(false)
   const [showSuccessModal, setShowSuccessModal] = useState<boolean>(false)
   const [showFailureModal, setShowFailureModal] = useState<boolean>(false)
-  const [imageError, setImageError] = useState<boolean>(false)
 
   const [searchParams] = useSearchParams()
   const params = useMemo(() => Object.fromEntries([...searchParams]), [searchParams])
@@ -155,8 +154,7 @@ function ListingForm() {
     condition &&
     description &&
     imageURL &&
-    isValidPrice(startingPrice) &&
-    !imageError
+    isValidPrice(startingPrice)
 
   const handleChangeName = useCallback(
     (e: React.FormEvent<HTMLInputElement>) => {
@@ -215,23 +213,12 @@ function ListingForm() {
   const handleChangeImage = useCallback(
     (files: File[]) => {
       const imageFile = files[0]
-      if (
-        imageFile.name.endsWith(".png") ||
-        imageFile.name.endsWith(".jpg") ||
-        imageFile.name.endsWith(".gif")
-      ) {
-        setImageError(false)
-        const reader = new FileReader()
-        reader.onload = (e) => {
-          dispatch(updateListingState({ imageURL: e.target.result as string }))
-        }
-        reader.readAsDataURL(imageFile)
-        setImage(imageFile)
-      } else {
-        setImageError(true)
-        setImage(null)
-        dispatch(updateListingState({ imageURL: "" }))
+      const reader = new FileReader()
+      reader.onload = (e) => {
+        dispatch(updateListingState({ imageURL: e.target.result as string }))
       }
+      reader.readAsDataURL(imageFile)
+      setImage(imageFile)
     },
     [dispatch],
   )
@@ -241,7 +228,6 @@ function ListingForm() {
     formData.append("name", name)
     formData.append("category", category)
     formData.append("condition", condition)
-    formData.append("price", startingPrice)
     formData.append("description", description)
     if (image) {
       formData.append("image", image, image.name)
@@ -249,13 +235,16 @@ function ListingForm() {
     if (id) {
       formData.append("id", id)
     }
+    if (bids?.length === 0 || !id) {
+      formData.append("price", startingPrice)
+    }
 
     setSubmitting(true)
     const response = await fetch("/api/add_item", {
       method: "POST",
       body: formData,
     })
-    if (response.status >= 200 && response.status <= 299) {
+    if (response.ok) {
       setSubmitting(false)
       setShowSuccessModal(true)
       setShowFailureModal(false)
@@ -264,11 +253,11 @@ function ListingForm() {
       setShowSuccessModal(false)
       setShowFailureModal(true)
     }
-  }, [name, category, condition, startingPrice, description, image, id])
+  }, [name, category, condition, startingPrice, description, image, id, bids?.length])
 
   const submitBtn = (
     <Button type="submit" disabled={!canSubmit} loading={submitting} onClick={onSubmit} positive>
-      Finish and List
+      {id ? "Update Item" : "Finish and List"}
     </Button>
   )
 
@@ -322,11 +311,6 @@ function ListingForm() {
     </OverlayTrigger>
   )
 
-  const dropzoneAreaMessage = imageError
-    ? "Error uploading image: file type not supported"
-    : "Drag and drop an image of the listed item, or click to upload"
-  const dropzoneAreaClass = imageError ? "droparea-error" : "droparea-text"
-
   const currTime = DateTime.now().toISO()
 
   if (sellerId && sellerId !== user?.id) {
@@ -345,7 +329,7 @@ function ListingForm() {
       />
       <Row>
         <Col xs="6">
-          <h1 className="column-heading-centered">Enter Listing Details</h1>
+          <h1 className="text-centered">Enter Listing Details</h1>
           <br />
           <Form>
             <Row>
@@ -387,12 +371,18 @@ function ListingForm() {
             </Row>
             <br />
             <Row>
-              <Dropzone onDrop={handleChangeImage}>
+              <Dropzone
+                onDrop={handleChangeImage}
+                accept={{ "image/*": [".jpeg", ".png", ".gif"] }}
+              >
                 {({ getRootProps, getInputProps }) => (
                   <div {...getRootProps()}>
-                    <div className="droparea">
+                    <div className="droparea-listing">
                       <input {...getInputProps()} />
-                      <b className={dropzoneAreaClass}>{image?.name || dropzoneAreaMessage}</b>
+                      <b className="droparea-text">
+                        {image?.name ||
+                          "Drag and drop an image of the listed item, or click to upload"}
+                      </b>
                     </div>
                   </div>
                 )}
@@ -414,7 +404,7 @@ function ListingForm() {
           </Form>
         </Col>
         <Col xs="6">
-          <h1 className="column-heading-centered">Preview (Buyer View)</h1>
+          <h1 className="text-centered">Preview (Buyer View)</h1>
           <br />
           <Listing
             name={name}

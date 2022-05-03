@@ -2,26 +2,30 @@ package api
 
 import (
 	"agora/src/app/database"
-	u "agora/src/app/user"
-	log "github.com/sirupsen/logrus"
+	"encoding/json"
 	"net/http"
+
+	log "github.com/sirupsen/logrus"
 )
 
 func (h Handle) GetUser(w http.ResponseWriter, r *http.Request) {
-	loginUserId, err := u.GetAuthorizedUserId(h.Store, r)
-	if err != nil {
-		log.WithError(err).Error("Failed to get cookie session when authorized user id.")
-		w.WriteHeader(http.StatusInternalServerError)
+	urlParams := r.URL.Query()["data"][0]
+	payload := struct {
+		UserId uint32
+	}{}
+	if err := json.Unmarshal([]byte(urlParams), &payload); err != nil {
+		log.WithError(err).Error("Failed to unmarshal user id while getting user.")
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	if loginUserId == 0 {
-		log.Error("Cannot get user info without login.")
+	if payload.UserId == 0 {
+		log.Error("Cannot get user info without specified user id.")
 		w.WriteHeader(http.StatusForbidden)
 		return
 	}
 	var result []database.User
 	if err := h.Db.Model(&database.User{}).Select("first_name", "last_name", "email", "image", "bio").Where(
-		"id = ?", loginUserId).Find(&result).Error; err != nil {
+		"id = ?", payload.UserId).Find(&result).Error; err != nil {
 		log.WithError(err).Error("Failed to query user info.")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
