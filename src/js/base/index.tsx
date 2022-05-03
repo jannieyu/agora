@@ -36,10 +36,6 @@ import {
   API_ARGS as LOGIN_STATUS_ARGS,
   Response as LoginStatusResponse,
 } from "../api/get_login_status"
-import {
-  apiCall as getNotifications,
-  Response as GetNotificationsResponse,
-} from "../api/get_notifications"
 import { rootReducer, AppState } from "./reducers"
 import { setData, clearListingState } from "./actions"
 import Unauthorized from "./unauthorized"
@@ -74,7 +70,9 @@ function Base(props: BaseProps) {
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const location = useLocation()
-  const { user, showLoginModal, isSignUp, notifications } = useSelector((state: AppState) => state)
+  const { user, showLoginModal, isSignUp, numUnseenNotifs } = useSelector(
+    (state: AppState) => state,
+  )
 
   const requiresAuth = LOGGED_IN_PATHS.has(location.pathname)
 
@@ -149,24 +147,7 @@ function Base(props: BaseProps) {
     )
   }, [dispatch])
 
-  useEffect(() => {
-    if (user) {
-      getNotifications(
-        {},
-        (notificationResponse: GetNotificationsResponse) => {
-          dispatch(
-            setData({
-              notifications: notificationResponse || [],
-            }),
-          )
-        },
-        () => {},
-      )
-    }
-  }, [dispatch, user])
-
-  const numNewNotifications = notifications.filter((notif) => !notif.seen).length
-  const notifStrLen = numNewNotifications.toString().length
+  const notifStrLen = numUnseenNotifs.toString().length
   const topNotifBubbleWidth = `${notifStrLen * 0.15 + 0.9}rem`
   const bottomNotifBubbleWidth = `${notifStrLen * 0.2 + 1.2}rem`
 
@@ -198,19 +179,17 @@ function Base(props: BaseProps) {
                     <div className="name-trigger">
                       <span
                         style={
-                          numNewNotifications
-                            ? { marginRight: `${(notifStrLen - 1) * 0.2}rem` }
-                            : null
+                          numUnseenNotifs ? { marginRight: `${(notifStrLen - 1) * 0.2}rem` } : null
                         }
                       >{`${user.firstName} ${user.lastName}`}</span>
-                      {numNewNotifications > 0 ? (
+                      {numUnseenNotifs > 0 ? (
                         <div
                           className="res-circle"
                           style={{
                             width: topNotifBubbleWidth,
                           }}
                         >
-                          <div className="circle-txt">{numNewNotifications}</div>
+                          <div className="circle-txt">{numUnseenNotifs}</div>
                         </div>
                       ) : null}
                     </div>
@@ -221,14 +200,14 @@ function Base(props: BaseProps) {
                     <Dropdown.Item onClick={onClickNotifications}>
                       <div className="notif-dropdown">
                         Notifications{" "}
-                        {numNewNotifications > 0 ? (
+                        {numUnseenNotifs > 0 ? (
                           <div
                             className="res-circle"
                             style={{
                               width: bottomNotifBubbleWidth,
                             }}
                           >
-                            <div className="circle-txt">{numNewNotifications}</div>
+                            <div className="circle-txt">{numUnseenNotifs}</div>
                           </div>
                         ) : null}
                       </div>
