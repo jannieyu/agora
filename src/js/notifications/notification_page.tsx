@@ -4,11 +4,15 @@ import { useNavigate } from "react-router-dom"
 import { Button } from "semantic-ui-react"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { IconProp } from "@fortawesome/fontawesome-svg-core"
-import { useCallback, useDispatch, useSelector } from "../base/react_base"
+import { useCallback, useDispatch, useEffect, useState, useSelector } from "../base/react_base"
 import { AppState, Notification, NotificationType } from "../base/reducers"
-import { updateNotification } from "../base/actions"
+import { clearNotifcation, setData } from "../base/actions"
 import { safeParseFloat } from "../base/util"
 import { apiCall as updateSeenNotifications } from "../api/update_seen_notifications"
+import {
+  apiCall as getNotifications,
+  Response as GetNotificationsResponse,
+} from "../api/get_notifications"
 
 const iconMap = new Map<NotificationType, IconProp>([
   [NotificationType.WON, "thumbs-up"],
@@ -34,8 +38,14 @@ const colorMap = new Map([
   [NotificationType.BIDBOT_DEACTIVATED_ITEM_DELISTED, "red"],
 ])
 
-function LineItem(props: Notification) {
-  const { id, noteType, seen, itemId, price, itemName, user } = props
+interface LineItemProps {
+  notification: Notification
+  viewNotification: (id: number) => void
+}
+
+function LineItem(props: LineItemProps) {
+  const { notification, viewNotification } = props
+  const { id, noteType, seen, itemId, price, itemName, user } = notification
 
   const navigate = useNavigate()
   const dispatch = useDispatch()
@@ -112,13 +122,14 @@ function LineItem(props: Notification) {
   })()
 
   const dismiss = useCallback(() => {
-    dispatch(updateNotification({ seen: true }, id))
+    dispatch(clearNotifcation())
+    viewNotification(id)
     updateSeenNotifications(
       { noteIds: [id] },
       () => {},
       () => {},
     )
-  }, [dispatch, id])
+  }, [dispatch, id, viewNotification])
 
   const onClick = () => {
     dismiss()
@@ -168,7 +179,35 @@ function LineItem(props: Notification) {
 }
 
 export default function NotificationPage() {
-  const notifications = useSelector((state: AppState) => state.notifications)
+  const { user } = useSelector((state: AppState) => state)
+  const [notifications, setNotifcations] = useState<Notification[]>([])
+  const dispatch = useDispatch()
+
+  useEffect(() => {
+    if (user) {
+      getNotifications(
+        {},
+        (notificationResponse: GetNotificationsResponse) => {
+          setNotifcations(notificationResponse || [])
+          dispatch(
+            setData({
+              numUnseenNotifs: notificationResponse.filter((notif) => !notif.seen).length,
+            }),
+          )
+        },
+        () => {},
+      )
+    }
+  }, [dispatch, user])
+
+  const viewNotification = useCallback(
+    (id: number) => {
+      setNotifcations(
+        notifications.map((notif) => (notif.id === id ? { ...notif, seen: true } : notif)),
+      )
+    },
+    [notifications],
+  )
 
   return (
     <Row>
@@ -176,7 +215,11 @@ export default function NotificationPage() {
       <Col xs={8}>
         <h1 className="text-centered">Notifications</h1>
         {notifications.map((notification: Notification) => (
-          <LineItem {...notification} key={notification.id} />
+          <LineItem
+            notification={notification}
+            key={notification.id}
+            viewNotification={viewNotification}
+          />
         ))}
       </Col>
       <Col xs={2} />

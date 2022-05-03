@@ -72,8 +72,8 @@ const initialState = {
   showLoginModal: false as boolean,
   isSignUp: true as boolean,
   searchItems: [] as SearchItem[],
-  notifications: [] as Notification[],
   listingState: {} as ListingState,
+  numUnseenNotifs: 0 as number,
 }
 
 export type AppState = typeof initialState
@@ -81,10 +81,9 @@ export type AppState = typeof initialState
 export enum ActionType {
   SET_DATA = "SET_DATA",
   UPDATE_SEARCH_ITEM = "UPDATE_SEARCH_ITEM",
-  CREATE_NOTIFICATION = "CREATE_NOTIFICATION",
-  UPDATE_NOTIFICATION = "UPDATE_NOTIFICATION",
   UPDATE_LISTING_STATE = "UPDATE_LISTING_STATE",
   CLEAR_LISTING_STATE = "CLEAR_LISTING_STATE",
+  CLEAR_NOTIFICATION = "CLEAR_NOTIFICATION",
 }
 
 export type SearchItemAction = {
@@ -93,17 +92,7 @@ export type SearchItemAction = {
   newBid?: BidHistory
 }
 
-export type NotificationAction = {
-  data: Partial<Notification>
-  notificationId: number
-}
-
-export type ActionPayload =
-  | Partial<AppState>
-  | SearchItemAction
-  | Notification
-  | NotificationAction
-  | Partial<ListingState>
+export type ActionPayload = Partial<AppState> | SearchItemAction | Partial<ListingState>
 
 export interface Action {
   type: ActionType
@@ -131,26 +120,6 @@ export const rootReducer = (state: AppState = initialState, action: Action) => {
         ),
       }
     }
-    case ActionType.CREATE_NOTIFICATION: {
-      return {
-        ...state,
-        notifications: [...state.notifications, action.payload],
-      }
-    }
-    case ActionType.UPDATE_NOTIFICATION: {
-      const { data, notificationId } = action.payload as NotificationAction
-      return {
-        ...state,
-        notifications: state.notifications.map((notification: Notification) =>
-          notification.id === notificationId
-            ? {
-                ...notification,
-                ...data,
-              }
-            : notification,
-        ),
-      }
-    }
     case ActionType.UPDATE_LISTING_STATE: {
       const listingState = action.payload as ListingState
       return {
@@ -162,6 +131,12 @@ export const rootReducer = (state: AppState = initialState, action: Action) => {
       return {
         ...state,
         listingState: {},
+      }
+    }
+    case ActionType.CLEAR_NOTIFICATION: {
+      return {
+        ...state,
+        numUnseenNotifs: Math.max(0, state.numUnseenNotifs - 1),
       }
     }
     default: {
