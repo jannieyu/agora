@@ -4,6 +4,7 @@ import (
 	"agora/src/app/api"
 	"agora/src/app/database"
 	"agora/src/app/search"
+	"agora/src/app/ws"
 	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
@@ -29,8 +30,13 @@ func main() {
 		log.WithError(err).Fatal("Cannot create index file.")
 	}
 
-	h := api.New(index, db, sessions.NewCookieStore(key))
+	hub := ws.NewHub()
+	go hub.Run()
+
+	h := api.New(index, db, hub, sessions.NewCookieStore(key))
 	r := mux.NewRouter()
+
+	r.HandleFunc("/ws", h.Ws)
 
 	r.HandleFunc("/api/example", h.Authenticate)
 	r.HandleFunc("/api/login", h.Login)
@@ -38,6 +44,7 @@ func main() {
 	r.HandleFunc("/api/get_login_status", h.GetLoginStatus)
 	r.HandleFunc("/api/get_user", h.GetUser)
 	r.HandleFunc("/api/update_user", h.UpdateUser)
+
 	r.HandleFunc("/api/get_item", h.GetItem)
 	r.HandleFunc("/api/add_item", h.AddOrUpdateItem)
 	r.HandleFunc("/api/delist_item", h.DelistItem)

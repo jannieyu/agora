@@ -1,6 +1,7 @@
 package api
 
 import (
+	"agora/src/app/ws"
 	"encoding/json"
 	"github.com/blevesearch/bleve/v2"
 	"github.com/gorilla/sessions"
@@ -12,11 +13,12 @@ import (
 type Handle struct {
 	Index bleve.Index
 	Db    *gorm.DB
+	Hub   *ws.Hub
 	Store *sessions.CookieStore
 }
 
-func New(index bleve.Index, db *gorm.DB, store *sessions.CookieStore) Handle {
-	return Handle{index, db, store}
+func New(index bleve.Index, db *gorm.DB, hub *ws.Hub, store *sessions.CookieStore) Handle {
+	return Handle{index, db, hub, store}
 }
 
 func SafeEncode(w http.ResponseWriter, v interface{}) {
