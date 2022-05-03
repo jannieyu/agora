@@ -6,10 +6,11 @@ import (
 	"agora/src/app/search"
 	"agora/src/app/ws"
 	"fmt"
+	"net/http"
+
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
 	log "github.com/sirupsen/logrus"
-	"net/http"
 )
 
 var (
@@ -36,7 +37,7 @@ func main() {
 	h := api.New(index, db, hub, sessions.NewCookieStore(key))
 	r := mux.NewRouter()
 
-	r.HandleFunc("/ws", h.Ws)
+	r.HandleFunc("/api/ws", h.Ws)
 
 	r.HandleFunc("/api/example", h.Authenticate)
 	r.HandleFunc("/api/login", h.Login)

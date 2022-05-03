@@ -19,6 +19,7 @@ import {
   Provider,
   configureStore,
   useSelector,
+  useState,
   useEffect,
 } from "./react_base"
 import Home from "./home"
@@ -36,8 +37,8 @@ import {
   API_ARGS as LOGIN_STATUS_ARGS,
   Response as LoginStatusResponse,
 } from "../api/get_login_status"
-import { rootReducer, AppState } from "./reducers"
-import { setData, clearListingState } from "./actions"
+import { rootReducer, AppState, Broadcast, BroadcastType } from "./reducers"
+import { setData, clearListingState, receiveNotification } from "./actions"
 import Unauthorized from "./unauthorized"
 
 interface BaseProps {
@@ -73,6 +74,8 @@ function Base(props: BaseProps) {
   const { user, showLoginModal, isSignUp, numUnseenNotifs } = useSelector(
     (state: AppState) => state,
   )
+
+  const [ws, setWs] = useState<WebSocket | null>(null)
 
   const requiresAuth = LOGGED_IN_PATHS.has(location.pathname)
 
@@ -148,10 +151,27 @@ function Base(props: BaseProps) {
             }),
           )
         }
+        setWs(new WebSocket("ws://localhost:8000/api/ws"))
       },
       () => {},
     )
   }, [dispatch])
+
+  useEffect(() => {
+    if (ws) {
+      ws.onopen = () => {}
+
+      ws.onmessage = (evt) => {
+        // listen to data sent from the websocket server
+        const message: Broadcast = JSON.parse(evt.data)
+        if (message.broadcastType === BroadcastType.NEW_NOTIFICATION) {
+          dispatch(receiveNotification())
+        }
+      }
+
+      ws.onclose = () => {}
+    }
+  }, [ws, dispatch])
 
   const notifStrLen = numUnseenNotifs.toString().length
   const topNotifBubbleWidth = `${notifStrLen * 0.15 + 0.9}rem`

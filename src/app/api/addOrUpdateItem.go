@@ -18,6 +18,8 @@ func (h Handle) AddOrUpdateItem(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
+	log.Info("addOrUpdateItem", sellerID)
+
 	if sellerID == 0 {
 		log.Error("Cannot add or update item to unauthenticated user.")
 		w.WriteHeader(http.StatusForbidden)

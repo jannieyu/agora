@@ -22,3 +22,5 @@ export const updateListingState = (data: Partial<ListingState>) => ({
 export const clearListingState = () => ({ type: ActionType.CLEAR_LISTING_STATE })
 
 export const clearNotifcation = () => ({ type: ActionType.CLEAR_NOTIFICATION })
+
+export const receiveNotification = () => ({ type: ActionType.RECEIVE_NOTIFICATION })
