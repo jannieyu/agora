@@ -234,7 +234,9 @@ func createBidBotDeactivateNotification(db *gorm.DB, hub *ws.Hub, bidBot *databa
 	if err := db.Create(&notification).Error; err != nil {
 		return err
 	}
-	if err := hub.BroadcastMessage([]uint32{notification.ReceiverID}, ws.BroadcastAPI{ws.NEW_NOTIFICATION}); err != nil {
+	if err := hub.BroadcastMessage([]uint32{notification.ReceiverID}, ws.BroadcastAPI{
+		BroadcastType: ws.NEW_NOTIFICATION,
+	}); err != nil {
 		return err
 	}
 	return nil

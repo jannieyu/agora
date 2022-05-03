@@ -6,8 +6,12 @@ import (
 	"agora/src/app/database"
 	"agora/src/app/item"
 	"agora/src/app/notification"
+	"agora/src/app/ws"
 	"encoding/json"
+	"errors"
 	"net/http"
+
+	"gorm.io/gorm"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -67,7 +71,36 @@ func (h Handle) AddBid(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	w.WriteHeader(http.StatusCreated)
-	SafeEncode(w, "{}")
-	log.Info("Completed bid upload.")
+	if err := BroadcastNewBid(h.Hub, h.Db, bidAPI.ItemID); err != nil {
+		log.WithError(err).Error("Failed to broadcast new bid.")
+	} else {
+		w.WriteHeader(http.StatusCreated)
+		SafeEncode(w, "{}")
+		log.Info("Completed bid upload.")
+	}
+}
+
+func getHighestBidOfItem(db *gorm.DB, itemId uint32) (database.Bid, error) {
+	var bid database.Bid
+	if err := db.Omit("bot_id").Where("item_id = ?", itemId).Find(&bid).Error; err != nil {
+		return database.Bid{}, err
+	}
+	if bid.ID == 0 {
+		return database.Bid{}, errors.New("Failed to find highest bid of item.")
+	}
+	return bid, nil
+}
+
+func BroadcastNewBid(hub *ws.Hub, db *gorm.DB, itemId uint32) error {
+	newBid, err := getHighestBidOfItem(db, itemId)
+	if err != nil {
+		return err
+	}
+	if err := hub.BroadcastMessage([]uint32{}, ws.BroadcastAPI{
+		BroadcastType: ws.NEW_BID,
+		Data:          newBid,
+	}); err != nil {
+		return err
+	}
+	return nil
 }

@@ -4,6 +4,7 @@ import (
 	"agora/src/app/database"
 	i "agora/src/app/item"
 	"agora/src/app/user"
+	"agora/src/app/ws"
 	"net/http"
 	"strconv"
 	"strings"
@@ -18,7 +19,6 @@ func (h Handle) AddOrUpdateItem(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	log.Info("addOrUpdateItem", sellerID)
 
 	if sellerID == 0 {
 		log.Error("Cannot add or update item to unauthenticated user.")
@@ -65,6 +65,12 @@ func (h Handle) AddOrUpdateItem(w http.ResponseWriter, r *http.Request) {
 		log.WithError(err).Error("Failed to index item.")
 	}
 	if itemId > 0 {
+		if err := h.Hub.BroadcastMessage([]uint32{}, ws.BroadcastAPI{
+			BroadcastType: ws.UPDATE_ITEM,
+			Data:          item,
+		}); err != nil {
+			log.WithError(err).Error("Failed to broadcast item update.")
+		}
 		w.WriteHeader(http.StatusOK)
 	} else {
 		w.WriteHeader(http.StatusCreated)

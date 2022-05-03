@@ -10,6 +10,8 @@ type BroadcastType string
 
 const (
 	NEW_NOTIFICATION BroadcastType = "NEW_NOTIFICATION"
+	NEW_BID          BroadcastType = "NEW_BID"
+	UPDATE_ITEM      BroadcastType = "UPDATE_ITEM"
 )
 
 type WSMessage struct {
@@ -19,6 +21,7 @@ type WSMessage struct {
 
 type BroadcastAPI struct {
 	BroadcastType BroadcastType `json:"broadcastType"`
+	Data          any           `json:"data,omitempty"`
 }
 
 // Hub maintains the set of active clients and broadcasts messages to the

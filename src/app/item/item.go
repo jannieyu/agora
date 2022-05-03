@@ -68,12 +68,13 @@ func PopulateItem(item *database.Item, r *http.Request) error {
 	}
 
 	if item.ID == 0 || (item.ID > 0 && item.NumBids == 0) {
-		startingPrice, err := ConvertStringPriceToDecimal(r.FormValue("price"))
+		newStartingPrice, err := ConvertStringPriceToDecimal(r.FormValue("price"))
 		if err != nil {
 			log.WithError(err).Error("Failed to parse starting price value.")
 			return err
 		}
-		item.StartingPrice = startingPrice
+
+		item.StartingPrice = newStartingPrice
 		item.HighestBid = item.StartingPrice
 		item.Active = true
 	} else if !strings.EqualFold(r.FormValue("price"), "") {

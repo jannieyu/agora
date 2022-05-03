@@ -61,9 +61,13 @@ func (h Handle) AddOrUpdateBidBot(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	log.Info("Created or updated new bid bot.")
-	w.WriteHeader(http.StatusOK)
-	SafeEncode(w, "{}")
+	if err := BroadcastNewBid(h.Hub, h.Db, bot.ItemID); err != nil {
+		log.WithError(err).Error("Failed to broadcast new bid.")
+	} else {
+		log.Info("Created or updated new bid bot.")
+		w.WriteHeader(http.StatusOK)
+		SafeEncode(w, "{}")
+	}
 }
 
 func populateBidBot(bidBotAPI bidBot.BidBotAPI, ownerId uint32) (database.BidBot, error) {

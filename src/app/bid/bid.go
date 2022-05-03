@@ -63,7 +63,8 @@ func CreateNotification(db *gorm.DB, hub *ws.Hub, note database.Notification) er
 	if err := db.Create(&note).Error; err != nil {
 		return err
 	}
-	if err := hub.BroadcastMessage([]uint32{note.ReceiverID}, ws.BroadcastAPI{ws.NEW_NOTIFICATION}); err != nil {
+	if err := hub.BroadcastMessage([]uint32{note.ReceiverID}, ws.BroadcastAPI{
+		BroadcastType: ws.NEW_NOTIFICATION}); err != nil {
 		return err
 	}
 	return nil
