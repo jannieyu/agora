@@ -8,6 +8,7 @@ export type Response = {
   firstName: string
   lastName: string
   id: number
+  newNotificationCount: number
 }
 
 export const apiCall = buildWrappedGet<Arguments, Response>("/api/get_login_status")

@@ -3,10 +3,11 @@ package api
 import (
 	"agora/src/app/database"
 	"agora/src/app/user"
+	"net/http"
+
 	"github.com/gorilla/sessions"
 	log "github.com/sirupsen/logrus"
 	"gorm.io/gorm"
-	"net/http"
 )
 
 func getUser(db *gorm.DB, store *sessions.CookieStore, r *http.Request) (database.User, error) {
@@ -31,11 +32,31 @@ func getUser(db *gorm.DB, store *sessions.CookieStore, r *http.Request) (databas
 	return activeUser, nil
 }
 
+type LoginStatusAPI struct {
+	database.User
+	Count int64 `json:"newNotificationCount"`
+}
+
 func (h Handle) GetLoginStatus(w http.ResponseWriter, r *http.Request) {
 	user, err := getUser(h.Db, h.Store, r)
+
 	if err != nil {
 		log.WithError(err).Error("Failed to get user from database.")
 		w.WriteHeader(http.StatusInternalServerError)
 	}
-	SafeEncode(w, user)
+
+	var count int64
+	if err = h.Db.Model(&database.Notification{}).Where(
+		"seen = ? and receiver_id = ?", false, user.ID,
+	).Count(&count).Error; err != nil {
+		log.WithError(err).Error("Failed to get count of unseen notifications from database.")
+		w.WriteHeader(http.StatusInternalServerError)
+	}
+
+	response := LoginStatusAPI{
+		User:  user,
+		Count: count,
+	}
+
+	SafeEncode(w, response)
 }

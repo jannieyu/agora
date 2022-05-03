@@ -138,7 +138,13 @@ function Base(props: BaseProps) {
         if (data.email) {
           dispatch(
             setData({
-              user: data,
+              user: {
+                id: data.id,
+                email: data.email,
+                firstName: data.firstName,
+                lastName: data.lastName,
+              },
+              numUnseenNotifs: data.newNotificationCount,
             }),
           )
         }
