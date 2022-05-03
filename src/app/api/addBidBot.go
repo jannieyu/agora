@@ -54,7 +54,7 @@ func (h Handle) AddOrUpdateBidBot(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if !hasExistingAndActiveBidBot {
-		if statusCode, err := bidBot.RunBotAgainstBot(h.Db, bot); err != nil {
+		if statusCode, err := bidBot.RunBotAgainstBot(h.Db, h.Hub, bot); err != nil {
 			log.WithError(err).Error("Error running bot against bot.")
 			w.WriteHeader(statusCode)
 			return
