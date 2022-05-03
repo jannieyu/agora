@@ -72,6 +72,22 @@ func (h Handle) Login(w http.ResponseWriter, r *http.Request) {
 		status.FirstName = user.FirstName
 		status.LastName = user.LastName
 		status.ID = user.ID
+
+		var count int64
+		if err = h.Db.Model(&database.Notification{}).Where(
+			"seen = ? and receiver_id = ?", false, user.ID,
+		).Count(&count).Error; err != nil {
+			log.WithError(err).Error("Failed to get count of unseen notifications from database.")
+			w.WriteHeader(http.StatusInternalServerError)
+		}
+
+		response := u.LoginStatusAPI{
+			User:  status,
+			Count: count,
+		}
+
+		SafeEncode(w, response)
+
 		log.Info("Successful authentication of user.")
 
 	} else {
@@ -79,5 +95,4 @@ func (h Handle) Login(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusUnauthorized)
 		SafeEncode(w, "{}")
 	}
-	SafeEncode(w, status)
 }
