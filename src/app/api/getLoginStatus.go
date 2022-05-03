@@ -2,7 +2,7 @@ package api
 
 import (
 	"agora/src/app/database"
-	"agora/src/app/user"
+	u "agora/src/app/user"
 	"net/http"
 
 	"github.com/gorilla/sessions"
@@ -17,7 +17,7 @@ func getUser(db *gorm.DB, store *sessions.CookieStore, r *http.Request) (databas
 		return database.User{}, err
 	}
 
-	id, err := user.GetAuthorizedUserId(store, r)
+	id, err := u.GetAuthorizedUserId(store, r)
 	if err != nil {
 		return database.User{}, err
 	}
@@ -30,11 +30,6 @@ func getUser(db *gorm.DB, store *sessions.CookieStore, r *http.Request) (databas
 		activeUser.Pword = ""
 	}
 	return activeUser, nil
-}
-
-type LoginStatusAPI struct {
-	database.User
-	Count int64 `json:"newNotificationCount"`
 }
 
 func (h Handle) GetLoginStatus(w http.ResponseWriter, r *http.Request) {
@@ -53,7 +48,7 @@ func (h Handle) GetLoginStatus(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 	}
 
-	response := LoginStatusAPI{
+	response := u.LoginStatusAPI{
 		User:  user,
 		Count: count,
 	}
