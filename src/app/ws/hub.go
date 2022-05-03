@@ -2,6 +2,7 @@ package ws
 
 import (
 	"encoding/json"
+
 	log "github.com/sirupsen/logrus"
 )
 
@@ -17,7 +18,7 @@ type WSMessage struct {
 }
 
 type BroadcastAPI struct {
-	BroadcastType BroadcastType
+	BroadcastType BroadcastType `json:"broadcastType"`
 }
 
 // Hub maintains the set of active clients and broadcasts messages to the

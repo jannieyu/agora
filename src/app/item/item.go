@@ -80,14 +80,17 @@ func PopulateItem(item *database.Item, r *http.Request) error {
 		return errors.New("Failed to enter starting price value; can only make changes if item is new or listed item has zero bids.")
 	}
 
-	if image_location, err := ProcessImage(r, ITEMS_FOLDER); err != nil {
+	imageLocation, err := ProcessImage(r, ITEMS_FOLDER)
+	if err != nil {
+		return err
+	}
+
+	if strings.EqualFold(imageLocation, "") {
 		if item.ID == 0 {
-			return err
-		} else {
-			log.Info("No image given while updating item.")
+			return errors.New("No image given while creating new item.")
 		}
 	} else {
-		item.Image = image_location
+		item.Image = imageLocation
 	}
 
 	return nil

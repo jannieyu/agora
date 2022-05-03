@@ -1,3 +1,11 @@
+export enum BroadcastType {
+  NEW_NOTIFICATION = "NEW_NOTIFICATION",
+}
+
+export interface Broadcast {
+  broadcastType: BroadcastType
+}
+
 export interface User {
   id: number
   firstName: string
@@ -84,6 +92,8 @@ export enum ActionType {
   UPDATE_LISTING_STATE = "UPDATE_LISTING_STATE",
   CLEAR_LISTING_STATE = "CLEAR_LISTING_STATE",
   CLEAR_NOTIFICATION = "CLEAR_NOTIFICATION",
+  RECEIVE_NOTIFICATION = "RECEIVE_NOTIFICATION",
+  OPEN_WEBSOCKET = "OPEN_WEBSOCKET",
 }
 
 export type SearchItemAction = {
@@ -137,6 +147,12 @@ export const rootReducer = (state: AppState = initialState, action: Action) => {
       return {
         ...state,
         numUnseenNotifs: Math.max(0, state.numUnseenNotifs - 1),
+      }
+    }
+    case ActionType.RECEIVE_NOTIFICATION: {
+      return {
+        ...state,
+        numUnseenNotifs: state.numUnseenNotifs + 1,
       }
     }
     default: {
