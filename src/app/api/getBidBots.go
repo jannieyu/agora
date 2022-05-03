@@ -16,6 +16,7 @@ type BidBotAPI struct {
 	ItemName       string          `json:"itemName,omitempty"`
 	ItemImage      string          `json:"itemImage,omitempty"`
 	HighestItemBid decimal.Decimal `json:"highestItemBid,omitempty"`
+	ActiveItem     bool            `json:"activeItem,omitempty"`
 	MaxBid         decimal.Decimal `json:"maxBid,omitempty" gorm:"type:decimal(6,2);"`
 	HighestBotBid  decimal.Decimal `json:"highestBotBid,omitempty"`
 	Active         bool            `json:"active,omitempty"`
@@ -47,9 +48,10 @@ func (h Handle) GetBidBots(w http.ResponseWriter, r *http.Request) {
 			Name       string
 			Image      string
 			HighestBid decimal.Decimal
+			Active     bool
 		}{}
 		if err := h.Db.Model(&database.Item{}).Select(
-			"name, image, highest_bid").Where(
+			"name, image, highest_bid, active").Where(
 			"id = ?", r.ItemID).Find(&item).Error; err != nil {
 		}
 		bot := BidBotAPI{
@@ -58,6 +60,7 @@ func (h Handle) GetBidBots(w http.ResponseWriter, r *http.Request) {
 			ItemName:       item.Name,
 			ItemImage:      item.Image,
 			HighestItemBid: item.HighestBid,
+			ActiveItem:     item.Active,
 			MaxBid:         r.MaxBid,
 			Active:         r.Active,
 		}

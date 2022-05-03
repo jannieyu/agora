@@ -39,9 +39,9 @@ export default function Card(props: CardProps) {
   const onEdit = useCallback(
     (e: React.FormEvent<HTMLInputElement>) => {
       e.stopPropagation()
-      navigate("/create_listing")
+      navigate(`/update_listing/?id=${itemId}`)
     },
-    [navigate],
+    [navigate, itemId],
   )
 
   return (

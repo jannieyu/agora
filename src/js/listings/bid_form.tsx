@@ -227,10 +227,11 @@ interface BidFormProps {
   itemId: number
   handleSuccess: (message: string) => void
   bidderId: number
+  defaultAutomatic?: boolean
 }
 
 export default function BidForm(props: BidFormProps) {
-  const { priceStr } = props
+  const { priceStr, defaultAutomatic } = props
 
   const price = safeParseFloat(priceStr)
   const minIncrement = calculateIncrement(price)
@@ -246,5 +247,9 @@ export default function BidForm(props: BidFormProps) {
     },
   ]
 
-  return <Tab panes={panes} />
+  return <Tab panes={panes} defaultActiveIndex={defaultAutomatic ? 1 : 0} />
+}
+
+BidForm.defaultProps = {
+  defaultAutomatic: false,
 }

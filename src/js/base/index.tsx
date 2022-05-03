@@ -41,14 +41,21 @@ import {
   Response as GetNotificationsResponse,
 } from "../api/get_notifications"
 import { rootReducer, AppState } from "./reducers"
-import { setData } from "./actions"
+import { setData, clearListingState } from "./actions"
+import Unauthorized from "./unauthorized"
 
 interface BaseProps {
   children: React.ReactElement | React.ReactElement[]
 }
 
 // Paths that the user must be logged in to see
-const LOGGED_IN_PATHS = new Set(["/create_listing", "/notifications", "/my_listings", "/my_bids"])
+const LOGGED_IN_PATHS = new Set([
+  "/create_listing",
+  "/notifications",
+  "/my_listings",
+  "/my_bids",
+  "/update_listing",
+])
 
 function PageNotFound() {
   return (
@@ -56,18 +63,6 @@ function PageNotFound() {
       <h1>404: Page Not Found</h1>
       <p>
         The page you requested does not exist. Please return to the <Link to="/">home page</Link>.
-      </p>
-    </>
-  )
-}
-
-function Unauthorized() {
-  return (
-    <>
-      <h1>Unauthorized</h1>
-      <p>
-        You are not authorized to view this page. Please log in or return to the{" "}
-        <Link to="/">home page</Link>.
       </p>
     </>
   )
@@ -118,8 +113,9 @@ function Base(props: BaseProps) {
   }, [dispatch, navigate, requiresAuth])
 
   const onCreateListing = useCallback(() => {
+    dispatch(clearListingState())
     navigate("create_listing")
-  }, [navigate])
+  }, [dispatch, navigate])
 
   const onClickMyProfile = useCallback(() => {
     navigate(`user_profile/?id=${user.id}`)
@@ -190,8 +186,8 @@ function Base(props: BaseProps) {
                 About
               </Link>
             </Nav.Item>
-            {user ? (
-              <div className="login">
+            <div className="login">
+              {user ? (
                 <Dropdown
                   icon="bars"
                   floating
@@ -245,22 +241,24 @@ function Base(props: BaseProps) {
                     <Dropdown.Item onClick={onLogout} text="Log Out" />
                   </Dropdown.Menu>
                 </Dropdown>
-              </div>
-            ) : (
-              <span className="login">
-                <Button onClick={onLogin} color="green">
-                  Log In
-                </Button>
-                <Button onClick={onSignUp} color="orange">
-                  Sign Up
-                </Button>
-              </span>
-            )}
+              ) : (
+                <>
+                  <Button onClick={onLogin} color="green">
+                    Log In
+                  </Button>
+                  <Button onClick={onSignUp} color="orange">
+                    Sign Up
+                  </Button>
+                </>
+              )}
+            </div>
           </Nav>
         </Container>
       </Navbar>
       <Container>
-        <div className="content-base">{requiresAuth && !user ? <Unauthorized /> : children}</div>
+        <div className="content-base">
+          {requiresAuth && !user ? <Unauthorized loggedIn={!!user} /> : children}
+        </div>
       </Container>
     </>
   )
@@ -269,6 +267,7 @@ function Base(props: BaseProps) {
 const ROUTES = {
   about: About,
   create_listing: NewListing,
+  update_listing: NewListing,
   user_profile: UserProfile,
   notifications: NotificationPage,
   my_listings: MyListings,

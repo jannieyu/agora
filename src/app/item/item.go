@@ -24,6 +24,9 @@ const (
 func ProcessImage(r *http.Request, folder imageFolder) (string, error) {
 	file, header, err := r.FormFile("image")
 	if err != nil {
+		if err == http.ErrMissingFile {
+			return "", nil
+		}
 		return "", err
 	}
 

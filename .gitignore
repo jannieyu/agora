@@ -9,7 +9,8 @@ npm-debug.log
 # Go / Goland
 src/app/images
 src/app/index.bleve
-static/images
+static/images/items
+static/images/users
 
 
 # Python
