@@ -45,7 +45,7 @@ function LineItem(props: LineItemProps) {
 
   return (
     <Row
-      className={`my_listing align-items-center ${active ? "active" : "delisted"}`}
+      className={`my_listing align-items-center ${active ? "active-item" : "delisted"}`}
       onClick={onClick}
     >
       {active ? (

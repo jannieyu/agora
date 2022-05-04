@@ -41,7 +41,7 @@ function AutomaticBid(props: AutomaticBidProps) {
       onKeyDown={onClick}
       role="button"
       tabIndex={0}
-      className={`my_bids align-items-center ${activeItem ? "active" : "delisted"}`}
+      className={`my_bids align-items-center ${activeItem ? "active-item" : "delisted"}`}
     >
       <Col xs={2}>
         <img src={`/${itemImage}`} alt="Listing Preview" />
@@ -98,7 +98,7 @@ function ManualBid(props: ManualBidProps) {
 
   return (
     <Row
-      className={`my_bids align-items-center ${activeItem ? "active" : "delisted"}`}
+      className={`my_bids align-items-center ${activeItem ? "active-item" : "delisted"}`}
       onClick={onClick}
     >
       <Col xs={3} align="center">
