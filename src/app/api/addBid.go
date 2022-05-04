@@ -67,7 +67,11 @@ func (h Handle) AddBid(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	w.WriteHeader(http.StatusCreated)
-	SafeEncode(w, "{}")
-	log.Info("Completed bid upload.")
+	if err := bid.BroadcastNewBid(h.Hub, h.Db, bidAPI.ItemID); err != nil {
+		log.WithError(err).Error("Failed to broadcast new bid.")
+	} else {
+		w.WriteHeader(http.StatusCreated)
+		SafeEncode(w, "{}")
+		log.Info("Completed bid upload.")
+	}
 }

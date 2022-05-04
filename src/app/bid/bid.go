@@ -63,7 +63,8 @@ func CreateNotification(db *gorm.DB, hub *ws.Hub, note database.Notification) er
 	if err := db.Create(&note).Error; err != nil {
 		return err
 	}
-	if err := hub.BroadcastMessage([]uint32{note.ReceiverID}, ws.BroadcastAPI{ws.NEW_NOTIFICATION}); err != nil {
+	if err := hub.BroadcastMessage([]uint32{note.ReceiverID}, ws.BroadcastAPI{
+		BroadcastType: ws.NEW_NOTIFICATION}); err != nil {
 		return err
 	}
 	return nil
@@ -133,4 +134,29 @@ func updateMaxBid(item *database.Item, maxBid decimal.Decimal) {
 
 func updateNumBid(item *database.Item) {
 	item.NumBids += 1
+}
+
+func getHighestBidOfItem(db *gorm.DB, itemId uint32) (database.Bid, error) {
+	var bid database.Bid
+	if err := db.Omit("bot_id").Where("item_id = ?", itemId).Find(&bid).Error; err != nil {
+		return database.Bid{}, err
+	}
+	if bid.ID == 0 {
+		return database.Bid{}, errors.New("Failed to find highest bid of item.")
+	}
+	return bid, nil
+}
+
+func BroadcastNewBid(hub *ws.Hub, db *gorm.DB, itemId uint32) error {
+	newBid, err := getHighestBidOfItem(db, itemId)
+	if err != nil {
+		return err
+	}
+	if err := hub.BroadcastMessage([]uint32{}, ws.BroadcastAPI{
+		BroadcastType: ws.NEW_BID,
+		Data:          newBid,
+	}); err != nil {
+		return err
+	}
+	return nil
 }
