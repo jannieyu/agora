@@ -122,14 +122,16 @@ function LineItem(props: LineItemProps) {
   })()
 
   const dismiss = useCallback(() => {
-    dispatch(clearNotifcation())
-    viewNotification(id)
-    updateSeenNotifications(
-      { noteIds: [id] },
-      () => {},
-      () => {},
-    )
-  }, [dispatch, id, viewNotification])
+    if (!seen) {
+      dispatch(clearNotifcation())
+      viewNotification(id)
+      updateSeenNotifications(
+        { noteIds: [id] },
+        () => {},
+        () => {},
+      )
+    }
+  }, [dispatch, id, viewNotification, seen])
 
   const onClick = () => {
     dismiss()
@@ -179,26 +181,36 @@ function LineItem(props: LineItemProps) {
 }
 
 export default function NotificationPage() {
-  const { user } = useSelector((state: AppState) => state)
+  const { user, numUnseenNotifs } = useSelector((state: AppState) => state)
   const [notifications, setNotifcations] = useState<Notification[]>([])
   const dispatch = useDispatch()
 
+  const fetchNotifs = useCallback(() => {
+    getNotifications(
+      {},
+      (notificationResponse: GetNotificationsResponse) => {
+        setNotifcations(notificationResponse || [])
+        dispatch(
+          setData({
+            numUnseenNotifs: notificationResponse.filter((notif) => !notif.seen).length,
+          }),
+        )
+      },
+      () => {},
+    )
+  }, [dispatch])
+
   useEffect(() => {
     if (user) {
-      getNotifications(
-        {},
-        (notificationResponse: GetNotificationsResponse) => {
-          setNotifcations(notificationResponse || [])
-          dispatch(
-            setData({
-              numUnseenNotifs: notificationResponse.filter((notif) => !notif.seen).length,
-            }),
-          )
-        },
-        () => {},
-      )
+      fetchNotifs()
     }
-  }, [dispatch, user])
+  }, [user, fetchNotifs])
+
+  useEffect(() => {
+    if (notifications && notifications.filter((notif) => !notif.seen).length < numUnseenNotifs) {
+      fetchNotifs()
+    }
+  }, [fetchNotifs, notifications, numUnseenNotifs])
 
   const viewNotification = useCallback(
     (id: number) => {
