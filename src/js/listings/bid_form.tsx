@@ -22,9 +22,7 @@ export interface RefinedBidFormProps {
 }
 
 export function AutomaticBidForm(props: RefinedBidFormProps) {
-  const { price, numBids, itemId, handleSuccess, bidderId, minIncrement } = props
-
-  const dispatch = useDispatch()
+  const { price, itemId, handleSuccess, minIncrement } = props
 
   const [bidPrice, setBidPrice] = useState<string>("")
   const [submitting, setSubmitting] = useState<boolean>(false)
@@ -46,17 +44,6 @@ export function AutomaticBidForm(props: RefinedBidFormProps) {
       { itemId, maxBid: bidPrice },
       () => {
         setSubmitting(false)
-
-        const newBid = {
-          bidderId,
-          itemId,
-          bidPrice: `${minBid}`,
-          createdAt: DateTime.now().toISO(),
-        }
-
-        dispatch(
-          updateSearchItem({ highestBid: `${minBid}`, numBids: numBids + 1 }, itemId, newBid),
-        )
         handleSuccess(
           `The autobidder was successfullly confirgured to bid up to $${bidPrice}! You will be notified
           if another user's bid exceeds this price or if the auction ends and you win the item.`,
@@ -67,7 +54,7 @@ export function AutomaticBidForm(props: RefinedBidFormProps) {
         setError(err.body as string)
       },
     )
-  }, [dispatch, itemId, bidPrice, numBids, handleSuccess, bidderId, minBid])
+  }, [itemId, bidPrice, handleSuccess])
 
   const isValidBid = isValidPrice(bidPrice) && safeParseFloat(bidPrice) >= minBid
 

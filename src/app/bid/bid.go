@@ -6,10 +6,11 @@ import (
 	"agora/src/app/ws"
 	"errors"
 	"fmt"
+	"net/http"
+
 	"github.com/shopspring/decimal"
 	log "github.com/sirupsen/logrus"
 	"gorm.io/gorm"
-	"net/http"
 )
 
 func PlaceBid(bidderID uint32, itemID uint32, bidBotID uint32, bidPrice decimal.Decimal, db *gorm.DB, hub *ws.Hub) (int, error) {
@@ -138,7 +139,7 @@ func updateNumBid(item *database.Item) {
 
 func getHighestBidOfItem(db *gorm.DB, itemId uint32) (database.Bid, error) {
 	var bid database.Bid
-	if err := db.Omit("bot_id").Where("item_id = ?", itemId).Find(&bid).Error; err != nil {
+	if err := db.Omit("bot_id").Where("item_id = ?", itemId).Order("bid_price desc").Find(&bid).Error; err != nil {
 		return database.Bid{}, err
 	}
 	if bid.ID == 0 {
