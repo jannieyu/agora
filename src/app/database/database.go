@@ -41,6 +41,13 @@ func Init() (*gorm.DB, error) {
 		}
 	}
 
+	if !db.Migrator().HasTable(&ItemClick{}) {
+		if err := db.AutoMigrate(&ItemClick{}); err != nil {
+			log.WithError(err).Error("Failed to initiate ItemClicks table.")
+			return nil, err
+		}
+	}
+
 	if !db.Migrator().HasTable(&Item{}) {
 		if err := db.AutoMigrate(&Item{}); err != nil {
 			log.WithError(err).Error("Failed to initiate Items table.")
