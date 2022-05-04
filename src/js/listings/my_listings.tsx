@@ -3,13 +3,21 @@ import { Row, Col } from "react-bootstrap"
 import { Icon } from "semantic-ui-react"
 import { useNavigate } from "react-router"
 import { Link, useSearchParams } from "react-router-dom"
-import { useCallback, useEffect, useMemo, useSelector, useState } from "../base/react_base"
+import {
+  useCallback,
+  useDispatch,
+  useEffect,
+  useMemo,
+  useSelector,
+  useState,
+} from "../base/react_base"
 import { apiCall as getSearchItems, Response as SearchItemResponse } from "../api/get_search_items"
 import { AppState, SearchItem } from "../base/reducers"
 import ListingModal from "./listing_modal"
 import ConfirmationModal from "../base/confirmation_modal"
 import { ListingProps } from "./types"
 import { safeParseFloat } from "../base/util"
+import { setData } from "../base/actions"
 
 type LineItemProps = ListingProps & {
   setSearchParams: (arg: unknown) => void
@@ -80,16 +88,16 @@ function LineItem(props: LineItemProps) {
 }
 
 export default function MyListings() {
-  const [myListings, setMyListings] = useState<SearchItem[]>([])
+  const { user, searchItems } = useSelector((state: AppState) => state)
   const [deleteId, setDeleteId] = useState<number | null>(null)
 
   const [searchParams, setSearchParams] = useSearchParams()
   const params = useMemo(() => Object.fromEntries([...searchParams]), [searchParams])
 
   const selectedItemId = safeParseFloat(params.id)
-  const selectedItem = myListings.find((item: SearchItem) => item.id === selectedItemId)
+  const selectedItem = searchItems.find((item: SearchItem) => item.id === selectedItemId)
 
-  const { user } = useSelector((state: AppState) => state)
+  const dispatch = useDispatch()
 
   const deselectItem = useCallback(() => {
     setSearchParams({})
@@ -99,21 +107,21 @@ export default function MyListings() {
     setDeleteId(null)
   }, [])
 
-  const fetchItems = () => {
+  const fetchItems = useCallback(() => {
     getSearchItems(
       { sellerItemsOnly: true },
       (results: SearchItemResponse) => {
-        setMyListings(results)
+        dispatch(setData({ searchItems: results }))
       },
       () => {},
     )
-  }
+  }, [dispatch])
 
   useEffect(() => {
     fetchItems()
-  }, [])
+  }, [fetchItems])
 
-  const lineItems = (myListings as ListingProps[]).map((listing) => (
+  const lineItems = (searchItems as ListingProps[]).map((listing) => (
     <LineItem
       {...listing}
       key={listing.id}
@@ -124,7 +132,7 @@ export default function MyListings() {
 
   const delistFollowup = useCallback(() => {
     fetchItems()
-  }, [])
+  }, [fetchItems])
 
   return (
     <>
