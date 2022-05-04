@@ -37,7 +37,7 @@ import {
   API_ARGS as LOGIN_STATUS_ARGS,
   Response as LoginStatusResponse,
 } from "../api/get_login_status"
-import { rootReducer, AppState, Broadcast, BroadcastType } from "./reducers"
+import { rootReducer, AppState, Broadcast, BroadcastType, BidHistory } from "./reducers"
 import { setData, clearListingState, receiveNotification, updateSearchItem } from "./actions"
 import Unauthorized from "./unauthorized"
 
@@ -167,7 +167,10 @@ function Base(props: BaseProps) {
         if (message.broadcastType === BroadcastType.NEW_NOTIFICATION) {
           dispatch(receiveNotification())
         } else if (message.broadcastType === BroadcastType.NEW_BID) {
-          dispatch(updateSearchItem({}, message.data.itemId, message.data))
+          const newBid = message.data as BidHistory
+          dispatch(updateSearchItem({}, newBid.itemId, newBid))
+        } else if (message.broadcastType === BroadcastType.UPDATE_ITEM) {
+          dispatch(updateSearchItem(message.data, message.data.id))
         }
       }
 

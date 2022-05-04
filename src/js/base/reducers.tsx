@@ -9,11 +9,7 @@ export interface BidHistory {
 export enum BroadcastType {
   NEW_NOTIFICATION = "NEW_NOTIFICATION",
   NEW_BID = "NEW_BID",
-}
-
-export interface Broadcast {
-  broadcastType: BroadcastType
-  data?: BidHistory
+  UPDATE_ITEM = "UPDATE_ITEM",
 }
 
 export interface User {
@@ -74,6 +70,11 @@ export interface SearchItem {
   sellerId: number
   active: boolean
   bids: BidHistory[]
+}
+
+export interface Broadcast {
+  broadcastType: BroadcastType
+  data?: BidHistory | SearchItem
 }
 
 const initialState = {
