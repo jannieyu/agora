@@ -1,6 +1,7 @@
 package api
 
 import (
+	"agora/src/app/bid"
 	"agora/src/app/bidBot"
 	"agora/src/app/database"
 	"agora/src/app/item"
@@ -61,7 +62,7 @@ func (h Handle) AddOrUpdateBidBot(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	if err := BroadcastNewBid(h.Hub, h.Db, bot.ItemID); err != nil {
+	if err := bid.BroadcastNewBid(h.Hub, h.Db, bot.ItemID); err != nil {
 		log.WithError(err).Error("Failed to broadcast new bid.")
 	} else {
 		log.Info("Created or updated new bid bot.")
