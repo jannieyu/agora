@@ -1,9 +1,19 @@
+export interface BidHistory {
+  id?: number
+  bidderId: number
+  itemId: number
+  bidPrice: string
+  createdAt: string
+}
+
 export enum BroadcastType {
   NEW_NOTIFICATION = "NEW_NOTIFICATION",
+  NEW_BID = "NEW_BID",
 }
 
 export interface Broadcast {
   broadcastType: BroadcastType
+  data?: BidHistory
 }
 
 export interface User {
@@ -37,14 +47,6 @@ export interface Notification {
 
   user?: User
   itemName?: string
-}
-
-export interface BidHistory {
-  id?: number
-  bidderId: number
-  itemId: number
-  bidPrice: string
-  createdAt: string
 }
 
 export interface ListingState {
@@ -125,6 +127,8 @@ export const rootReducer = (state: AppState = initialState, action: Action) => {
                 ...item,
                 ...data,
                 bids: newBid ? [...item.bids, newBid] : item.bids,
+                numBids: newBid ? item.bids.length + 1 : item.bids.length,
+                highestBid: newBid ? newBid.bidPrice : item.highestBid,
               }
             : item,
         ),

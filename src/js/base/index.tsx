@@ -38,7 +38,7 @@ import {
   Response as LoginStatusResponse,
 } from "../api/get_login_status"
 import { rootReducer, AppState, Broadcast, BroadcastType } from "./reducers"
-import { setData, clearListingState, receiveNotification } from "./actions"
+import { setData, clearListingState, receiveNotification, updateSearchItem } from "./actions"
 import Unauthorized from "./unauthorized"
 
 interface BaseProps {
@@ -166,6 +166,8 @@ function Base(props: BaseProps) {
         const message: Broadcast = JSON.parse(evt.data)
         if (message.broadcastType === BroadcastType.NEW_NOTIFICATION) {
           dispatch(receiveNotification())
+        } else if (message.broadcastType === BroadcastType.NEW_BID) {
+          dispatch(updateSearchItem({}, message.data.itemId, message.data))
         }
       }
 

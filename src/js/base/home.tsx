@@ -177,16 +177,19 @@ function Home() {
     retreiveItems()
   }, [setDeletingItemId, retreiveItems])
 
-  const cardRows = []
-  for (let i = 0; i < searchItems.length; i += 4) {
-    const cards: ListingProps[] = []
-    for (let j = 0; j < 4; j += 1) {
-      if (i + j < searchItems.length) {
-        cards.push(searchItems[i + j])
+  const cardRows = useMemo(() => {
+    const rows = []
+    for (let i = 0; i < searchItems.length; i += 4) {
+      const cards: ListingProps[] = []
+      for (let j = 0; j < 4; j += 1) {
+        if (i + j < searchItems.length) {
+          cards.push(searchItems[i + j])
+        }
       }
+      rows.push(<CardRow cards={cards} key={i} handleClick={handleCardAction} />)
     }
-    cardRows.push(<CardRow cards={cards} key={i} handleClick={handleCardAction} />)
-  }
+    return rows
+  }, [handleCardAction, searchItems])
 
   return (
     <>
