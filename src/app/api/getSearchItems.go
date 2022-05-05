@@ -58,14 +58,16 @@ func (h Handle) GetSearchItems(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
-		query := ""
-		for i, itemId := range itemsByMostClicks {
-			query += fmt.Sprintf("WHEN id=%d THEN %d ", itemId, i)
+		if len(itemsByMostClicks) != 0 {
+			query := ""
+			for i, itemId := range itemsByMostClicks {
+				query += fmt.Sprintf("WHEN id=%d THEN %d ", itemId, i)
 
+			}
+			result = result.Clauses(clause.OrderBy{
+				Expression: clause.Expr{SQL: "CASE " + query + "END", WithoutParentheses: true},
+			})
 		}
-		result = result.Clauses(clause.OrderBy{
-			Expression: clause.Expr{SQL: "CASE " + query + "END", WithoutParentheses: true},
-		})
 	default:
 		result = result.Order("created_at desc")
 	}
