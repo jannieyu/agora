@@ -107,5 +107,6 @@ func (h Handle) GetSearchItems(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
+	//item.CloseAuction(h.Db, h.Hub)
 	SafeEncode(w, items)
 }
