@@ -5,6 +5,7 @@ type SortMethod string
 const (
 	PriceHighLow SortMethod = "highLow"
 	PriceLowHigh SortMethod = "lowHigh"
+	MostViewed   SortMethod = "mostViewed"
 )
 
 type Filters struct {

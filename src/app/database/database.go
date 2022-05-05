@@ -34,16 +34,16 @@ func Init() (*gorm.DB, error) {
 		}
 	}
 
-	if !db.Migrator().HasTable(&User{}) {
-		if err := db.AutoMigrate(&User{}); err != nil {
-			log.WithError(err).Error("Failed to initiate Users table.")
+	if !db.Migrator().HasTable(&ItemClick{}) {
+		if err := db.AutoMigrate(&ItemClick{}); err != nil {
+			log.WithError(err).Error("Failed to initiate ItemClicks table.")
 			return nil, err
 		}
 	}
 
-	if !db.Migrator().HasTable(&ItemClick{}) {
-		if err := db.AutoMigrate(&ItemClick{}); err != nil {
-			log.WithError(err).Error("Failed to initiate ItemClicks table.")
+	if !db.Migrator().HasTable(&User{}) {
+		if err := db.AutoMigrate(&User{}); err != nil {
+			log.WithError(err).Error("Failed to initiate Users table.")
 			return nil, err
 		}
 	}
