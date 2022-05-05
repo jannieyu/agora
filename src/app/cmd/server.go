@@ -45,7 +45,9 @@ func main() {
 	r.HandleFunc("/api/get_login_status", h.GetLoginStatus)
 	r.HandleFunc("/api/get_user", h.GetUser)
 	r.HandleFunc("/api/update_user", h.UpdateUser)
+	r.HandleFunc("/api/get_user_history", h.GetUserHistory)
 
+	r.HandleFunc("/api/record_item_click", h.RecordItemClick)
 	r.HandleFunc("/api/get_item", h.GetItem)
 	r.HandleFunc("/api/add_item", h.AddOrUpdateItem)
 	r.HandleFunc("/api/delist_item", h.DelistItem)

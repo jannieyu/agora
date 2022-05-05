@@ -34,6 +34,13 @@ type Notification struct {
 	Seen       bool              `json:"seen"`
 }
 
+type ItemClick struct {
+	ID        uint32    `json:"id,omitempty"`
+	ItemID    uint32    `json:"itemId,omitempty"`
+	ViewerID  uint32    `json:"viewerId,omitempty"`
+	CreatedAt time.Time `json:"createdAt,omitempty" gorm:"autoCreateTime"`
+}
+
 type User struct {
 	ID                   uint32         `json:"id,omitempty" gorm:"primarykey"`
 	FirstName            string         `json:"firstName,omitempty"`
@@ -46,12 +53,13 @@ type User struct {
 	BidBots              []BidBot       `json:"bidBots,omitempty" gorm:"foreignkey:OwnerID"`
 	ReceiveNotifications []Notification `json:"receiveNotifications,omitempty" gorm:"foreignkey:ReceiverID"`
 	SendNotifications    []Notification `json:"sendNotifications,omitempty" gorm:"foreignkey:SenderID"`
+	Clicks               []ItemClick    `json:"clicks,omitempty" gorm:"foreignkey:ViewerID"`
 }
 
 type Item struct {
 	ID            uint32          `json:"id,omitempty" gorm:"primarykey"`
 	SellerID      uint32          `json:"sellerId,omitempty"`
-	Seller        User            `json:"seller,omitempty" gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;foreignkey:SellerID"`
+	Seller        User            `json:"seller,omitempty" gorm:"constraint:OnUpdate:CASCADE;foreignkey:SellerID"`
 	Name          string          `json:"name,omitempty"`
 	Image         string          `json:"image,omitempty"`
 	Category      string          `json:"category,omitempty"`
@@ -61,6 +69,7 @@ type Item struct {
 	Bids          []Bid           `json:"bids" gorm:"foreignkey:ItemID"`
 	BidBots       []BidBot        `json:"bidBots" gorm:"foreignkey:ItemID"`
 	Notifications []Notification  `json:"notifications" gorm:"foreignkey:ItemID"`
+	Clicks        []ItemClick     `json:"clicks" gorm:"foreignkey:ItemID"`
 	HighestBid    decimal.Decimal `json:"highestBid"  gorm:"type:decimal(6,2);"`
 	NumBids       uint32          `json:"numBids"`
 	Active        bool            `json:"active"`
