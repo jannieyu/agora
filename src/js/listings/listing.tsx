@@ -10,6 +10,7 @@ import { safeParseFloat } from "../base/util"
 import { isValidPrice } from "./util"
 import { ListingProps } from "./types"
 import BidForm from "./bid_form"
+import RecommendedItems from "./recommended_items"
 
 function HistoricalBidDatum(bid: BidHistoryT) {
   const { createdAt, bidPrice } = bid
@@ -85,6 +86,9 @@ export default function Listing(props: ListingProps) {
     numBids,
     isLocal,
     active,
+    showRecommendations,
+    isPreview,
+    redirectHome,
   } = props
   const activeUser = useSelector((state: AppState) => state.user)
 
@@ -118,95 +122,106 @@ export default function Listing(props: ListingProps) {
 
   const imageSrc = isLocal ? image : `/${image}`
 
-  return (
-    <Row>
-      <Col xs="12">
-        <div className="listing">
-          {category ? <b className="category">{category}</b> : null}
-          <div>
-            {image ? <img src={imageSrc} alt="Listing Preview" className="listing-image" /> : null}
+  /* &&id trick prevents modal from showing (delisted) upon closure */
+
+  return id || isPreview ? (
+    <div>
+      <Row>
+        <Col xs="12">
+          <div className="listing">
+            {category ? <b className="category">{category}</b> : null}
+            <div>
+              {image ? (
+                <img src={imageSrc} alt="Listing Preview" className="listing-image" />
+              ) : null}
+            </div>
+            <div className="listing-information">
+              <h2>
+                <span>{name}</span>
+                {!active && <span className="red">&nbsp;(delisted)</span>}
+              </h2>
+              <table className="listing-metadata-table">
+                <tbody>
+                  {highestBid && isValidPrice(highestBid) ? (
+                    <tr>
+                      <td className="name-cell">
+                        <b>Price</b>
+                      </td>
+                      <td>{`$${safeParseFloat(highestBid)?.toFixed(2)}`}</td>
+                    </tr>
+                  ) : null}
+                  {condition ? (
+                    <tr>
+                      <td className="name-cell">
+                        <b>Condition</b>
+                      </td>
+                      <td>{condition}</td>
+                    </tr>
+                  ) : null}
+                  <tr>
+                    <td className="name-cell">
+                      <b>Sold By</b>
+                    </td>
+                    <td>
+                      <Link
+                        to={`/user_profile/?id=${seller?.id}`}
+                        target="_blank"
+                      >{`${seller?.firstName} ${seller?.lastName}`}</Link>
+                    </td>
+                  </tr>
+                  {description ? (
+                    <tr>
+                      <td className="name-cell">
+                        <b>Description</b>
+                      </td>
+                      <td>{description}</td>
+                    </tr>
+                  ) : null}
+                </tbody>
+              </table>
+              <BidHistory {...props} defaultShowHistory={!isBiddable && !!activeUser} />
+              {isBiddable ? (
+                <Button primary onClick={toggleShowBid} className="bid-button">
+                  {showBidOptions ? "Cancel" : "Place Bid"}
+                </Button>
+              ) : null}
+              {!isBiddable && !activeUser ? (
+                <Message>
+                  <Button onClick={onLogin} color="green">
+                    Log in
+                  </Button>{" "}
+                  or{" "}
+                  <Button onClick={onSignUp} color="orange">
+                    Sign Up
+                  </Button>{" "}
+                  to bid on this item.
+                </Message>
+              ) : null}
+              <br />
+              <Transition.Group animation="zoom" duration={200}>
+                {showBidOptions && (
+                  <div>
+                    <br />
+                    <BidForm
+                      priceStr={highestBid}
+                      itemId={id}
+                      numBids={numBids}
+                      handleSuccess={handleSuccess}
+                      bidderId={activeUser?.id}
+                    />
+                  </div>
+                )}
+                {!showBidOptions && !!successMessage && <Message success>{successMessage}</Message>}
+              </Transition.Group>
+            </div>
           </div>
-          <div className="listing-information">
-            <h2>
-              <span>{name}</span>
-              {active ? null : <span className="red">&nbsp;(delisted)</span>}
-            </h2>
-            <table className="listing-metadata-table">
-              <tbody>
-                {highestBid && isValidPrice(highestBid) ? (
-                  <tr>
-                    <td className="name-cell">
-                      <b>Price</b>
-                    </td>
-                    <td>{`$${safeParseFloat(highestBid)?.toFixed(2)}`}</td>
-                  </tr>
-                ) : null}
-                {condition ? (
-                  <tr>
-                    <td className="name-cell">
-                      <b>Condition</b>
-                    </td>
-                    <td>{condition}</td>
-                  </tr>
-                ) : null}
-                <tr>
-                  <td className="name-cell">
-                    <b>Sold By</b>
-                  </td>
-                  <td>
-                    <Link
-                      to={`/user_profile/?id=${seller?.id}`}
-                      target="_blank"
-                    >{`${seller?.firstName} ${seller?.lastName}`}</Link>
-                  </td>
-                </tr>
-                {description ? (
-                  <tr>
-                    <td className="name-cell">
-                      <b>Description</b>
-                    </td>
-                    <td>{description}</td>
-                  </tr>
-                ) : null}
-              </tbody>
-            </table>
-            <BidHistory {...props} defaultShowHistory={!isBiddable && !!activeUser} />
-            {isBiddable ? (
-              <Button primary onClick={toggleShowBid} className="bid-button">
-                {showBidOptions ? "Cancel" : "Place Bid"}
-              </Button>
-            ) : null}
-            {!isBiddable && !activeUser ? (
-              <Message>
-                <Button onClick={onLogin} color="green">
-                  Log in
-                </Button>{" "}
-                or{" "}
-                <Button onClick={onSignUp} color="orange">
-                  Sign Up
-                </Button>{" "}
-                to bid on this item.
-              </Message>
-            ) : null}
-            <br />
-            <Transition.Group animation="zoom" duration={200}>
-              {showBidOptions && (
-                <div>
-                  <br />
-                  <BidForm
-                    priceStr={highestBid}
-                    itemId={id}
-                    numBids={numBids}
-                    handleSuccess={handleSuccess}
-                    bidderId={activeUser?.id}
-                  />
-                </div>
-              )}
-              {!showBidOptions && !!successMessage && <Message success>{successMessage}</Message>}
-            </Transition.Group>
-          </div>
-        </div>
-      </Col>
-    </Row>
+        </Col>
+      </Row>
+      {showRecommendations && (
+        <RecommendedItems category={category} itemId={id} redirectHome={redirectHome} />
+      )}
+    </div>
+  ) : (
+    <div />
   )
 }

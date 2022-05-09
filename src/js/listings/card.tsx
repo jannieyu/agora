@@ -1,10 +1,10 @@
 import * as React from "react"
 import { Icon } from "semantic-ui-react"
 import { useNavigate } from "react-router"
-import { ListingProps } from "./types"
+import { apiCall as recordItemClick } from "../api/record_item_click"
+import { ActionType, ListingProps } from "./types"
 import { useCallback, useSelector } from "../base/react_base"
 import { AppState } from "../base/reducers"
-import { ActionType } from "../base/types"
 import { safeParseFloat } from "../base/util"
 
 export interface CardProps extends ListingProps {
@@ -19,6 +19,11 @@ export default function Card(props: CardProps) {
 
   const handleSelectCard = useCallback(() => {
     handleClick(itemId, ActionType.SELECT)
+    recordItemClick(
+      { itemId },
+      () => {},
+      () => {},
+    )
   }, [itemId, handleClick])
 
   const handleDeleteItem = useCallback(() => {

@@ -3,9 +3,7 @@
 import * as React from "react"
 import { Row, Col, OverlayTrigger, Popover } from "react-bootstrap"
 import { Button, Tab, Form, Message } from "semantic-ui-react"
-import { DateTime } from "luxon"
-import { useCallback, useDispatch, useState } from "../base/react_base"
-import { updateSearchItem } from "../base/actions"
+import { useCallback, useState } from "../base/react_base"
 import { safeParseFloat } from "../base/util"
 import { isValidPrice, calculateIncrement } from "./util"
 import DollarInput from "./dollar_input"
@@ -109,9 +107,7 @@ export function AutomaticBidForm(props: RefinedBidFormProps) {
 }
 
 export function ManualBidForm(props: RefinedBidFormProps) {
-  const { price, minIncrement, numBids, itemId, handleSuccess, bidderId } = props
-
-  const dispatch = useDispatch()
+  const { price, minIncrement, itemId, handleSuccess } = props
 
   const [bidPrice, setBidPrice] = useState<string>("")
   const [submitting, setSubmitting] = useState<boolean>(false)
@@ -132,14 +128,6 @@ export function ManualBidForm(props: RefinedBidFormProps) {
       () => {
         setSubmitting(false)
 
-        const newBid = {
-          bidderId,
-          itemId,
-          bidPrice,
-          createdAt: DateTime.now().toISO(),
-        }
-
-        dispatch(updateSearchItem({ highestBid: bidPrice, numBids: numBids + 1 }, itemId, newBid))
         handleSuccess(
           `Bid of $${bidPrice} successfully created! You will be notified if you are outbid or
           if the auction ends and you win the item.`,
@@ -150,7 +138,7 @@ export function ManualBidForm(props: RefinedBidFormProps) {
         setError(err.body as string)
       },
     )
-  }, [dispatch, itemId, bidPrice, numBids, handleSuccess, bidderId])
+  }, [itemId, bidPrice, handleSuccess])
 
   const minBid = price + minIncrement
 

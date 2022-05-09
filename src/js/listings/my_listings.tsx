@@ -140,6 +140,7 @@ export default function MyListings() {
         show={!!selectedItem}
         onHide={deselectItem}
         selectedItem={{ ...selectedItem, seller: user }}
+        redirectHome
       />
       <ConfirmationModal
         show={!!deleteId}

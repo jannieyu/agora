@@ -221,7 +221,12 @@ export default function MyBids() {
 
   return (
     <>
-      <ListingModal show={!!selectedItem} onHide={deselectItem} selectedItem={selectedItem} />
+      <ListingModal
+        show={!!selectedItem}
+        onHide={deselectItem}
+        selectedItem={selectedItem}
+        redirectHome
+      />
       <Row>
         <h1 className="text-centered">My Bids</h1>
         <Col xs={2} />

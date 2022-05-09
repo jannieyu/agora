@@ -17,4 +17,16 @@ export interface ListingProps {
   createdAt?: string
   defaultShowHistory?: boolean
   isLocal?: boolean
+  showRecommendations?: boolean
+  redirectHome?: boolean
+  isPreview?: boolean
+}
+
+export interface OnChangeObject {
+  value: string
+}
+
+export enum ActionType {
+  SELECT = "select",
+  DELETE = "delete",
 }
