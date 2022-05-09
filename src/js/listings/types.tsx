@@ -18,3 +18,12 @@ export interface ListingProps {
   defaultShowHistory?: boolean
   isLocal?: boolean
 }
+
+export interface OnChangeObject {
+  value: string
+}
+
+export enum ActionType {
+  SELECT = "select",
+  DELETE = "delete",
+}

@@ -8,11 +8,10 @@ import {
   apiCall as getSearchItems,
   Response as GetSearchItemsResponse,
 } from "../api/get_search_items"
-import { ListingProps } from "../listings/types"
-import Card from "../listings/card"
+import { ListingProps, ActionType, OnChangeObject } from "../listings/types"
+import CardRow from "../listings/card_rows"
 import ListingModal from "../listings/listing_modal"
 import ConfirmationModal from "./confirmation_modal"
-import { ActionType, OnChangeObject } from "./types"
 import { AppState, SearchItem } from "./reducers"
 import { setData } from "./actions"
 import { safeParseFloat } from "./util"
@@ -42,6 +41,11 @@ const sortByOptions = [
     text: "Sort By: Most Recent",
   },
   {
+    key: "mostViewed",
+    value: "mostViewed",
+    text: "Sort By: Most Viewed",
+  },
+  {
     key: "highLow",
     value: "highLow",
     text: "Sort By: Price (High to Low)",
@@ -52,28 +56,6 @@ const sortByOptions = [
     text: "Sort By: Price (Low to High)",
   },
 ]
-
-interface CardRowProps {
-  cards: ListingProps[]
-  handleClick: (id: number, type: ActionType) => void
-}
-
-function CardRow(props: CardRowProps) {
-  const { cards, handleClick } = props
-
-  return (
-    <>
-      <Row>
-        {cards.map((prop: ListingProps) => (
-          <Col xs={3} key={prop.id}>
-            <Card {...prop} handleClick={handleClick} itemId={prop.id} />
-          </Col>
-        ))}
-      </Row>
-      <br />
-    </>
-  )
-}
 
 function Home() {
   const { searchItems } = useSelector((state: AppState) => state)
