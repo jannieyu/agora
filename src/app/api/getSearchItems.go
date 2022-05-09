@@ -5,12 +5,14 @@ import (
 	"agora/src/app/search"
 	"agora/src/app/user"
 	"encoding/json"
+	"fmt"
+	"github.com/blevesearch/bleve/v2"
+	log "github.com/sirupsen/logrus"
+	"gorm.io/gorm/clause"
 	"net/http"
 	"strconv"
 	"strings"
-
-	"github.com/blevesearch/bleve/v2"
-	log "github.com/sirupsen/logrus"
+	"time"
 )
 
 func (h Handle) GetSearchItems(w http.ResponseWriter, r *http.Request) {
@@ -45,6 +47,27 @@ func (h Handle) GetSearchItems(w http.ResponseWriter, r *http.Request) {
 		result = result.Order("highest_bid desc")
 	case search.PriceLowHigh:
 		result = result.Order("highest_bid")
+	case search.MostViewed:
+		var itemsByMostClicks []uint32
+		now := time.Now()
+		if err := h.Db.Model(&database.ItemClick{}).Select(
+			"item_clicks.item_id").Group(
+			"item_clicks.item_id").Where("item_clicks.created_at BETWEEN ? AND ?", now.Add(time.Duration(-24)*time.Hour), now).Order(
+			"count(item_clicks.id) DESC").Find(&itemsByMostClicks).Error; err != nil {
+			log.WithError(result.Error).Error("Failed to make query to sort items by most clicks.")
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		if len(itemsByMostClicks) != 0 {
+			query := ""
+			for i, itemId := range itemsByMostClicks {
+				query += fmt.Sprintf("WHEN id=%d THEN %d ", itemId, i)
+
+			}
+			result = result.Clauses(clause.OrderBy{
+				Expression: clause.Expr{SQL: "CASE " + query + "END", WithoutParentheses: true},
+			})
+		}
 	default:
 		result = result.Order("created_at desc")
 	}
@@ -84,5 +107,6 @@ func (h Handle) GetSearchItems(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
+	//item.CloseAuction(h.Db, h.Hub)
 	SafeEncode(w, items)
 }
