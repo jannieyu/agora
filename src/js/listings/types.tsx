@@ -17,6 +17,7 @@ export interface ListingProps {
   createdAt?: string
   defaultShowHistory?: boolean
   isLocal?: boolean
+  showRecommendations?: boolean
 }
 
 export interface OnChangeObject {

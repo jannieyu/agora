@@ -18,7 +18,7 @@ import { updateListingState } from "../base/actions"
 import { conditions, categories } from "./constants"
 import Listing from "./listing"
 import { isValidPrice } from "./util"
-import { OnChangeObject } from "../base/types"
+import { OnChangeObject } from "./types"
 import { safeParseInt } from "../base/util"
 import { apiCall as getItem, Response as GetItemResponse } from "../api/get_item"
 import DollarInput from "./dollar_input"
@@ -420,6 +420,7 @@ function ListingForm() {
             createdAt={currTime}
             bids={bids || []}
             isLocal={!!image}
+            showRecommendations={false}
             active
           />
         </Col>

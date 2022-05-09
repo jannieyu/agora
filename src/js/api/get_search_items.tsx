@@ -1,9 +1,14 @@
 import buildWrappedGet from "../base/api"
 import { SearchItem } from "../base/reducers"
 
-export const API_ARGS = {}
+export enum SEARCH_CATEGORY {}
 
-export type Arguments = typeof API_ARGS
+export type Arguments = {
+  category?: string
+  condition?: string
+  sort?: string
+  search?: string
+}
 export type Response = SearchItem[]
 
 export const apiCall = buildWrappedGet<Arguments, Response>("/api/get_search_items")

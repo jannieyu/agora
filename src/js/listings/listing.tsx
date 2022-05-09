@@ -86,6 +86,7 @@ export default function Listing(props: ListingProps) {
     numBids,
     isLocal,
     active,
+    showRecommendations,
   } = props
   const activeUser = useSelector((state: AppState) => state.user)
 
@@ -212,7 +213,7 @@ export default function Listing(props: ListingProps) {
           </div>
         </Col>
       </Row>
-      <RecommendedItems />
+      {showRecommendations && <RecommendedItems category={category} itemId={id} />}
     </>
   )
 }

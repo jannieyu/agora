@@ -167,6 +167,10 @@
         transform: translateY(-50%);
         max-height: 25vh;
     }
+
+    h2 {
+        white-space: break-spaces;
+    }
 }
 
 
@@ -298,5 +302,15 @@
     img {
         max-width: 50%;
         border-radius: 50%;
+    }
+}
+
+.card-row {
+    .scrollable {
+        white-space: nowrap;
+        overflow-x: scroll;
+    }
+   .row-fluid .col-lg-3{
+        display: inline-block;
     }
 }

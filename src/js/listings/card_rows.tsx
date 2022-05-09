@@ -1,5 +1,4 @@
 import * as React from "react"
-import { Row, Col } from "react-bootstrap"
 import Card from "./card"
 import { ActionType, ListingProps } from "./types"
 
@@ -12,15 +11,15 @@ export default function CardRow(props: CardRowProps) {
   const { cards, handleClick } = props
 
   return (
-    <>
-      <Row>
+    <div className="card-row">
+      <div className={`row-fluid ${cards.length > 4 ? "scrollable" : ""}`}>
         {cards.map((prop: ListingProps) => (
-          <Col xs={3} key={prop.id}>
+          <div className="col-lg-3" key={prop.id}>
             <Card {...prop} handleClick={handleClick} itemId={prop.id} />
-          </Col>
+          </div>
         ))}
-      </Row>
+      </div>
       <br />
-    </>
+    </div>
   )
 }

@@ -31,7 +31,7 @@ export default function ListingModal(props: ModalProps) {
       <Modal.Header closeButton>
         <Modal.Title id="contained-modal-title-vcenter">View Listing</Modal.Title>
       </Modal.Header>
-      <Listing {...selectedItem} />
+      <Listing {...selectedItem} showRecommendations />
     </Modal>
   )
 }
