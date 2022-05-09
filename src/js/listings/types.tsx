@@ -18,6 +18,8 @@ export interface ListingProps {
   defaultShowHistory?: boolean
   isLocal?: boolean
   showRecommendations?: boolean
+  redirectHome?: boolean
+  isPreview?: boolean
 }
 
 export interface OnChangeObject {

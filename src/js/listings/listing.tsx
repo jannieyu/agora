@@ -87,6 +87,8 @@ export default function Listing(props: ListingProps) {
     isLocal,
     active,
     showRecommendations,
+    isPreview,
+    redirectHome,
   } = props
   const activeUser = useSelector((state: AppState) => state.user)
 
@@ -120,8 +122,10 @@ export default function Listing(props: ListingProps) {
 
   const imageSrc = isLocal ? image : `/${image}`
 
-  return (
-    <>
+  /* &&id trick prevents modal from showing (delisted) upon closure */
+
+  return id || isPreview ? (
+    <div>
       <Row>
         <Col xs="12">
           <div className="listing">
@@ -134,7 +138,7 @@ export default function Listing(props: ListingProps) {
             <div className="listing-information">
               <h2>
                 <span>{name}</span>
-                {active ? null : <span className="red">&nbsp;(delisted)</span>}
+                {!active && <span className="red">&nbsp;(delisted)</span>}
               </h2>
               <table className="listing-metadata-table">
                 <tbody>
@@ -213,7 +217,11 @@ export default function Listing(props: ListingProps) {
           </div>
         </Col>
       </Row>
-      {showRecommendations && <RecommendedItems category={category} itemId={id} />}
-    </>
+      {showRecommendations && (
+        <RecommendedItems category={category} itemId={id} redirectHome={redirectHome} />
+      )}
+    </div>
+  ) : (
+    <div />
   )
 }

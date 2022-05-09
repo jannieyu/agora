@@ -8,6 +8,7 @@ export type Arguments = {
   condition?: string
   sort?: string
   search?: string
+  sellerItemsOnly?: boolean
 }
 export type Response = SearchItem[]
 

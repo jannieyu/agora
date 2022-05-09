@@ -1,5 +1,6 @@
 import * as React from "react"
 import { useSearchParams } from "react-router-dom"
+import { useNavigate } from "react-router"
 import { Row, Col } from "react-bootstrap"
 import {
   apiCall as getSearchItems,
@@ -13,15 +14,18 @@ import CardRow from "./card_rows"
 interface RecommendedItemsProps {
   category: string
   itemId: number
+  redirectHome: boolean
 }
 
 export default function RecommendedItems(props: RecommendedItemsProps) {
-  const { category, itemId } = props
+  const { category, itemId, redirectHome } = props
   const [items, setItems] = useState<ListingProps[]>([])
   const { user } = useSelector((state: AppState) => state)
 
   const [searchParams, setSearchParams] = useSearchParams()
   const params = useMemo(() => Object.fromEntries([...searchParams]), [searchParams])
+
+  const navigate = useNavigate()
 
   useEffect(() => {
     getSearchItems(
@@ -43,10 +47,14 @@ export default function RecommendedItems(props: RecommendedItemsProps) {
   const handleClick = useCallback(
     (id: number, actionType: ActionType) => {
       if (actionType === ActionType.SELECT) {
-        setSearchParams({ ...params, itemId: `${id}` })
+        if (redirectHome) {
+          navigate(`/?itemId=${id}`)
+        } else {
+          setSearchParams({ ...params, itemId: `${id}` })
+        }
       }
     },
-    [params, setSearchParams],
+    [navigate, params, redirectHome, setSearchParams],
   )
 
   return items.length > 0 ? (

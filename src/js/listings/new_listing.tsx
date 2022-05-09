@@ -422,6 +422,7 @@ function ListingForm() {
             isLocal={!!image}
             showRecommendations={false}
             active
+            isPreview
           />
         </Col>
       </Row>

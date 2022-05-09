@@ -9,10 +9,11 @@ interface ModalProps {
   onHide: () => void
   show: boolean
   selectedItem: ListingProps
+  redirectHome?: boolean
 }
 
 export default function ListingModal(props: ModalProps) {
-  const { onHide, show, selectedItem } = props
+  const { onHide, show, selectedItem, redirectHome } = props
 
   const showingLoginModal = useSelector((state: AppState) => state.showLoginModal)
 
@@ -31,7 +32,11 @@ export default function ListingModal(props: ModalProps) {
       <Modal.Header closeButton>
         <Modal.Title id="contained-modal-title-vcenter">View Listing</Modal.Title>
       </Modal.Header>
-      <Listing {...selectedItem} showRecommendations />
+      <Listing {...selectedItem} redirectHome={redirectHome} showRecommendations />
     </Modal>
   )
+}
+
+ListingModal.defaultProps = {
+  redirectHome: false,
 }
