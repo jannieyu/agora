@@ -91,6 +91,7 @@ const initialState = {
   searchItems: [] as SearchItem[],
   listingState: {} as ListingState,
   numUnseenNotifs: 0 as number,
+  auction: null as Auction | null,
 }
 
 export type AppState = typeof initialState

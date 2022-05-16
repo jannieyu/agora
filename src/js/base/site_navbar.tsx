@@ -16,8 +16,7 @@ interface SiteNavbarProps {
 
 function SiteNavbar(props: SiteNavbarProps) {
   const { user, requiresAuth } = props
-  const numUnseenNotifs = useSelector((state: AppState) => state.numUnseenNotifs)
-  const auctionEnd = DateTime.now().plus({ seconds: 10 })
+  const { auction, numUnseenNotifs } = useSelector((state: AppState) => state)
 
   const dispatch = useDispatch()
   const navigate = useNavigate()
@@ -76,6 +75,16 @@ function SiteNavbar(props: SiteNavbarProps) {
   const topNotifBubbleWidth = `${notifStrLen * 0.15 + 0.9}rem`
   const bottomNotifBubbleWidth = `${notifStrLen * 0.2 + 1.2}rem`
 
+  const showCountdown = auction?.id && DateTime.now() < DateTime.fromISO(auction?.endTime)
+  let endTime = null
+  if (showCountdown) {
+    if (DateTime.now() < DateTime.fromISO(auction.startTime)) {
+      endTime = DateTime.fromISO(auction.startTime)
+    } else {
+      endTime = DateTime.fromISO(auction.endTime)
+    }
+  }
+
   return (
     <Navbar bg="primary" variant="dark">
       <Container>
@@ -92,7 +101,7 @@ function SiteNavbar(props: SiteNavbarProps) {
           </Nav.Item>
           <div className="login">
             <Nav.Item className="nav-link nav-countdown">
-              <Countdown endTime={auctionEnd} />
+              <Countdown endTime={endTime} showClock />
             </Nav.Item>
             {user ? (
               <Dropdown

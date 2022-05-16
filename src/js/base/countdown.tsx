@@ -4,11 +4,12 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { useCallback, useEffect, useState } from "./react_base"
 
 interface CountdownProps {
-  endTime: DateTime
+  endTime: DateTime | null
+  showClock: boolean
 }
 
 function Countdown(props: CountdownProps) {
-  const { endTime } = props
+  const { endTime, showClock } = props
 
   const [dayStr, setDayStr] = useState<string>("00")
   const [hourStr, setHourStr] = useState<string>("00")
@@ -17,7 +18,10 @@ function Countdown(props: CountdownProps) {
 
   const tick = useCallback(() => {
     // Time remaining in seconds
-    const secondsRemaining = Math.max(0, Math.floor((endTime.ts - DateTime.now().ts) / 1000))
+    const secondsRemaining = Math.max(
+      0,
+      Math.floor(((endTime?.ts || 0) - DateTime.now().ts) / 1000),
+    )
 
     const d = Math.floor(secondsRemaining / (3600 * 24))
     const h = Math.floor((secondsRemaining % (3600 * 24)) / 3600)
@@ -36,11 +40,13 @@ function Countdown(props: CountdownProps) {
     return () => clearInterval(timerId)
   }, [tick])
 
-  return (
+  return endTime ? (
     <span>
-      <FontAwesomeIcon icon="clock" className="clock-icon" />
+      {showClock && <FontAwesomeIcon icon="clock" className="clock-icon" />}
       <span>{`${dayStr}:${hourStr}:${minStr}:${secStr}`}</span>
     </span>
+  ) : (
+    <span />
   )
 }
 

@@ -86,6 +86,7 @@ function Base(props: BaseProps) {
                 lastName: data.lastName,
               },
               numUnseenNotifs: data.newNotificationCount,
+              auction: data.auction,
             }),
           )
         }
