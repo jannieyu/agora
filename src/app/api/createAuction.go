@@ -26,17 +26,6 @@ func (h Handle) CreateAuction(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	isAuctionActive, err := IsAuctionActive(h.Db)
-	if err != nil {
-		log.WithError(err).Error("Failed to check if there exists an active auction while creating an auction.")
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-	if isAuctionActive {
-		log.Error("Auction has already been created. Create new auction after current is disabled or ended.")
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
 	urlParams := r.URL.Query()["data"][0]
 	payload := struct {
 		StartTime string `json:"startTime"`
@@ -53,6 +42,23 @@ func (h Handle) CreateAuction(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
+
+	var overlappingAuctions []database.Auction
+	if err = h.Db.Where(
+		"start_time BETWEEN ? AND ?", auction.StartTime, auction.EndTime).Or(
+		"end_time BETWEEN ? AND ?", auction.StartTime, auction.EndTime).Or(
+		"start_time < ? AND end_time > ?", auction.StartTime, auction.EndTime).Find(
+		&overlappingAuctions).Error; err != nil {
+		log.WithError(err).Error("Failed to query overlapping auctions.")
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	if len(overlappingAuctions) > 0 {
+		log.Error("Auction is overlapping an existing planned/active auction.")
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
 	if err = h.Db.Create(&auction).Error; err != nil {
 		log.WithError(err).Error("Failed to add new auction to DB.")
 		w.WriteHeader(http.StatusInternalServerError)

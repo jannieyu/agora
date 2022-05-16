@@ -24,7 +24,7 @@ func (h Handle) AddOrUpdateItem(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	auction, err := GetMostRecentAuction(h.Db)
+	auction, err := GetCurrentAuction(h.Db)
 	if err != nil {
 		log.WithError(err).Error("Failed to get auction info when creating/updating item.")
 		w.WriteHeader(http.StatusInternalServerError)

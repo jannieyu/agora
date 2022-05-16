@@ -37,7 +37,7 @@ func main() {
 
 	h := api.New(index, db, hub, sessions.NewCookieStore(key))
 
-	auction, err := api.GetMostRecentAuction(db)
+	auction, err := api.GetCurrentAuction(db)
 	if err != nil {
 		log.WithError(err).Fatal("Cannot retrieve auction info from database.")
 	}
