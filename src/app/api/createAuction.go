@@ -26,14 +26,14 @@ func (h Handle) CreateAuction(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var auction database.Auction
-	if err := h.Db.Where("id = ?", 1).Find(&auction).Error; err != nil {
-		log.WithError(err).Error("Failed to get auction info from database.")
+	isAuctionActive, err := IsAuctionActive(h.Db)
+	if err != nil {
+		log.WithError(err).Error("Failed to check if there exists an active auction while creating an auction.")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	if auction.ID != 0 {
-		log.Error("Auction has already been created. Cannot create two auctions at the same time.")
+	if isAuctionActive {
+		log.Error("Auction has already been created. Create new auction after current is disabled or ended.")
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
@@ -42,32 +42,27 @@ func (h Handle) CreateAuction(w http.ResponseWriter, r *http.Request) {
 		StartTime string `json:"startTime"`
 		EndTime   string `json:"endTime"`
 	}{}
-	if err := json.Unmarshal([]byte(urlParams), &payload); err != nil {
+	if err = json.Unmarshal([]byte(urlParams), &payload); err != nil {
 		log.WithError(err).Error("Failed to unmarshal auction info.")
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	auction, err = parseAndValidateTime(payload.StartTime, payload.EndTime)
+	auction, err := parseAndValidateTime(payload.StartTime, payload.EndTime)
 	if err != nil {
 		log.WithError(err).Error("Failed to parse time for auction start/end time.")
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	go func() {
-		d := auction.StartTime.Sub(time.Now())
-		time.Sleep(d)
-		err := initAuction(h.Db, h.Hub, &auction)
-		if err != nil {
-			log.WithError(err).Error("Failed to init auction.")
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-	}()
+	if err = h.Db.Create(&auction).Error; err != nil {
+		log.WithError(err).Error("Failed to add new auction to DB.")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	go SetAuctionTimers(auction, h.Db, h.Hub)
+	w.WriteHeader(http.StatusOK)
 }
 
 func parseAndValidateTime(startTimeString string, endTimeString string) (database.Auction, error) {
-	log.Info(startTimeString, endTimeString)
-
 	iso8601 := "2006-01-02T15:04:05-0700"
 	startTime, err := time.Parse(iso8601, startTimeString)
 	if err != nil {
@@ -77,16 +72,25 @@ func parseAndValidateTime(startTimeString string, endTimeString string) (databas
 	if err != nil {
 		return database.Auction{}, err
 	}
-	if startTime.Sub(time.Now()) < 0 {
+	if startTime.Before(time.Now()) {
 		return database.Auction{}, errors.New("Invalid start date; must start after current time.")
 	}
-	if endTime.Sub(startTime) < 0 {
+	if endTime.Before(startTime) {
 		return database.Auction{}, errors.New("Invalid start/end date; start date must come before end date.")
 	}
 	return database.Auction{
 		StartTime: startTime,
 		EndTime:   endTime,
 	}, nil
+}
+
+func SetAuctionTimers(auction database.Auction, db *gorm.DB, hub *ws.Hub) {
+	d := auction.StartTime.Sub(time.Now())
+	time.Sleep(d)
+	if err := initAuction(db, hub, &auction); err != nil {
+		log.WithError(err).Error("Failed to init auction.")
+	}
+	log.Info("Started auction.")
 }
 
 func initAuction(db *gorm.DB, hub *ws.Hub, auction *database.Auction) error {
@@ -100,11 +104,10 @@ func initAuction(db *gorm.DB, hub *ws.Hub, auction *database.Auction) error {
 	}
 	go func() {
 		time.Sleep(d)
-		err := item.CloseAuction(db, hub)
-		if err != nil {
+		if err := item.CloseAuction(db, hub); err != nil {
 			log.WithError(err).Error("Failed to close auction.")
-			panic(err)
 		}
+		log.Info("Closed auction.")
 	}()
 	return nil
 }

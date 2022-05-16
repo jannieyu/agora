@@ -60,6 +60,7 @@ type Item struct {
 	ID            uint32          `json:"id,omitempty" gorm:"primarykey"`
 	SellerID      uint32          `json:"sellerId,omitempty"`
 	Seller        User            `json:"seller,omitempty" gorm:"constraint:OnUpdate:CASCADE;foreignkey:SellerID"`
+	AuctionID     uint32          `json:"auctionId,omitempty"`
 	Name          string          `json:"name,omitempty"`
 	Image         string          `json:"image,omitempty"`
 	Category      string          `json:"category,omitempty"`
@@ -78,6 +79,8 @@ type Item struct {
 
 type Auction struct {
 	ID        uint32    `json:"id,omitempty" gorm:"primarykey"`
-	StartTime time.Time `json:"startTime"`
-	EndTime   time.Time `json:"endTime"`
+	Name      string    `json:"name,omitempty"`
+	StartTime time.Time `json:"startTime,omitempty"`
+	EndTime   time.Time `json:"endTime,omitempty"`
+	Items     []Item    `json:"items,omitempty" gorm:"foreignkey:AuctionID"`
 }

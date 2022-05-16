@@ -13,6 +13,17 @@ import (
 )
 
 func (h Handle) AddBid(w http.ResponseWriter, r *http.Request) {
+	isAuctionActive, err := IsAuctionActive(h.Db)
+	if err != nil {
+		log.WithError(err).Error("Failed to check if auction is active.")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	if !isAuctionActive {
+		log.Error("Auction is inactive; cannot create bid.")
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
 	session, err := h.Store.Get(r, "user-auth")
 	if err != nil {
 		log.WithError(err).Error("Failed to get cookie session at logout.")

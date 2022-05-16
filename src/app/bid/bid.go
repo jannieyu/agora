@@ -24,7 +24,9 @@ func PlaceBid(bidderID uint32, itemID uint32, bidBotID uint32, bidPrice decimal.
 	if err := db.First(&item, itemID).Error; err != nil {
 		return http.StatusInternalServerError, err
 	}
-
+	if item.Active == false {
+		return http.StatusBadRequest, errors.New("Invalid bid: Bid on inactive item.")
+	}
 	if err := checkValidBidIncrement(bidPrice.InexactFloat64(), item.HighestBid.InexactFloat64()); err != nil {
 		return http.StatusBadRequest, errors.New("Invalid bid: must be higher than existing highest bid or starting price value.")
 	}
