@@ -2,10 +2,12 @@ import * as React from "react"
 import { Container, Nav, Navbar } from "react-bootstrap"
 import { Button, Dropdown } from "semantic-ui-react"
 import { Link, useNavigate } from "react-router-dom"
+import { DateTime } from "luxon"
 import { apiCall as logoutCall } from "../api/logout"
 import { useCallback, useDispatch, useSelector } from "./react_base"
 import { clearListingState, setData } from "./actions"
 import { AppState, User } from "./reducers"
+import Countdown from "./countdown"
 
 interface SiteNavbarProps {
   user: User
@@ -15,6 +17,7 @@ interface SiteNavbarProps {
 function SiteNavbar(props: SiteNavbarProps) {
   const { user, requiresAuth } = props
   const numUnseenNotifs = useSelector((state: AppState) => state.numUnseenNotifs)
+  const auctionEnd = DateTime.now().plus({ seconds: 10 })
 
   const dispatch = useDispatch()
   const navigate = useNavigate()
@@ -88,6 +91,9 @@ function SiteNavbar(props: SiteNavbarProps) {
             </Link>
           </Nav.Item>
           <div className="login">
+            <Nav.Item className="nav-link nav-countdown">
+              <Countdown endTime={auctionEnd} />
+            </Nav.Item>
             {user ? (
               <Dropdown
                 icon="bars"
