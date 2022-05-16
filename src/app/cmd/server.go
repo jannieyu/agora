@@ -62,8 +62,12 @@ func main() {
 	r.HandleFunc("/api/get_notifications", h.GetNotifications)
 	r.HandleFunc("/api/update_seen_notifications", h.UpdateSeenNotifications)
 
+	r.HandleFunc("/api/create_auction", h.CreateAuction)
+	r.HandleFunc("/api/get_auction", h.GetAuctionStatus)
+
 	port := 8000
 	log.Info("Server up and running on port " + fmt.Sprint(port))
 
 	http.ListenAndServe(":"+fmt.Sprint(port), r)
+
 }

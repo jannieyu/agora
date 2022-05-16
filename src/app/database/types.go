@@ -75,3 +75,9 @@ type Item struct {
 	Active        bool            `json:"active"`
 	CreatedAt     time.Time       `json:"createdAt,omitempty" gorm:"autoCreateTime"`
 }
+
+type Auction struct {
+	ID        uint32    `json:"id,omitempty" gorm:"primarykey"`
+	StartTime time.Time `json:"startTime"`
+	EndTime   time.Time `json:"endTime"`
+}

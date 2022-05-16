@@ -127,10 +127,9 @@ func CloseAuction(db *gorm.DB, hub *ws.Hub) error {
 			return err
 		}
 		item.Active = false
-	}
-
-	if err := db.Save(&items).Error; err != nil {
-		return err
+		if err := db.Save(&item).Error; err != nil {
+			return err
+		}
 	}
 	return nil
 }
@@ -148,16 +147,16 @@ func notifySellerOfItemResult(db *gorm.DB, hub *ws.Hub, item database.Item) erro
 			return err
 		}
 	} else {
-		var winnerId uint32
-		if err := db.Select("bidder_id").Where("bid_price = ? AND item_id = ?", item.HighestBid, item.ID).Find(&winnerId).Error; err != nil {
+		var winningBid database.Bid
+		if err := db.Where("bid_price = ? AND item_id = ?", item.HighestBid, item.ID).Find(&winningBid).Error; err != nil {
 			return err
 		}
-		if winnerId == 0 {
+		if winningBid.BidderID == 0 {
 			return errors.New(fmt.Sprintf("No winner found for item %d", item.ID))
 		}
 		if err := bid.CreateNotification(db, hub, database.Notification{
 			ReceiverID: item.SellerID,
-			SenderID:   winnerId,
+			SenderID:   winningBid.ID,
 			ItemID:     item.ID,
 			Price:      item.HighestBid,
 			NoteType:   notification.ITEM_SOLD,

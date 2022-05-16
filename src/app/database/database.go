@@ -55,5 +55,12 @@ func Init() (*gorm.DB, error) {
 		}
 	}
 
+	if !db.Migrator().HasTable(&Auction{}) {
+		if err := db.AutoMigrate(&Auction{}); err != nil {
+			log.WithError(err).Error("Failed to initiate Auctions table.")
+			return nil, err
+		}
+	}
+
 	return db, nil
 }
