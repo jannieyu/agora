@@ -1,3 +1,9 @@
+export interface Auction {
+  id?: number
+  startTime: string
+  endTime: string
+}
+
 export interface BidHistory {
   id?: number
   bidderId: number

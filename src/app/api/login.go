@@ -81,9 +81,13 @@ func (h Handle) Login(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusInternalServerError)
 		}
 
+		var auction database.Auction
+		auction, err = GetMostRecentAuction(h.Db)
+
 		response := u.LoginStatusAPI{
-			User:  status,
-			Count: count,
+			User:    status,
+			Count:   count,
+			Auction: auction,
 		}
 
 		SafeEncode(w, response)
