@@ -13,6 +13,18 @@ import (
 )
 
 func (h Handle) AddOrUpdateItem(w http.ResponseWriter, r *http.Request) {
+	isAuctionActive, err := IsAuctionActive(h.Db)
+	if err != nil {
+		log.WithError(err).Error("Failed to check if auction is active.")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	if !isAuctionActive {
+		log.Error("Auction is inactive; cannot create/update item.")
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
 	sellerID, err := user.GetAuthorizedUserId(h.Store, r)
 	if err != nil {
 		log.WithError(err).Error("Failed to get cookie session for login status check.")
@@ -45,6 +57,13 @@ func (h Handle) AddOrUpdateItem(w http.ResponseWriter, r *http.Request) {
 	}
 	if item.ID == 0 {
 		item.SellerID = sellerID
+		auction, err := GetMostRecentAuction(h.Db)
+		if err != nil {
+			log.WithError(err).Error("Failed to get auction info when creating/updating item.")
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		item.AuctionID = auction.ID
 	} else if item.SellerID != sellerID {
 		log.WithError(err).Error("Cannot update item; user doesn't match seller.")
 		w.WriteHeader(http.StatusForbidden)

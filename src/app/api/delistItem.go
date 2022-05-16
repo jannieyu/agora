@@ -17,6 +17,17 @@ import (
 )
 
 func (h Handle) DelistItem(w http.ResponseWriter, r *http.Request) {
+	isAuctionActive, err := IsAuctionActive(h.Db)
+	if err != nil {
+		log.WithError(err).Error("Failed to check if auction is active.")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	if !isAuctionActive {
+		log.Error("Auction is inactive; cannot delist item.")
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
 	sellerID, err := user.GetAuthorizedUserId(h.Store, r)
 	if err != nil {
 		log.WithError(err).Error("Failed to get cookie session for login status check.")

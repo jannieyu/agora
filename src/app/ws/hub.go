@@ -12,6 +12,7 @@ const (
 	NEW_NOTIFICATION BroadcastType = "NEW_NOTIFICATION"
 	NEW_BID          BroadcastType = "NEW_BID"
 	UPDATE_ITEM      BroadcastType = "UPDATE_ITEM"
+	AUCTION_END      BroadcastType = "AUCTION_END"
 )
 
 type WSMessage struct {

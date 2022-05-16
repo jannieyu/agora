@@ -115,6 +115,10 @@ func ConvertStringPriceToDecimal(price string) (decimal.Decimal, error) {
 }
 
 func CloseAuction(db *gorm.DB, hub *ws.Hub) error {
+	if err := hub.BroadcastMessage([]uint32{}, ws.BroadcastAPI{
+		BroadcastType: ws.AUCTION_END}); err != nil {
+		return err
+	}
 	var items []database.Item
 	if err := db.Where("active = ?", true).Find(&items).Error; err != nil {
 		return err

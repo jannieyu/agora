@@ -7,6 +7,7 @@ import (
 	"agora/src/app/ws"
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
@@ -35,6 +36,17 @@ func main() {
 	go hub.Run()
 
 	h := api.New(index, db, hub, sessions.NewCookieStore(key))
+
+	auction, err := api.GetMostRecentAuction(db)
+	if err != nil {
+		log.WithError(err).Fatal("Cannot retrieve auction info from database.")
+	}
+	if auction.ID != 0 {
+		if time.Now().Before(auction.EndTime) {
+			go api.SetAuctionTimers(auction, db, hub)
+		}
+	}
+
 	r := mux.NewRouter()
 
 	r.HandleFunc("/api/ws", h.Ws)

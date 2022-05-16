@@ -6,13 +6,23 @@ import (
 	"agora/src/app/database"
 	"agora/src/app/item"
 	"encoding/json"
-	"net/http"
-
 	log "github.com/sirupsen/logrus"
 	"gorm.io/gorm"
+	"net/http"
 )
 
 func (h Handle) AddOrUpdateBidBot(w http.ResponseWriter, r *http.Request) {
+	isAuctionActive, err := IsAuctionActive(h.Db)
+	if err != nil {
+		log.WithError(err).Error("Failed to check if auction is active.")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	if !isAuctionActive {
+		log.Error("Auction is inactive; cannot create/update bidbot.")
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
 	session, err := h.Store.Get(r, "user-auth")
 	if err != nil {
 		log.WithError(err).Error("Failed to get cookie session at logout.")
