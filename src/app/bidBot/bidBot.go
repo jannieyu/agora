@@ -72,6 +72,10 @@ func runBotAgainstHighestBid(db *gorm.DB, hub *ws.Hub, bidBot *database.BidBot) 
 		return http.StatusInternalServerError, err
 	}
 
+	if err := bid.BroadcastNewBid(hub, db, bidBot.ItemID); err != nil {
+		log.WithError(err).Error("Failed to broadcast new bid.")
+	}
+
 	return http.StatusOK, nil
 }
 func RunManualBidAgainstBot(db *gorm.DB, hub *ws.Hub, itemId uint32, bidderID uint32, bidPrice decimal.Decimal) (int, bool, error) {
@@ -205,6 +209,9 @@ func RunBotAgainstBot(db *gorm.DB, hub *ws.Hub, newBidBot database.BidBot) (int,
 			return updateBidBotTie(db, hub, &newBidBot, &oldBidBot)
 		} else {
 			return updateBidBotWinner(db, hub, &oldBidBot, &newBidBot)
+		}
+		if err := bid.BroadcastNewBid(hub, db, newBidBot.ItemID); err != nil {
+			log.WithError(err).Error("Failed to broadcast new bid.")
 		}
 	}
 	return http.StatusOK, nil
