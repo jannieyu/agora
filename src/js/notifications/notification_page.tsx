@@ -165,7 +165,11 @@ function LineItem(props: LineItemProps) {
   const onClick = () => {
     dismiss()
     let destination = `/my_bids/?id=${itemId}`
-    if (noteType === NotificationType.ITEM_BID_ON || noteType === NotificationType.ITEM_SOLD) {
+    if (
+      noteType === NotificationType.ITEM_BID_ON ||
+      noteType === NotificationType.ITEM_SOLD ||
+      noteType === NotificationType.ITEM_NOT_SOLD
+    ) {
       destination = `/my_listings/?id=${itemId}`
     }
     navigate(destination)

@@ -18,14 +18,26 @@ import ConfirmationModal from "../base/confirmation_modal"
 import { ListingProps } from "./types"
 import { safeParseFloat } from "../base/util"
 import { setData } from "../base/actions"
+import { AuctionState } from "../base/types"
 
 type LineItemProps = ListingProps & {
   setSearchParams: (arg: unknown) => void
   setDeleteId: (id: number) => void
+  auctionState: AuctionState
 }
 
 function LineItem(props: LineItemProps) {
-  const { id, image, name, highestBid, numBids, active, setSearchParams, setDeleteId } = props
+  const {
+    id,
+    image,
+    name,
+    highestBid,
+    numBids,
+    active,
+    setSearchParams,
+    setDeleteId,
+    auctionState,
+  } = props
 
   const navigate = useNavigate()
 
@@ -53,7 +65,9 @@ function LineItem(props: LineItemProps) {
 
   return (
     <Row
-      className={`my_listing align-items-center ${active ? "active-item" : "delisted"}`}
+      className={`my_listing align-items-center ${
+        active || auctionState === AuctionState.COMPLETE ? "active-item" : "delisted"
+      }`}
       onClick={onClick}
     >
       {active ? (
@@ -71,7 +85,11 @@ function LineItem(props: LineItemProps) {
         <div style={{ display: "flex", justifyContent: "space-between" }}>
           <b>
             <span>{name}</span>
-            {active ? null : <span className="red">&nbsp;(delisted)</span>}
+            {active ? null : (
+              <span className="red">
+                &nbsp;({auctionState === AuctionState.COMPLETE ? "Auction Closed" : "delisted"})
+              </span>
+            )}
           </b>
           <strong>{`${numBids} bid${numBids === 1 ? "" : "s"}`}</strong>
         </div>
@@ -88,7 +106,7 @@ function LineItem(props: LineItemProps) {
 }
 
 export default function MyListings() {
-  const { user, searchItems } = useSelector((state: AppState) => state)
+  const { user, auction, searchItems } = useSelector((state: AppState) => state)
   const [deleteId, setDeleteId] = useState<number | null>(null)
 
   const [searchParams, setSearchParams] = useSearchParams()
@@ -127,6 +145,7 @@ export default function MyListings() {
       key={listing.id}
       setSearchParams={setSearchParams}
       setDeleteId={setDeleteId}
+      auctionState={auction.state}
     />
   ))
 
