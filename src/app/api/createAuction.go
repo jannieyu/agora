@@ -7,10 +7,11 @@ import (
 	"agora/src/app/ws"
 	"encoding/json"
 	"errors"
-	log "github.com/sirupsen/logrus"
-	"gorm.io/gorm"
 	"net/http"
 	"time"
+
+	log "github.com/sirupsen/logrus"
+	"gorm.io/gorm"
 )
 
 func (h Handle) CreateAuction(w http.ResponseWriter, r *http.Request) {
