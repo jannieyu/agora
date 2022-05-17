@@ -63,7 +63,7 @@ function Gallery() {
   const [searchParams, setSearchParams] = useSearchParams()
   const params = useMemo(() => Object.fromEntries([...searchParams]), [searchParams])
 
-  const [searchBarText, setSearchBarText] = useState<string>(params.search)
+  const [searchBarText, setSearchBarText] = useState<string>(params.search || "")
   const [loading, setLoading] = useState<boolean>(false)
   const [deletingItemId, setDeletingItemId] = useState<number | null>(null)
 

@@ -12,10 +12,12 @@ function Home() {
   const { auction, user } = useSelector((state: AppState) => state)
 
   /* Case 1: No Auction in DB */
-  if (auction?.state === AuctionState.NO_AUCTION) {
+  if (auction?.state === AuctionState.NO_AUCTION || auction?.state === AuctionState.COMPLETE) {
     if (user?.id === 1) {
       return <StartAuction />
     }
+  }
+  if (auction?.state === AuctionState.NO_AUCTION) {
     return (
       <span style={{ fontSize: "32px" }}>
         No ongoing auctions. Please contact AuctionHouse to start your own community auction.
