@@ -93,7 +93,7 @@ export function AutomaticBidForm(props: RefinedBidFormProps) {
               onChange={handleChangeBidAmount}
               error={!!bidPrice && !isValidPrice(bidPrice)}
               value={bidPrice}
-              label="Agora will automatically increase your bid by the minimum
+              label="AuctionHouse will automatically increase your bid by the minimum
               increment each time you are outbid, until you reach the maximum amount specified below."
             />
           </div>

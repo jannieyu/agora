@@ -82,7 +82,7 @@ export default function Card(props: CardProps) {
             <Icon name="trash" className="card-trash" onClick={onDelete} />
           </div>
         ) : (
-          <div>{`${numBids} bid${numBids === 1 ? "" : "s"}`}</div>
+          <div>{`${numBids}\u00A0bid${numBids === 1 ? "" : "s"}`}</div>
         )}
       </div>
     </div>

@@ -237,7 +237,6 @@ function Gallery() {
           </Col>
         </Row>
         <br />
-
         {cardRows}
       </Form>
     </>
