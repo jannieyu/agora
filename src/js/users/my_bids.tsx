@@ -145,7 +145,7 @@ export default function MyBids() {
   const [bidBots, setBidBots] = useState<BidBot[]>([])
   const [selectedItem, setSelectedItem] = useState<SearchItem | null>(null)
   const [activeIndex, setActiveIndex] = useState<number>(0)
-  const auctionState = useSelector((state: AppState) => state.auction.state)
+  const auctionState = useSelector((state: AppState) => state.auction?.state)
 
   const [searchParams, setSearchParams] = useSearchParams()
   const params = useMemo(() => Object.fromEntries([...searchParams]), [searchParams])
