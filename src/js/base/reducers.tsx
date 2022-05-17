@@ -34,6 +34,8 @@ export enum NotificationType {
   BIDBOT_BID = "BIDBOT_BID",
   ITEM_DELISTED = "ITEM_DELISTED",
   BIDBOT_DEACTIVATED_ITEM_DELISTED = "BIDBOT_DEACTIVATED_ITEM_DELISTED",
+  BIDBOT_DEACTIVATED_AUCTION_END = "BIDBOT_DEACTIVATED_AUCTION_END",
+  ITEM_NOT_SOLD = "ITEM_NOT_SOLD",
 }
 
 export interface Notification {
@@ -44,8 +46,11 @@ export interface Notification {
   userId?: number
   price?: string
 
-  user?: User
   itemName?: string
+  userFirstName?: string
+  userLastName?: string
+  userEmail?: string
+  senderId?: number
 }
 
 export interface ListingState {
