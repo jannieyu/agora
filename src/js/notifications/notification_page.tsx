@@ -1,6 +1,6 @@
 import * as React from "react"
 import { Row, Col } from "react-bootstrap"
-import { useNavigate, Link } from "react-router-dom"
+import { useNavigate } from "react-router-dom"
 import { Button } from "semantic-ui-react"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { IconProp } from "@fortawesome/fontawesome-svg-core"
@@ -15,7 +15,7 @@ import {
 } from "../api/get_notifications"
 
 const iconMap = new Map<NotificationType, IconProp>([
-  [NotificationType.WON, "thumbs-up"],
+  [NotificationType.WON, "face-smile"],
   [NotificationType.LOST, "face-frown"],
   [NotificationType.OUTBID, "face-frown"],
   [NotificationType.ITEM_BID_ON, "arrow-up"],
@@ -49,18 +49,8 @@ interface LineItemProps {
 
 function LineItem(props: LineItemProps) {
   const { notification, viewNotification } = props
-  const {
-    id,
-    noteType,
-    seen,
-    itemId,
-    price,
-    itemName,
-    userFirstName,
-    userLastName,
-    userEmail,
-    senderId,
-  } = notification
+  const { id, noteType, seen, itemId, price, itemName, userFirstName, userLastName, userEmail } =
+    notification
 
   const navigate = useNavigate()
   const dispatch = useDispatch()
@@ -91,9 +81,9 @@ function LineItem(props: LineItemProps) {
         return (
           <div>
             Congratulations! You won {itemName} for a final bid price of
-            {priceStr} Please contact <Link to={`/user_profile?/id=${senderId}`} />
-            {`${userFirstName} ${userLastName}`} to arrange an exchange. Their email address is{" "}
-            {`${userEmail}`} and they may have more contact info listed on their profile page.
+            {priceStr}. Please contact {`${userFirstName} ${userLastName}`}
+            to arrange an exchange. Their email address is {`${userEmail}`} and they may have more
+            contact info listed on their profile page.
           </div>
         )
       case NotificationType.LOST:
@@ -109,7 +99,7 @@ function LineItem(props: LineItemProps) {
           <div>
             Congratulations! Your item {itemName} was sold to {`${userFirstName} ${userLastName}`}{" "}
             for a final price of {priceStr}. Please contact
-            {`${userFirstName} ${userLastName}`} to arrange an exchange. Their email address is{" "}
+            {` ${userFirstName} ${userLastName}`} to arrange an exchange. Their email address is{" "}
             {`${userEmail}`} and they may have more contact info listed on their profile page.
           </div>
         )

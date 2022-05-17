@@ -57,19 +57,24 @@ export default function Card(props: CardProps) {
       role="button"
       tabIndex={0}
     >
-      <h2>{name}</h2>
       <div>
         <img src={`/${image}`} alt="Listing Preview" className="card-image" />
       </div>
       <div className="card-metadata">
         <div>
           <div className="major-metadata">
-            <span>
-              <b>{`$${safeParseFloat(highestBid)?.toFixed(2)}`}</b>
-            </span>
+            <div>
+              <strong>{name}</strong>
+            </div>
           </div>
-          <div>{category}</div>
-          <div>{condition}</div>
+          <div className="category-and-condition">
+            {category}
+            {"\u00A0"}&#183;{"\u00A0"}
+            {condition}
+          </div>
+          <span>
+            <b>{`$${safeParseFloat(highestBid)?.toFixed(2)}`}</b>
+          </span>
         </div>
         {sellerId === activeUser?.id ? (
           <div>

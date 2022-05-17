@@ -182,7 +182,7 @@ func notifyBiddersOfItemResult(db *gorm.DB, hub *ws.Hub, item database.Item) err
 	var exists = struct{}{}
 	for _, b := range manualBids {
 		if _, ok := s[b.BidderID]; !ok {
-			if b.BidPrice == item.HighestBid {
+			if b.BidPrice.Equal(item.HighestBid) {
 				if err := bid.CreateNotification(db, hub, database.Notification{
 					ReceiverID: b.BidderID,
 					SenderID:   item.SellerID,

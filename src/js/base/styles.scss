@@ -138,7 +138,7 @@
 }
 
 .my_listing, .my_bids, .card {
-    border-width: 2px;
+    border-width: 1px;
     border-radius: 10px;
     border-color: #ccc;
     border-style: solid;
@@ -168,8 +168,8 @@
         max-height: 25vh;
     }
 
-    h2 {
-        white-space: break-spaces;
+    .category-and-condition {
+        color: rgb(112,112,112);
     }
 }
 
@@ -316,16 +316,25 @@
 }
 
 .nav-countdown {
-    position: absolute;
-    right: 110%;
-
     span {
-        color: white;
+        /* color: #8A001A; */
+        color: black;
+        padding-right: 0.5rem;
     }
 
     .clock-icon {
-        position: absolute;
-        right: 100%;
-        top: 30%;
+        padding-right: 0.5rem;
     }
+}
+
+.site-navbar {
+    border-bottom: solid #eee 1px;
+
+    img {
+        height: 2.5rem;
+    }
+}
+
+body {
+  color: rgb(34, 34, 34);
 }

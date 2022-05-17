@@ -90,92 +90,90 @@ function SiteNavbar(props: SiteNavbarProps) {
   const auctionState = auction?.state
 
   return (
-    <Navbar bg="primary" variant="dark">
-      <Container>
-        <Navbar.Brand>
-          <Link to="/" className="unstyled-link">
-            Agora
-          </Link>
-        </Navbar.Brand>
-        <Nav className="me-auto">
-          <Nav.Item className="nav-link">
-            <Link to="/about" className="unstyled-link">
-              About
+    <div style={{ position: "sticky", top: 0, zIndex: 1, backgroundColor: "white" }}>
+      <Navbar className="site-navbar">
+        <Container className="site-navbar-container">
+          <Navbar.Brand>
+            <Link to="/" className="unstyled-link">
+              <img src="/images/assets/auctionhouse_logo.png" alt="logo" />
             </Link>
-          </Nav.Item>
-          <div className="login">
+          </Navbar.Brand>
+          <Nav>
             <Nav.Item className="nav-link nav-countdown">
               {[AuctionState.ACTIVE, AuctionState.NOT_STARTED].includes(auction?.state) && (
                 <Countdown endTime={endTime} showClock />
               )}
               {auctionState === AuctionState.COMPLETE && AUCTION_COMPLETE_TEXT}
             </Nav.Item>
-            {user ? (
-              <Dropdown
-                icon="bars"
-                floating
-                labeled
-                button
-                className="icon"
-                trigger={
-                  <div className="name-trigger">
-                    <span
-                      style={
-                        numUnseenNotifs ? { marginRight: `${(notifStrLen - 1) * 0.2}rem` } : null
-                      }
-                    >{`${user.firstName} ${user.lastName}`}</span>
-                    {numUnseenNotifs > 0 ? (
-                      <div
-                        className="res-circle"
-                        style={{
-                          width: topNotifBubbleWidth,
-                        }}
-                      >
-                        <div className="circle-txt">{numUnseenNotifs}</div>
-                      </div>
-                    ) : null}
-                  </div>
-                }
-              >
-                <Dropdown.Menu>
-                  <Dropdown.Item text="My Bids" onClick={onClickMyBids} />
-                  <Dropdown.Item onClick={onClickNotifications}>
-                    <div className="notif-dropdown">
-                      Notifications{" "}
+            <div>
+              {user ? (
+                <Dropdown
+                  icon="bars"
+                  floating
+                  labeled
+                  basic
+                  button
+                  className="icon"
+                  trigger={
+                    <div className="name-trigger">
+                      <span
+                        style={
+                          numUnseenNotifs ? { marginRight: `${(notifStrLen - 1) * 0.2}rem` } : null
+                        }
+                      >{`${user.firstName} ${user.lastName}`}</span>
                       {numUnseenNotifs > 0 ? (
                         <div
                           className="res-circle"
                           style={{
-                            width: bottomNotifBubbleWidth,
+                            width: topNotifBubbleWidth,
                           }}
                         >
                           <div className="circle-txt">{numUnseenNotifs}</div>
                         </div>
                       ) : null}
                     </div>
-                  </Dropdown.Item>
-                  <Dropdown.Divider />
-                  <Dropdown.Item text="Create Listing" onClick={onCreateListing} />
-                  <Dropdown.Item text="My Listings" onClick={onClickMyListings} />
-                  <Dropdown.Divider />
-                  <Dropdown.Item text="Account" onClick={onClickMyProfile} />
-                  <Dropdown.Item onClick={onLogout} text="Log Out" />
-                </Dropdown.Menu>
-              </Dropdown>
-            ) : (
-              <>
-                <Button onClick={onLogin} color="green">
-                  Log In
-                </Button>
-                <Button onClick={onSignUp} color="orange">
-                  Sign Up
-                </Button>
-              </>
-            )}
-          </div>
-        </Nav>
-      </Container>
-    </Navbar>
+                  }
+                >
+                  <Dropdown.Menu>
+                    <Dropdown.Item text="My Bids" onClick={onClickMyBids} />
+                    <Dropdown.Item onClick={onClickNotifications}>
+                      <div className="notif-dropdown">
+                        Notifications{" "}
+                        {numUnseenNotifs > 0 ? (
+                          <div
+                            className="res-circle"
+                            style={{
+                              width: bottomNotifBubbleWidth,
+                            }}
+                          >
+                            <div className="circle-txt">{numUnseenNotifs}</div>
+                          </div>
+                        ) : null}
+                      </div>
+                    </Dropdown.Item>
+                    <Dropdown.Divider />
+                    <Dropdown.Item text="Create Listing" onClick={onCreateListing} />
+                    <Dropdown.Item text="My Listings" onClick={onClickMyListings} />
+                    <Dropdown.Divider />
+                    <Dropdown.Item text="Account" onClick={onClickMyProfile} />
+                    <Dropdown.Item onClick={onLogout} text="Log Out" />
+                  </Dropdown.Menu>
+                </Dropdown>
+              ) : (
+                <>
+                  <Button onClick={onLogin} color="green">
+                    Log In
+                  </Button>
+                  <Button onClick={onSignUp} color="orange">
+                    Sign Up
+                  </Button>
+                </>
+              )}
+            </div>
+          </Nav>
+        </Container>
+      </Navbar>
+    </div>
   )
 }
 
