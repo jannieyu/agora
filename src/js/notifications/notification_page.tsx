@@ -80,8 +80,8 @@ function LineItem(props: LineItemProps) {
       case NotificationType.WON:
         return (
           <div>
-            Congratulations! You won {itemName} for a final bid price of
-            {priceStr}. Please contact {`${userFirstName} ${userLastName}`}
+            Congratulations! You won {itemName} for a final bid price of {priceStr}. Please contact{" "}
+            {`${userFirstName} ${userLastName} `}
             to arrange an exchange. Their email address is {`${userEmail}`} and they may have more
             contact info listed on their profile page.
           </div>
