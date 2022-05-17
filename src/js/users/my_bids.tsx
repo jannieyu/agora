@@ -3,15 +3,17 @@ import { useSearchParams } from "react-router-dom"
 import { Row, Col } from "react-bootstrap"
 import { Tab } from "semantic-ui-react"
 import ListingModal from "../listings/listing_modal"
-import { SearchItem } from "../base/reducers"
-import { useCallback, useEffect, useMemo, useState } from "../base/react_base"
+import { AppState, SearchItem } from "../base/reducers"
+import { useCallback, useEffect, useMemo, useSelector, useState } from "../base/react_base"
 import { safeParseFloat, safeParseInt } from "../base/util"
 import { apiCall as getBids, Response as GetBidsResponse, ItemBid } from "../api/get_bids"
 import { apiCall as getBidBots, Response as GetBidBotsResponse, BidBot } from "../api/get_bid_bots"
 import { apiCall as getItem, Response as GetItemResponse } from "../api/get_item"
+import { AuctionState } from "../base/types"
 
 type AutomaticBidProps = BidBot & {
   setSearchParams: (arg: unknown) => void
+  auctionState: AuctionState
 }
 
 function AutomaticBid(props: AutomaticBidProps) {
@@ -25,6 +27,7 @@ function AutomaticBid(props: AutomaticBidProps) {
     active,
     activeItem,
     setSearchParams,
+    auctionState,
   } = props
 
   const highestItemBidStr = `$${safeParseFloat(highestItemBid).toFixed(2)}`
@@ -35,13 +38,17 @@ function AutomaticBid(props: AutomaticBidProps) {
     setSearchParams({ id: itemId })
   }, [setSearchParams, itemId])
 
+  const delistedText = auctionState === AuctionState.COMPLETE ? "Auction Closed" : "Item Delisted"
+
   return (
     <Row
       onClick={onClick}
       onKeyDown={onClick}
       role="button"
       tabIndex={0}
-      className={`my_bids align-items-center ${activeItem ? "active-item" : "delisted"}`}
+      className={`my_bids align-items-center ${
+        activeItem || auctionState === AuctionState.COMPLETE ? "active-item" : "delisted"
+      }`}
     >
       <Col xs={2}>
         <img src={`/${itemImage}`} alt="Listing Preview" />
@@ -66,7 +73,7 @@ function AutomaticBid(props: AutomaticBidProps) {
         {active && activeItem ? (
           <strong className="winning">Active</strong>
         ) : (
-          <strong className="losing">{activeItem ? "Deactivated" : "Item Delisted"}</strong>
+          <strong className="losing">{activeItem ? "Deactivated" : delistedText}</strong>
         )}
       </Col>
     </Row>
@@ -75,6 +82,7 @@ function AutomaticBid(props: AutomaticBidProps) {
 
 type ManualBidProps = ItemBid & {
   setSearchParams: (arg: unknown) => void
+  auctionState: AuctionState
 }
 
 function ManualBid(props: ManualBidProps) {
@@ -86,6 +94,7 @@ function ManualBid(props: ManualBidProps) {
     itemImage,
     activeItem,
     setSearchParams,
+    auctionState,
   } = props
   const highestItemBidStr = `$${safeParseFloat(highestItemBid).toFixed(2)}`
   const highestUserBidStr = `$${safeParseFloat(highestUserBid).toFixed(2)}`
@@ -96,9 +105,13 @@ function ManualBid(props: ManualBidProps) {
     setSearchParams({ id: itemId })
   }, [setSearchParams, itemId])
 
+  const delistedText = auctionState === AuctionState.COMPLETE ? "Auction Closed" : "Item Delisted"
+
   return (
     <Row
-      className={`my_bids align-items-center ${activeItem ? "active-item" : "delisted"}`}
+      className={`my_bids align-items-center ${
+        activeItem || auctionState === AuctionState.COMPLETE ? "active-item" : "delisted"
+      }`}
       onClick={onClick}
     >
       <Col xs={3} align="center">
@@ -120,7 +133,7 @@ function ManualBid(props: ManualBidProps) {
         {winning && activeItem ? (
           <strong className="winning">Winning</strong>
         ) : (
-          <strong className="losing">{activeItem ? "Losing" : "Item Delisted"}</strong>
+          <strong className="losing">{activeItem ? "Losing" : delistedText}</strong>
         )}
       </Col>
     </Row>
@@ -132,6 +145,7 @@ export default function MyBids() {
   const [bidBots, setBidBots] = useState<BidBot[]>([])
   const [selectedItem, setSelectedItem] = useState<SearchItem | null>(null)
   const [activeIndex, setActiveIndex] = useState<number>(0)
+  const auctionState = useSelector((state: AppState) => state.auction.state)
 
   const [searchParams, setSearchParams] = useSearchParams()
   const params = useMemo(() => Object.fromEntries([...searchParams]), [searchParams])
@@ -186,11 +200,21 @@ export default function MyBids() {
   }, [params, bids])
 
   const manualBids = bids.map((bid: ItemBid) => (
-    <ManualBid key={bid.itemId} {...bid} setSearchParams={setSearchParams} />
+    <ManualBid
+      key={bid.itemId}
+      {...bid}
+      setSearchParams={setSearchParams}
+      auctionState={auctionState}
+    />
   ))
 
   const autoBids = bidBots.map((bidBot: BidBot) => (
-    <AutomaticBid key={bidBot.id} {...bidBot} setSearchParams={setSearchParams} />
+    <AutomaticBid
+      key={bidBot.id}
+      {...bidBot}
+      setSearchParams={setSearchParams}
+      auctionState={auctionState}
+    />
   ))
 
   const handleTabChange = (e: React.FormEvent, { aI }) => setActiveIndex(aI)

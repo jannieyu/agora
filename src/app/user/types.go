@@ -12,5 +12,6 @@ type LoginCredentialsAPI struct {
 
 type LoginStatusAPI struct {
 	database.User
-	Count int64 `json:"newNotificationCount"`
+	Count   int64            `json:"newNotificationCount"`
+	Auction database.Auction `json:"auction"`
 }

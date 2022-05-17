@@ -1,3 +1,4 @@
+import { Auction } from "../base/types"
 import buildWrappedGet from "../base/api"
 
 export const API_ARGS = {}
@@ -9,6 +10,7 @@ export type Response = {
   lastName: string
   id: number
   newNotificationCount: number
+  auction: Auction
 }
 
 export const apiCall = buildWrappedGet<Arguments, Response>("/api/get_login_status")

@@ -314,3 +314,18 @@
         display: inline-block;
     }
 }
+
+.nav-countdown {
+    position: absolute;
+    right: 110%;
+
+    span {
+        color: white;
+    }
+
+    .clock-icon {
+        position: absolute;
+        right: 100%;
+        top: 30%;
+    }
+}

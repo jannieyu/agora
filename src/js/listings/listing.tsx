@@ -11,6 +11,7 @@ import { isValidPrice } from "./util"
 import { ListingProps } from "./types"
 import BidForm from "./bid_form"
 import RecommendedItems from "./recommended_items"
+import { AuctionState } from "../base/types"
 
 function HistoricalBidDatum(bid: BidHistoryT) {
   const { createdAt, bidPrice } = bid
@@ -90,7 +91,10 @@ export default function Listing(props: ListingProps) {
     isPreview,
     redirectHome,
   } = props
-  const activeUser = useSelector((state: AppState) => state.user)
+  const { activeUser, auctionState } = useSelector((state: AppState) => ({
+    activeUser: state.user,
+    auctionState: state.auction.state,
+  }))
 
   const dispatch = useDispatch()
 
@@ -138,7 +142,11 @@ export default function Listing(props: ListingProps) {
             <div className="listing-information">
               <h2>
                 <span>{name}</span>
-                {!active && <span className="red">&nbsp;(delisted)</span>}
+                {!active && (
+                  <span className="red">
+                    &nbsp;({auctionState === AuctionState.COMPLETE ? "Auction Closed" : "delisted"})
+                  </span>
+                )}
               </h2>
               <table className="listing-metadata-table">
                 <tbody>

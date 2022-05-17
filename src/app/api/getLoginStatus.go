@@ -48,9 +48,13 @@ func (h Handle) GetLoginStatus(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 	}
 
+	var auction database.Auction
+	auction, err = GetMostRecentAuction(h.Db)
+
 	response := u.LoginStatusAPI{
-		User:  user,
-		Count: count,
+		User:    user,
+		Count:   count,
+		Auction: auction,
 	}
 
 	SafeEncode(w, response)

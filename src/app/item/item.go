@@ -7,13 +7,14 @@ import (
 	"agora/src/app/ws"
 	"errors"
 	"fmt"
-	"gorm.io/gorm"
 	"io/ioutil"
 	"mime/multipart"
 	"net/http"
 	"strconv"
 	"strings"
 	"time"
+
+	"gorm.io/gorm"
 
 	"github.com/shopspring/decimal"
 	log "github.com/sirupsen/logrus"
@@ -160,7 +161,7 @@ func notifySellerOfItemResult(db *gorm.DB, hub *ws.Hub, item database.Item) erro
 		}
 		if err := bid.CreateNotification(db, hub, database.Notification{
 			ReceiverID: item.SellerID,
-			SenderID:   winningBid.ID,
+			SenderID:   winningBid.BidderID,
 			ItemID:     item.ID,
 			Price:      item.HighestBid,
 			NoteType:   notification.ITEM_SOLD,

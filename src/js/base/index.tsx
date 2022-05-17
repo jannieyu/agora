@@ -1,18 +1,10 @@
 import * as React from "react"
 import * as ReactDOM from "react-dom"
-import {
-  BrowserRouter as Router,
-  Route,
-  Routes,
-  useNavigate,
-  useLocation,
-  Link,
-} from "react-router-dom"
+import { BrowserRouter as Router, Route, Routes, useLocation, Link } from "react-router-dom"
 import { library } from "@fortawesome/fontawesome-svg-core"
 import { fas } from "@fortawesome/free-solid-svg-icons"
 import { far } from "@fortawesome/free-regular-svg-icons"
-import { Container, Nav, Navbar } from "react-bootstrap"
-import { Button, Dropdown } from "semantic-ui-react"
+import { Container } from "react-bootstrap"
 import {
   useCallback,
   useDispatch,
@@ -31,15 +23,16 @@ import MyBids from "../users/my_bids"
 import NotificationPage from "../notifications/notification_page"
 import NewListing from "../listings/new_listing"
 import "./styles.scss"
-import { apiCall as logoutCall } from "../api/logout"
 import {
   apiCall as getLoginStatus,
   API_ARGS as LOGIN_STATUS_ARGS,
   Response as LoginStatusResponse,
 } from "../api/get_login_status"
 import { rootReducer, AppState, Broadcast, BroadcastType, BidHistory } from "./reducers"
-import { setData, clearListingState, receiveNotification, updateSearchItem } from "./actions"
+import { setData, receiveNotification, updateSearchItem } from "./actions"
+import { determineAuctionState } from "./util"
 import Unauthorized from "./unauthorized"
+import SiteNavbar from "./site_navbar"
 
 interface BaseProps {
   children: React.ReactElement | React.ReactElement[]
@@ -69,11 +62,8 @@ function Base(props: BaseProps) {
   const { children } = props
 
   const dispatch = useDispatch()
-  const navigate = useNavigate()
   const location = useLocation()
-  const { user, showLoginModal, isSignUp, numUnseenNotifs } = useSelector(
-    (state: AppState) => state,
-  )
+  const { user, showLoginModal, isSignUp } = useSelector((state: AppState) => state)
 
   const [ws, setWs] = useState<WebSocket | null>(null)
 
@@ -83,74 +73,24 @@ function Base(props: BaseProps) {
     dispatch(setData({ showLoginModal: false }))
   }, [dispatch])
 
-  const onLogin = useCallback(() => {
-    dispatch(setData({ showLoginModal: true }))
-
-    dispatch(setData({ isSignUp: false }))
-  }, [dispatch])
-
-  const onSignUp = useCallback(() => {
-    dispatch(setData({ showLoginModal: true }))
-
-    dispatch(setData({ isSignUp: true }))
-  }, [dispatch])
-
-  const onLogout = useCallback(() => {
-    logoutCall(
-      null,
-      () => {
-        dispatch(
-          setData({
-            user: null,
-          }),
-        )
-
-        if (requiresAuth) {
-          navigate("/")
-        }
-      },
-      () => {},
-    )
-  }, [dispatch, navigate, requiresAuth])
-
-  const onCreateListing = useCallback(() => {
-    dispatch(clearListingState())
-    navigate("create_listing")
-  }, [dispatch, navigate])
-
-  const onClickMyProfile = useCallback(() => {
-    navigate(`user_profile/?id=${user.id}`)
-  }, [navigate, user])
-
-  const onClickMyListings = useCallback(() => {
-    navigate("my_listings")
-  }, [navigate])
-
-  const onClickMyBids = useCallback(() => {
-    navigate("my_bids")
-  }, [navigate])
-
-  const onClickNotifications = useCallback(() => {
-    navigate(`notifications`)
-  }, [navigate])
-
   useEffect(() => {
     getLoginStatus(
       LOGIN_STATUS_ARGS,
       (data: LoginStatusResponse) => {
-        if (data.email) {
-          dispatch(
-            setData({
-              user: {
-                id: data.id,
-                email: data.email,
-                firstName: data.firstName,
-                lastName: data.lastName,
-              },
-              numUnseenNotifs: data.newNotificationCount,
-            }),
-          )
-        }
+        dispatch(
+          setData({
+            user: data.email
+              ? {
+                  id: data.id,
+                  email: data.email,
+                  firstName: data.firstName,
+                  lastName: data.lastName,
+                }
+              : null,
+            numUnseenNotifs: data.newNotificationCount,
+            auction: { ...data.auction, state: determineAuctionState(data.auction) },
+          }),
+        )
         setWs(new WebSocket("ws://localhost:8000/api/ws"))
       },
       () => {},
@@ -178,93 +118,10 @@ function Base(props: BaseProps) {
     }
   }, [ws, dispatch])
 
-  const notifStrLen = numUnseenNotifs.toString().length
-  const topNotifBubbleWidth = `${notifStrLen * 0.15 + 0.9}rem`
-  const bottomNotifBubbleWidth = `${notifStrLen * 0.2 + 1.2}rem`
-
   return (
     <>
+      <SiteNavbar user={user} requiresAuth={requiresAuth} />
       <LoginModal show={showLoginModal} onHide={hideLoginModal} isSignUp={isSignUp} />
-      <Navbar bg="primary" variant="dark">
-        <Container>
-          <Navbar.Brand>
-            <Link to="/" className="unstyled-link">
-              Agora
-            </Link>
-          </Navbar.Brand>
-          <Nav className="me-auto">
-            <Nav.Item className="nav-link">
-              <Link to="/about" className="unstyled-link">
-                About
-              </Link>
-            </Nav.Item>
-            <div className="login">
-              {user ? (
-                <Dropdown
-                  icon="bars"
-                  floating
-                  labeled
-                  button
-                  className="icon"
-                  trigger={
-                    <div className="name-trigger">
-                      <span
-                        style={
-                          numUnseenNotifs ? { marginRight: `${(notifStrLen - 1) * 0.2}rem` } : null
-                        }
-                      >{`${user.firstName} ${user.lastName}`}</span>
-                      {numUnseenNotifs > 0 ? (
-                        <div
-                          className="res-circle"
-                          style={{
-                            width: topNotifBubbleWidth,
-                          }}
-                        >
-                          <div className="circle-txt">{numUnseenNotifs}</div>
-                        </div>
-                      ) : null}
-                    </div>
-                  }
-                >
-                  <Dropdown.Menu>
-                    <Dropdown.Item text="My Bids" onClick={onClickMyBids} />
-                    <Dropdown.Item onClick={onClickNotifications}>
-                      <div className="notif-dropdown">
-                        Notifications{" "}
-                        {numUnseenNotifs > 0 ? (
-                          <div
-                            className="res-circle"
-                            style={{
-                              width: bottomNotifBubbleWidth,
-                            }}
-                          >
-                            <div className="circle-txt">{numUnseenNotifs}</div>
-                          </div>
-                        ) : null}
-                      </div>
-                    </Dropdown.Item>
-                    <Dropdown.Divider />
-                    <Dropdown.Item text="Create Listing" onClick={onCreateListing} />
-                    <Dropdown.Item text="My Listings" onClick={onClickMyListings} />
-                    <Dropdown.Divider />
-                    <Dropdown.Item text="Account" onClick={onClickMyProfile} />
-                    <Dropdown.Item onClick={onLogout} text="Log Out" />
-                  </Dropdown.Menu>
-                </Dropdown>
-              ) : (
-                <>
-                  <Button onClick={onLogin} color="green">
-                    Log In
-                  </Button>
-                  <Button onClick={onSignUp} color="orange">
-                    Sign Up
-                  </Button>
-                </>
-              )}
-            </div>
-          </Nav>
-        </Container>
-      </Navbar>
       <Container>
         <div className="content-base">
           {requiresAuth && !user ? <Unauthorized loggedIn={!!user} /> : children}

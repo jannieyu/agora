@@ -1,3 +1,6 @@
+import { Auction } from "./types"
+import { determineAuctionState } from "./util"
+
 export interface BidHistory {
   id?: number
   bidderId: number
@@ -31,6 +34,8 @@ export enum NotificationType {
   BIDBOT_BID = "BIDBOT_BID",
   ITEM_DELISTED = "ITEM_DELISTED",
   BIDBOT_DEACTIVATED_ITEM_DELISTED = "BIDBOT_DEACTIVATED_ITEM_DELISTED",
+  BIDBOT_DEACTIVATED_AUCTION_END = "BIDBOT_DEACTIVATED_AUCTION_END",
+  ITEM_NOT_SOLD = "ITEM_NOT_SOLD",
 }
 
 export interface Notification {
@@ -41,8 +46,11 @@ export interface Notification {
   userId?: number
   price?: string
 
-  user?: User
   itemName?: string
+  userFirstName?: string
+  userLastName?: string
+  userEmail?: string
+  senderId?: number
 }
 
 export interface ListingState {
@@ -85,6 +93,7 @@ const initialState = {
   searchItems: [] as SearchItem[],
   listingState: {} as ListingState,
   numUnseenNotifs: 0 as number,
+  auction: null as Auction | null,
 }
 
 export type AppState = typeof initialState
@@ -96,7 +105,7 @@ export enum ActionType {
   CLEAR_LISTING_STATE = "CLEAR_LISTING_STATE",
   CLEAR_NOTIFICATION = "CLEAR_NOTIFICATION",
   RECEIVE_NOTIFICATION = "RECEIVE_NOTIFICATION",
-  OPEN_WEBSOCKET = "OPEN_WEBSOCKET",
+  UPDATE_AUCTION_STATE = "UPDATE_AUCTION_STATE",
 }
 
 export type SearchItemAction = {
@@ -158,6 +167,12 @@ export const rootReducer = (state: AppState = initialState, action: Action) => {
       return {
         ...state,
         numUnseenNotifs: state.numUnseenNotifs + 1,
+      }
+    }
+    case ActionType.UPDATE_AUCTION_STATE: {
+      return {
+        ...state,
+        auction: { ...state.auction, state: determineAuctionState(state.auction) },
       }
     }
     default: {
