@@ -86,7 +86,10 @@ func parseAndValidateTime(startTimeString string, endTimeString string) (databas
 
 func SetAuctionTimers(auction database.Auction, db *gorm.DB, hub *ws.Hub) {
 	d := auction.StartTime.Sub(time.Now())
-	time.Sleep(d)
+	if d > 0 {
+		time.Sleep(d)
+	}
+
 	if err := initAuction(db, hub, &auction); err != nil {
 		log.WithError(err).Error("Failed to init auction.")
 	}
