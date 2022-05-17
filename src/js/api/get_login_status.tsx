@@ -1,4 +1,4 @@
-import { Auction } from "../base/reducers"
+import { Auction } from "../base/types"
 import buildWrappedGet from "../base/api"
 
 export const API_ARGS = {}

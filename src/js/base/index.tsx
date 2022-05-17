@@ -30,6 +30,7 @@ import {
 } from "../api/get_login_status"
 import { rootReducer, AppState, Broadcast, BroadcastType, BidHistory } from "./reducers"
 import { setData, receiveNotification, updateSearchItem } from "./actions"
+import { determineAuctionState } from "./util"
 import Unauthorized from "./unauthorized"
 import SiteNavbar from "./site_navbar"
 
@@ -76,20 +77,20 @@ function Base(props: BaseProps) {
     getLoginStatus(
       LOGIN_STATUS_ARGS,
       (data: LoginStatusResponse) => {
-        if (data.email) {
-          dispatch(
-            setData({
-              user: {
-                id: data.id,
-                email: data.email,
-                firstName: data.firstName,
-                lastName: data.lastName,
-              },
-              numUnseenNotifs: data.newNotificationCount,
-              auction: data.auction,
-            }),
-          )
-        }
+        dispatch(
+          setData({
+            user: data.email
+              ? {
+                  id: data.id,
+                  email: data.email,
+                  firstName: data.firstName,
+                  lastName: data.lastName,
+                }
+              : null,
+            numUnseenNotifs: data.newNotificationCount,
+            auction: { ...data.auction, state: determineAuctionState(data.auction) },
+          }),
+        )
         setWs(new WebSocket("ws://localhost:8000/api/ws"))
       },
       () => {},

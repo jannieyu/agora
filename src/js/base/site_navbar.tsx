@@ -8,11 +8,14 @@ import { useCallback, useDispatch, useSelector } from "./react_base"
 import { clearListingState, setData } from "./actions"
 import { AppState, User } from "./reducers"
 import Countdown from "./countdown"
+import { AuctionState } from "./types"
 
 interface SiteNavbarProps {
   user: User
   requiresAuth: boolean
 }
+
+const AUCTION_COMPLETE_TEXT = <span>Auction{"\u00A0"}Complete</span>
 
 function SiteNavbar(props: SiteNavbarProps) {
   const { user, requiresAuth } = props
@@ -75,15 +78,16 @@ function SiteNavbar(props: SiteNavbarProps) {
   const topNotifBubbleWidth = `${notifStrLen * 0.15 + 0.9}rem`
   const bottomNotifBubbleWidth = `${notifStrLen * 0.2 + 1.2}rem`
 
-  const showCountdown = auction?.id && DateTime.now() < DateTime.fromISO(auction?.endTime)
   let endTime = null
-  if (showCountdown) {
+  if (auction?.id) {
     if (DateTime.now() < DateTime.fromISO(auction.startTime)) {
       endTime = DateTime.fromISO(auction.startTime)
     } else {
       endTime = DateTime.fromISO(auction.endTime)
     }
   }
+
+  const auctionState = auction?.state
 
   return (
     <Navbar bg="primary" variant="dark">
@@ -101,7 +105,10 @@ function SiteNavbar(props: SiteNavbarProps) {
           </Nav.Item>
           <div className="login">
             <Nav.Item className="nav-link nav-countdown">
-              <Countdown endTime={endTime} showClock />
+              {[AuctionState.ACTIVE, AuctionState.NOT_STARTED].includes(auction?.state) && (
+                <Countdown endTime={endTime} showClock />
+              )}
+              {auctionState === AuctionState.COMPLETE && AUCTION_COMPLETE_TEXT}
             </Nav.Item>
             {user ? (
               <Dropdown

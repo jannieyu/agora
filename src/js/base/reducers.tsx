@@ -1,8 +1,5 @@
-export interface Auction {
-  id?: number
-  startTime: string
-  endTime: string
-}
+import { Auction } from "./types"
+import { determineAuctionState } from "./util"
 
 export interface BidHistory {
   id?: number
@@ -103,7 +100,7 @@ export enum ActionType {
   CLEAR_LISTING_STATE = "CLEAR_LISTING_STATE",
   CLEAR_NOTIFICATION = "CLEAR_NOTIFICATION",
   RECEIVE_NOTIFICATION = "RECEIVE_NOTIFICATION",
-  OPEN_WEBSOCKET = "OPEN_WEBSOCKET",
+  UPDATE_AUCTION_STATE = "UPDATE_AUCTION_STATE",
 }
 
 export type SearchItemAction = {
@@ -165,6 +162,12 @@ export const rootReducer = (state: AppState = initialState, action: Action) => {
       return {
         ...state,
         numUnseenNotifs: state.numUnseenNotifs + 1,
+      }
+    }
+    case ActionType.UPDATE_AUCTION_STATE: {
+      return {
+        ...state,
+        auction: { ...state.auction, state: determineAuctionState(state.auction) },
       }
     }
     default: {
