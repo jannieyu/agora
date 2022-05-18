@@ -91,10 +91,16 @@
 
 .my_bids,
 .my_listing {
+    display: flex;
+    align-items: center;
+    text-align: center;
+
     margin-top: 1rem;
     margin-bottom: 1rem;
+    padding-left: 1rem;
 
     position: relative;
+    overflow-x: hidden;
 
     img {
         max-height: 8rem;
@@ -388,14 +394,28 @@ body {
     }
 }
 
+.my-bids-outer,
+.my-listings-outer,
 .notification-page-outer {
     display: flex;
     justify-content: center;
 
+    .my-listings-inner,
+    .my-bids-inner,
     .notification-page-inner {
         display: block;
         width: 100%;
         max-width: 60rem;
+    }
+
+    .my-bids-inner {
+        .width-2 {
+            width: 16.667%;
+        }
+
+        .width-3 {
+            width: 25%;
+        }
     }
 }
 

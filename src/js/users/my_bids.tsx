@@ -1,6 +1,5 @@
 import * as React from "react"
 import { useSearchParams } from "react-router-dom"
-import { Row, Col } from "react-bootstrap"
 import { Tab } from "semantic-ui-react"
 import ListingModal from "../listings/listing_modal"
 import { AppState, SearchItem } from "../base/reducers"
@@ -41,42 +40,42 @@ function AutomaticBid(props: AutomaticBidProps) {
   const delistedText = auctionState === AuctionState.COMPLETE ? "Auction Closed" : "Item Delisted"
 
   return (
-    <Row
+    <div
+      className={`my_bids ${
+        activeItem || auctionState === AuctionState.COMPLETE ? "active-item" : "delisted"
+      }`}
       onClick={onClick}
       onKeyDown={onClick}
       role="button"
       tabIndex={0}
-      className={`my_bids align-items-center ${
-        activeItem || auctionState === AuctionState.COMPLETE ? "active-item" : "delisted"
-      }`}
     >
-      <Col xs={2}>
+      <div className="width-2">
         <img src={`/${itemImage}`} alt="Listing Preview" />
-      </Col>
-      <Col xs={2}>
+      </div>
+      <div className="width-2">
         <b>{itemName}</b>
-      </Col>
-      <Col xs={2}>
+      </div>
+      <div className="width-2">
         <div>Your Top Bid:</div>
         <strong>{highestUserBidStr}</strong>
-      </Col>
-      <Col xs={2}>
+      </div>
+      <div className="width-2">
         <div>Top Overall Bid:</div>
         <strong>{highestItemBidStr}</strong>
-      </Col>
-      <Col xs={2}>
+      </div>
+      <div className="width-2">
         <div>Bot Upper Limit:</div>
         <strong>{maxBidStr}</strong>
-      </Col>
-      <Col xs={2}>
+      </div>
+      <div className="width-2">
         <div>Status</div>
         {active && activeItem ? (
           <strong className="winning">Active</strong>
         ) : (
           <strong className="losing">{activeItem ? "Deactivated" : delistedText}</strong>
         )}
-      </Col>
-    </Row>
+      </div>
+    </div>
   )
 }
 
@@ -108,35 +107,38 @@ function ManualBid(props: ManualBidProps) {
   const delistedText = auctionState === AuctionState.COMPLETE ? "Auction Closed" : "Item Delisted"
 
   return (
-    <Row
-      className={`my_bids align-items-center ${
+    <div
+      className={`my_bids ${
         activeItem || auctionState === AuctionState.COMPLETE ? "active-item" : "delisted"
       }`}
       onClick={onClick}
+      onKeyDown={onClick}
+      role="button"
+      tabIndex={0}
     >
-      <Col xs={3} align="center">
+      <div className="width-3 text-centered">
         <img src={`/${itemImage}`} alt="Listing Preview" />
-      </Col>
-      <Col xs={3}>
+      </div>
+      <div className="width-3">
         <b>{itemName}</b>
-      </Col>
-      <Col xs={2}>
+      </div>
+      <div className="width-2">
         <div>Your Top Bid:</div>
         <strong>{highestUserBidStr}</strong>
-      </Col>
-      <Col xs={2}>
+      </div>
+      <div className="width-2">
         <div>Top Overall Bid:</div>
         <strong>{highestItemBidStr}</strong>
-      </Col>
-      <Col xs={2}>
+      </div>
+      <div className="width-2">
         <div>Status</div>
         {winning && activeItem ? (
           <strong className="winning">Winning</strong>
         ) : (
           <strong className="losing">{activeItem ? "Losing" : delistedText}</strong>
         )}
-      </Col>
-    </Row>
+      </div>
+    </div>
   )
 }
 
@@ -251,15 +253,13 @@ export default function MyBids() {
         selectedItem={selectedItem}
         redirectHome
       />
-      <Row>
-        <h1 className="text-centered">My Bids</h1>
-        <Col xs={2} />
-        <Col xs={8} align="center">
+      <div className="my-bids-outer">
+        <div className="my-bids-inner">
+          <h1 className="text-centered">My Bids</h1>
           <br />
           <Tab panes={panes} activeIndex={activeIndex} onTabChange={handleTabChange} />
-        </Col>
-        <Col xs={2} />
-      </Row>
+        </div>
+      </div>
     </>
   )
 }
