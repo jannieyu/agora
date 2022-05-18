@@ -272,6 +272,23 @@
     .notification-box {
         padding: 16px 12px 16px 12px;
 
+        display: flex;
+        align-items: center;
+
+        .width-1 {
+            width: 8.333%;
+            min-width: 3rem;
+        }
+        
+        .width-2 {
+            width: 16.667%;
+            min-width: 6rem;
+        }
+
+        .width-8 {
+            width: 66.667%;
+        }
+
         .notification-text {
             cursor: pointer;
         }
@@ -368,6 +385,17 @@ body {
     justify-content: center;
 
     .block {
+        display: block;
+        width: 100%;
+        max-width: 60rem;
+    }
+}
+
+.notification-page-outer {
+    display: flex;
+    justify-content: center;
+
+    .notification-page-inner {
         display: block;
         width: 100%;
         max-width: 60rem;

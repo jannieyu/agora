@@ -1,5 +1,4 @@
 import * as React from "react"
-import { Row, Col } from "react-bootstrap"
 import { useNavigate } from "react-router-dom"
 import { Button } from "semantic-ui-react"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
@@ -168,36 +167,28 @@ function LineItem(props: LineItemProps) {
   return (
     <div className="notification">
       <div className={`notification-box ${seen ? "" : "unseen"}`}>
-        <Row className="align-items-center">
-          <Col xs={1} className="text-centered">
-            {!seen ? <FontAwesomeIcon icon="circle" color="rgb(24, 118, 242)" /> : null}
-          </Col>
-          <Col xs={1}>
-            <FontAwesomeIcon
-              icon={iconMap.get(noteType)}
-              size="2x"
-              color={colorMap.get(noteType)}
-            />
-          </Col>
-          <Col
-            xs={8}
-            className="notification-text"
-            onClick={onClick}
-            onKeyPress={onClick}
-            role="link"
-            tabIndex={0}
-          >
-            {lineItemContent}
-          </Col>
-
-          <Col xs={2} className="text-centered">
-            {!seen ? (
-              <Button size="mini" basic color="black" onClick={dismiss}>
-                Dismiss
-              </Button>
-            ) : null}
-          </Col>
-        </Row>
+        <div className="width-1 text-centered">
+          {!seen ? <FontAwesomeIcon icon="circle" color="rgb(24, 118, 242)" /> : null}
+        </div>
+        <div className="width-1">
+          <FontAwesomeIcon icon={iconMap.get(noteType)} size="2x" color={colorMap.get(noteType)} />
+        </div>
+        <div
+          className="width-8 notification-text"
+          onClick={onClick}
+          onKeyPress={onClick}
+          role="link"
+          tabIndex={0}
+        >
+          {lineItemContent}
+        </div>
+        <div className="width-2 text-centered">
+          {!seen ? (
+            <Button size="mini" basic color="black" onClick={dismiss}>
+              Dismiss
+            </Button>
+          ) : null}
+        </div>
       </div>
     </div>
   )
@@ -245,9 +236,8 @@ export default function NotificationPage() {
   )
 
   return (
-    <Row>
-      <Col xs={2} />
-      <Col xs={8}>
+    <div className="notification-page-outer">
+      <div className="notification-page-inner">
         <h1 className="text-centered">Notifications</h1>
         {notifications.map((notification: Notification) => (
           <LineItem
@@ -256,8 +246,7 @@ export default function NotificationPage() {
             viewNotification={viewNotification}
           />
         ))}
-      </Col>
-      <Col xs={2} />
-    </Row>
+      </div>
+    </div>
   )
 }
