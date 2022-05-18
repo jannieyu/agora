@@ -1,5 +1,4 @@
 import * as React from "react"
-import { Row, Col } from "react-bootstrap"
 import { Accordion, Button, Message, Icon, Transition } from "semantic-ui-react"
 import { DateTime } from "luxon"
 import { Link } from "react-router-dom"
@@ -129,107 +128,97 @@ export default function Listing(props: ListingProps) {
   /* &&id trick prevents modal from showing (delisted) upon closure */
 
   return id || isPreview ? (
-    <div>
-      <Row>
-        <Col xs="12">
-          <div className="listing">
-            {category ? <b className="category">{category}</b> : null}
-            <div className="grid">
-              <div className="text-centered">
-                {image ? (
-                  <img src={imageSrc} alt="Listing Preview" className="listing-image" />
-                ) : null}
-              </div>
-              <div className="listing-information">
-                <h2>
-                  <span>{name}</span>
-                  {!active && (
-                    <span className="red">
-                      &nbsp;(
-                      {auctionState === AuctionState.COMPLETE ? "Auction Closed" : "delisted"})
-                    </span>
-                  )}
-                </h2>
-                <table className="listing-metadata-table">
-                  <tbody>
-                    {highestBid && isValidPrice(highestBid) ? (
-                      <tr>
-                        <td className="name-cell">
-                          <b>Price</b>
-                        </td>
-                        <td>{`$${safeParseFloat(highestBid)?.toFixed(2)}`}</td>
-                      </tr>
-                    ) : null}
-                    {condition ? (
-                      <tr>
-                        <td className="name-cell">
-                          <b>Condition</b>
-                        </td>
-                        <td>{condition}</td>
-                      </tr>
-                    ) : null}
-                    <tr>
-                      <td className="name-cell">
-                        <b>Sold By</b>
-                      </td>
-                      <td>
-                        <Link
-                          to={`/user_profile/?id=${seller?.id}`}
-                          target="_blank"
-                        >{`${seller?.firstName} ${seller?.lastName}`}</Link>
-                      </td>
-                    </tr>
-                    {description ? (
-                      <tr>
-                        <td className="name-cell">
-                          <b>Description</b>
-                        </td>
-                        <td>{description}</td>
-                      </tr>
-                    ) : null}
-                  </tbody>
-                </table>
-                <BidHistory {...props} defaultShowHistory={!isBiddable && !!activeUser} />
-                {isBiddable ? (
-                  <Button primary onClick={toggleShowBid} className="bid-button">
-                    {showBidOptions ? "Cancel" : "Place Bid"}
-                  </Button>
-                ) : null}
-                {!isBiddable && !activeUser ? (
-                  <Message>
-                    <Button onClick={onLogin} color="green">
-                      Log in
-                    </Button>{" "}
-                    or{" "}
-                    <Button onClick={onSignUp} color="orange">
-                      Sign Up
-                    </Button>{" "}
-                    to bid on this item.
-                  </Message>
-                ) : null}
+    <div className="listing">
+      {category ? <b className="category">{category}</b> : null}
+      <div className="grid">
+        <div className="text-centered">
+          {image ? <img src={imageSrc} alt="Listing Preview" className="listing-image" /> : null}
+        </div>
+        <div className="listing-information">
+          <h2>
+            <span>{name}</span>
+            {!active && (
+              <span className="red">
+                &nbsp;(
+                {auctionState === AuctionState.COMPLETE ? "Auction Closed" : "delisted"})
+              </span>
+            )}
+          </h2>
+          <table className="listing-metadata-table">
+            <tbody>
+              {highestBid && isValidPrice(highestBid) ? (
+                <tr>
+                  <td className="name-cell">
+                    <b>Price</b>
+                  </td>
+                  <td>{`$${safeParseFloat(highestBid)?.toFixed(2)}`}</td>
+                </tr>
+              ) : null}
+              {condition ? (
+                <tr>
+                  <td className="name-cell">
+                    <b>Condition</b>
+                  </td>
+                  <td>{condition}</td>
+                </tr>
+              ) : null}
+              <tr>
+                <td className="name-cell">
+                  <b>Sold By</b>
+                </td>
+                <td>
+                  <Link
+                    to={`/user_profile/?id=${seller?.id}`}
+                    target="_blank"
+                  >{`${seller?.firstName} ${seller?.lastName}`}</Link>
+                </td>
+              </tr>
+              {description ? (
+                <tr>
+                  <td className="name-cell">
+                    <b>Description</b>
+                  </td>
+                  <td>{description}</td>
+                </tr>
+              ) : null}
+            </tbody>
+          </table>
+          <BidHistory {...props} defaultShowHistory={!isBiddable && !!activeUser} />
+          {isBiddable ? (
+            <Button primary onClick={toggleShowBid} className="bid-button">
+              {showBidOptions ? "Cancel" : "Place Bid"}
+            </Button>
+          ) : null}
+          {!isBiddable && !activeUser ? (
+            <Message>
+              <Button onClick={onLogin} color="green">
+                Log in
+              </Button>{" "}
+              or{" "}
+              <Button onClick={onSignUp} color="orange">
+                Sign Up
+              </Button>{" "}
+              to bid on this item.
+            </Message>
+          ) : null}
+          <br />
+          <Transition.Group animation="zoom" duration={200}>
+            {showBidOptions && (
+              <div>
                 <br />
-                <Transition.Group animation="zoom" duration={200}>
-                  {showBidOptions && (
-                    <div>
-                      <br />
-                      <BidForm
-                        priceStr={highestBid}
-                        itemId={id}
-                        numBids={numBids}
-                        handleSuccess={handleSuccess}
-                        bidderId={activeUser?.id}
-                      />
-                    </div>
-                  )}
-                  {!showBidOptions && !!successMessage && (
-                    <Message success>{successMessage}</Message>
-                  )}
-                </Transition.Group>
+                <BidForm
+                  priceStr={highestBid}
+                  itemId={id}
+                  numBids={numBids}
+                  handleSuccess={handleSuccess}
+                  bidderId={activeUser?.id}
+                />
               </div>
-            </div>
-          </div>
-        </Col>
-      </Row>
+            )}
+            {!showBidOptions && !!successMessage && <Message success>{successMessage}</Message>}
+          </Transition.Group>
+        </div>
+      </div>
       {showRecommendations && (
         <RecommendedItems category={category} itemId={id} redirectHome={redirectHome} />
       )}

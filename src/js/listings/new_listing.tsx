@@ -318,7 +318,7 @@ function ListingForm() {
   }
 
   return (
-    <>
+    <div className="new-listing">
       <SubmissionModal
         onHide={reset}
         show={showSuccessModal || showFailureModal}
@@ -327,11 +327,11 @@ function ListingForm() {
         id={id}
         fetchItem={fetchItem}
       />
-      <Row>
-        <Col xs="6">
-          <h1 className="text-centered">Enter Listing Details</h1>
-          <br />
-          <Form>
+      <Form>
+        <div className="grid">
+          <div>
+            <h1 className="text-centered">Enter Listing Details</h1>
+            <br />
             <Row>
               <Col xs="6">
                 <Form.Field
@@ -397,37 +397,34 @@ function ListingForm() {
                 value={description || ""}
               />
             </Row>
+          </div>
+          <div>
+            <h1 className="text-centered">Preview (Buyer View)</h1>
             <br />
-            <Row>
-              <Col xs="6">{wrappedSubmitBtn}</Col>
-            </Row>
-          </Form>
-        </Col>
-        <Col xs="6">
-          <h1 className="text-centered">Preview (Buyer View)</h1>
-          <br />
-          <Listing
-            name={name}
-            highestBid={highestBid || startingPrice}
-            price={startingPrice}
-            condition={condition}
-            description={description}
-            numBids={0}
-            category={category}
-            image={imageURL}
-            seller={user}
-            id={0}
-            createdAt={currTime}
-            bids={bids || []}
-            isLocal={!!image}
-            showRecommendations={false}
-            active
-            isPreview
-          />
-        </Col>
-      </Row>
+            <Listing
+              name={name}
+              highestBid={highestBid || startingPrice}
+              price={startingPrice}
+              condition={condition}
+              description={description}
+              numBids={0}
+              category={category}
+              image={imageURL}
+              seller={user}
+              id={0}
+              createdAt={currTime}
+              bids={bids || []}
+              isLocal={!!image}
+              showRecommendations={false}
+              active
+              isPreview
+            />
+          </div>
+          <div>{wrappedSubmitBtn}</div>
+        </div>
+      </Form>
       <div className="footer" />
-    </>
+    </div>
   )
 }
 

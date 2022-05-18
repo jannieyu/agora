@@ -2,11 +2,6 @@
   padding-top: 2%;
 }
 
-.login {
-    position: absolute;
-    right: 5%;
-}
-
 .login-form {
     padding: 3% 5% 5% 5%;
 }
@@ -42,14 +37,11 @@
     width: 95%;
     padding: 3%;
     margin-top: 0%;
-    margin-left: 5%;
     margin-right: 0%;
     margin-bottom: 0%;
-    overflow: auto;
 }
 
 .listing{
-
     .grid {
         display: grid;
         gap: 1rem;
@@ -207,7 +199,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding-left: 2%;
+    padding-right: 1%;
 }
 
 .softly-rounded {
@@ -341,14 +333,18 @@
     }
 }
 
-.card-row {
-    .scrollable {
-        white-space: nowrap;
-        overflow-x: scroll;
+.card-row-outer {
+    .card-row-inner {
+        display: grid;
+        grid-gap: 1rem;
+        padding: 0.5rem;
+        grid-template-columns: repeat(auto-fill,minmax(16rem,1fr));
+        grid-auto-flow: column;
+        grid-auto-columns: minmax(16rem,1fr);
+
     }
-   .row-fluid .col-lg-3{
-        display: inline-block;
-    }
+    white-space: nowrap;
+    overflow-x: auto;
 }
 
 .nav-countdown {
@@ -374,6 +370,7 @@
 body {
   color: rgb(34, 34, 34);
 }
+
 .gallery-grid {
     display: grid;
     gap: 1rem;
@@ -400,4 +397,16 @@ body {
         width: 100%;
         max-width: 60rem;
     }
+}
+
+.new-listing {
+    .grid {
+        display: grid;
+        gap: 1rem;
+        grid-template-columns: repeat(auto-fit, minmax(32rem, 1fr));
+    }
+}
+
+.recommendations {
+    padding: 1rem;
 }

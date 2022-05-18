@@ -1,5 +1,4 @@
 import * as React from "react"
-import { Row, Col } from "react-bootstrap"
 import { Button, Dropdown, Icon, Input, Form } from "semantic-ui-react"
 import { useSearchParams } from "react-router-dom"
 import { categories, conditions } from "../listings/constants"
@@ -210,21 +209,17 @@ function Gallery() {
       </div>
       <br />
       <Form loading={loading}>
-        <Row>
-          <Col xs={12}>
-            <div className="results-row">
-              <b>{searchItems.length} Results</b>
-              <Dropdown
-                button
-                basic
-                floating
-                options={sortByOptions}
-                value={params.sort || "recent"}
-                onChange={handleChangeSortBy}
-              />
-            </div>
-          </Col>
-        </Row>
+        <div className="results-row">
+          <b>{searchItems.length} Results</b>
+          <Dropdown
+            button
+            basic
+            floating
+            options={sortByOptions}
+            value={params.sort || "recent"}
+            onChange={handleChangeSortBy}
+          />
+        </div>
         <br />
         <div className="gallery-grid">{cards}</div>
       </Form>

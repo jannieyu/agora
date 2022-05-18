@@ -1,7 +1,6 @@
 import * as React from "react"
 import { useSearchParams } from "react-router-dom"
 import { useNavigate } from "react-router"
-import { Row, Col } from "react-bootstrap"
 import {
   apiCall as getSearchItems,
   Response as GetSearchItemsResponse,
@@ -58,13 +57,9 @@ export default function RecommendedItems(props: RecommendedItemsProps) {
   )
 
   return items.length > 0 ? (
-    <Row>
-      <Col xs={1} />
-      <Col xs={10}>
-        <h3>You May Also Be Interested In:</h3>
-        <CardRow cards={items} handleClick={handleClick} />
-      </Col>
-      <Col xs={1} />
-    </Row>
+    <div className="recommendations">
+      <h3>You May Also Be Interested In:</h3>
+      <CardRow cards={items} handleClick={handleClick} />
+    </div>
   ) : null
 }
