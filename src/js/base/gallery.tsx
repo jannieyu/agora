@@ -8,8 +8,8 @@ import {
   apiCall as getSearchItems,
   Response as GetSearchItemsResponse,
 } from "../api/get_search_items"
-import { ListingProps, ActionType, OnChangeObject } from "../listings/types"
-import CardRow from "../listings/card_rows"
+import { ActionType, OnChangeObject } from "../listings/types"
+import Card from "../listings/card"
 import ListingModal from "../listings/listing_modal"
 import ConfirmationModal from "./confirmation_modal"
 import { AppState, SearchItem } from "./reducers"
@@ -159,19 +159,9 @@ function Gallery() {
     retreiveItems()
   }, [setDeletingItemId, retreiveItems])
 
-  const cardRows = useMemo(() => {
-    const rows = []
-    for (let i = 0; i < searchItems.length; i += 4) {
-      const cards: ListingProps[] = []
-      for (let j = 0; j < 4; j += 1) {
-        if (i + j < searchItems.length) {
-          cards.push(searchItems[i + j])
-        }
-      }
-      rows.push(<CardRow cards={cards} key={i} handleClick={handleCardAction} />)
-    }
-    return rows
-  }, [handleCardAction, searchItems])
+  const cards = searchItems.map((item) => (
+    <Card {...item} handleClick={handleCardAction} itemId={item.id} key={item.id} />
+  ))
 
   return (
     <>
@@ -237,7 +227,7 @@ function Gallery() {
           </Col>
         </Row>
         <br />
-        {cardRows}
+        <div className="gallery-grid">{cards}</div>
       </Form>
     </>
   )

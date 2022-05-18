@@ -339,3 +339,9 @@
 body {
   color: rgb(34, 34, 34);
 }
+.gallery-grid {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+}
+
