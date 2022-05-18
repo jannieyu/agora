@@ -1,7 +1,7 @@
 /* eslint-disable react/no-unused-prop-types */
 /* eslint-disable jsx-a11y/label-has-associated-control */
 import * as React from "react"
-import { Row, Col, OverlayTrigger, Popover } from "react-bootstrap"
+import { OverlayTrigger, Popover } from "react-bootstrap"
 import { Button, Tab, Form, Message } from "semantic-ui-react"
 import { useCallback, useState } from "../base/react_base"
 import { safeParseFloat } from "../base/util"
@@ -83,22 +83,18 @@ export function AutomaticBidForm(props: RefinedBidFormProps) {
 
   return (
     <Form error={!!error}>
-      <Row>
-        <Col xs="12">
-          <div>
-            <br />
-            <Form.Field
-              control={DollarInput}
-              placeholder={minBid.toFixed(2)}
-              onChange={handleChangeBidAmount}
-              error={!!bidPrice && !isValidPrice(bidPrice)}
-              value={bidPrice}
-              label="AuctionHouse will automatically increase your bid by the minimum
+      <div>
+        <br />
+        <Form.Field
+          control={DollarInput}
+          placeholder={minBid.toFixed(2)}
+          onChange={handleChangeBidAmount}
+          error={!!bidPrice && !isValidPrice(bidPrice)}
+          value={bidPrice}
+          label="AuctionHouse will automatically increase your bid by the minimum
               increment each time you are outbid, until you reach the maximum amount specified below."
-            />
-          </div>
-        </Col>
-      </Row>
+        />
+      </div>
       <Message error header="Error" content={error} />
       <br />
       {wrappedSubmitBtn}
@@ -171,24 +167,18 @@ export function ManualBidForm(props: RefinedBidFormProps) {
   return (
     <Form error={!!error}>
       <br />
-      <Row>
-        <Col xs="12">
-          <div className="field">
-            <label>{`Enter bid of $${minBid.toFixed(2)} or more.`}</label>
-          </div>
-        </Col>
-      </Row>
-      <Row className="align-items-center">
-        <Col xs="12">
-          <Form.Field
-            control={DollarInput}
-            placeholder={minBid.toFixed(2)}
-            onChange={handleChangeBidAmount}
-            error={!!bidPrice && !isValidPrice(bidPrice)}
-            value={bidPrice}
-          />
-        </Col>
-      </Row>
+      <div className="field">
+        <label>{`Enter bid of $${minBid.toFixed(2)} or more.`}</label>
+      </div>
+      <div>
+        <Form.Field
+          control={DollarInput}
+          placeholder={minBid.toFixed(2)}
+          onChange={handleChangeBidAmount}
+          error={!!bidPrice && !isValidPrice(bidPrice)}
+          value={bidPrice}
+        />
+      </div>
       <Message error header="Error" content={error} />
       <br />
       {wrappedSubmitBtn}

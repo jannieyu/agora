@@ -172,9 +172,8 @@ function Gallery() {
         delistFollowup={() => {}}
       />
       <ListingModal show={!!selectedItem} onHide={deselectItem} selectedItem={selectedItem} />
-      <Row>
-        <Col xs={2} />
-        <Col xs={8} align="center">
+      <div className="search-container">
+        <div className="block">
           <Input
             action
             size="large"
@@ -183,6 +182,7 @@ function Gallery() {
             value={searchBarText}
             onChange={handleChangeSearchText}
             onKeyPress={handleSearchKeyPress}
+            className="search-bar"
           >
             <Dropdown
               button
@@ -206,9 +206,8 @@ function Gallery() {
               <Icon name="search" />
             </Button>
           </Input>
-        </Col>
-        <Col xs={2} />
-      </Row>
+        </div>
+      </div>
       <br />
       <Form loading={loading}>
         <Row>
@@ -229,6 +228,7 @@ function Gallery() {
         <br />
         <div className="gallery-grid">{cards}</div>
       </Form>
+      <br />
     </>
   )
 }
