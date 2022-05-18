@@ -292,26 +292,35 @@
     color: red;
 }
 
-.user-profile {
-    .edit-icon {
-        display: flex;
-        justify-content: right;
-        position: relative;
-        right: 20%;
-        top: 1em;
-        height: 0;
-    }
+.user-profile-container {
 
-    .edit-icon > svg {
-        background-color: white;
-        border-radius: 0.1875em;
-        border: solid 0.1875em white;
-        cursor: pointer;
-    }
+    display: flex;
+    justify-content: center;
 
-    img {
-        max-width: 50%;
-        border-radius: 50%;
+    .user-profile-inner {
+        width: 90%;
+        max-width: 50rem;
+
+        .edit-icon {
+            display: flex;
+            justify-content: right;
+            position: relative;
+            right: 20%;
+            top: 1em;
+            height: 0;
+        }
+
+        .edit-icon > svg {
+            background-color: white;
+            border-radius: 0.1875em;
+            border: solid 0.1875em white;
+            cursor: pointer;
+        }
+
+        img {
+            max-width: 50%;
+            border-radius: 50%;
+        }
     }
 }
 

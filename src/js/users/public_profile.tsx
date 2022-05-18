@@ -1,5 +1,4 @@
 import * as React from "react"
-import { Row, Col } from "react-bootstrap"
 import { User } from "../base/reducers"
 
 interface PublicProfileProps {
@@ -10,9 +9,8 @@ export default function PublicProfile(props: PublicProfileProps) {
   const { user } = props
 
   return (
-    <Row className="user-profile">
-      <Col xs={3} />
-      <Col xs={6}>
+    <div className="user-profile-container">
+      <div className="user-profile-inner">
         <div className="text-centered">
           <img
             alt="profile"
@@ -27,8 +25,7 @@ export default function PublicProfile(props: PublicProfileProps) {
           <h3>{`${user?.email}`}</h3>
           <p>{user?.bio}</p>
         </div>
-      </Col>
-      <Col xs={3} />
-    </Row>
+      </div>
+    </div>
   )
 }
