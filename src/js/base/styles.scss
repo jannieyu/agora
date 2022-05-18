@@ -2,11 +2,6 @@
   padding-top: 2%;
 }
 
-.login {
-    position: absolute;
-    right: 5%;
-}
-
 .login-form {
     padding: 3% 5% 5% 5%;
 }
@@ -42,25 +37,29 @@
     width: 95%;
     padding: 3%;
     margin-top: 0%;
-    margin-left: 5%;
     margin-right: 0%;
     margin-bottom: 0%;
-    overflow: auto;
 }
 
 .listing{
+    .grid {
+        display: grid;
+        gap: 1rem;
+        grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
+    }
+
     .bid-button {
         margin-top: 2.5vh !important;
         min-height: 5vh !important;
+        margin-right: 0;
+        margin-left: 0;
+        width: 100%;
     }
 
     .listing-information {
-        display: grid;
+        display: block;
         overflow: auto;
-        max-height: 60vh;
         padding-bottom: 2vh;
-        padding-right: 2vh;
-        padding-left: 2vh;
     }
 
     .listing-history-table,
@@ -82,18 +81,26 @@
     }
 
     .listing-image {
-        width: 50%;
-        padding-right: 15px;
         max-height: 50vh;
+        max-width: 100%;
+
+        margin: auto;    
+        display: block;
     }
 }
 
 .my_bids,
 .my_listing {
+    display: flex;
+    align-items: center;
+    text-align: center;
+
     margin-top: 1rem;
     margin-bottom: 1rem;
+    padding-left: 1rem;
 
     position: relative;
+    overflow-x: hidden;
 
     img {
         max-height: 8rem;
@@ -167,6 +174,7 @@
         top: 50%;
         transform: translateY(-50%);
         max-height: 25vh;
+        float: left;
     }
 
     .category-and-condition {
@@ -182,7 +190,6 @@
 .card-image,
 .listing-image {
     padding-bottom: 5px;
-    float: left;
     object-fit: contain;
 }
 
@@ -198,7 +205,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding-left: 2%;
+    padding-right: 1%;
 }
 
 .softly-rounded {
@@ -263,6 +270,23 @@
     .notification-box {
         padding: 16px 12px 16px 12px;
 
+        display: flex;
+        align-items: center;
+
+        .width-1 {
+            width: 8.333%;
+            min-width: 3rem;
+        }
+        
+        .width-2 {
+            width: 16.667%;
+            min-width: 6rem;
+        }
+
+        .width-8 {
+            width: 66.667%;
+        }
+
         .notification-text {
             cursor: pointer;
         }
@@ -283,37 +307,50 @@
     color: red;
 }
 
-.user-profile {
-    .edit-icon {
-        display: flex;
-        justify-content: right;
-        position: relative;
-        right: 20%;
-        top: 1em;
-        height: 0;
-    }
+.user-profile-container {
 
-    .edit-icon > svg {
-        background-color: white;
-        border-radius: 0.1875em;
-        border: solid 0.1875em white;
-        cursor: pointer;
-    }
+    display: flex;
+    justify-content: center;
 
-    img {
-        max-width: 50%;
-        border-radius: 50%;
+    .user-profile-inner {
+        width: 90%;
+        max-width: 50rem;
+
+        .edit-icon {
+            display: flex;
+            justify-content: right;
+            position: relative;
+            right: 20%;
+            top: 1em;
+            height: 0;
+        }
+
+        .edit-icon > svg {
+            background-color: white;
+            border-radius: 0.1875em;
+            border: solid 0.1875em white;
+            cursor: pointer;
+        }
+
+        img {
+            max-width: 50%;
+            border-radius: 50%;
+        }
     }
 }
 
-.card-row {
-    .scrollable {
-        white-space: nowrap;
-        overflow-x: scroll;
+.card-row-outer {
+    .card-row-inner {
+        display: grid;
+        grid-gap: 1rem;
+        padding: 0.5rem;
+        grid-template-columns: repeat(auto-fill,minmax(16rem,1fr));
+        grid-auto-flow: column;
+        grid-auto-columns: minmax(16rem,1fr);
+
     }
-   .row-fluid .col-lg-3{
-        display: inline-block;
-    }
+    white-space: nowrap;
+    overflow-x: auto;
 }
 
 .nav-countdown {
@@ -338,4 +375,58 @@
 
 body {
   color: rgb(34, 34, 34);
+}
+
+.gallery-grid {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+}
+
+.search-container {
+    display: flex;
+    justify-content: center;
+
+    .block {
+        display: block;
+        width: 100%;
+        max-width: 60rem;
+    }
+}
+
+.my-bids-outer,
+.my-listings-outer,
+.notification-page-outer {
+    display: flex;
+    justify-content: center;
+
+    .my-listings-inner,
+    .my-bids-inner,
+    .notification-page-inner {
+        display: block;
+        width: 100%;
+        max-width: 60rem;
+    }
+
+    .my-bids-inner {
+        .width-2 {
+            width: 16.667%;
+        }
+
+        .width-3 {
+            width: 25%;
+        }
+    }
+}
+
+.new-listing {
+    .grid {
+        display: grid;
+        gap: 1rem;
+        grid-template-columns: repeat(auto-fit, minmax(32rem, 1fr));
+    }
+}
+
+.recommendations {
+    padding: 1rem;
 }

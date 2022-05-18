@@ -1,5 +1,5 @@
 import * as React from "react"
-import { Row, Col } from "react-bootstrap"
+import { Col } from "react-bootstrap"
 import { Icon } from "semantic-ui-react"
 import { useNavigate } from "react-router"
 import { Link, useSearchParams } from "react-router-dom"
@@ -64,11 +64,14 @@ function LineItem(props: LineItemProps) {
   )
 
   return (
-    <Row
-      className={`my_listing align-items-center ${
+    <div
+      className={`my_listing ${
         active || auctionState === AuctionState.COMPLETE ? "active-item" : "delisted"
       }`}
       onClick={onClick}
+      onKeyDown={onClick}
+      role="button"
+      tabIndex={0}
     >
       {active ? (
         <div className="icon-bar">
@@ -101,7 +104,7 @@ function LineItem(props: LineItemProps) {
           <b>{priceStr}</b>
         </div>
       </Col>
-    </Row>
+    </div>
   )
 }
 
@@ -167,10 +170,9 @@ export default function MyListings() {
         itemId={deleteId}
         delistFollowup={delistFollowup}
       />
-      <Row>
-        <h1 className="text-centered">My Listings</h1>
-        <Col xs={2} />
-        <Col xs={8}>
+      <div className="my-listings-outer">
+        <div className="my-listings-inner">
+          <h1 className="text-centered">My Listings</h1>
           {lineItems.length ? (
             lineItems
           ) : (
@@ -179,9 +181,8 @@ export default function MyListings() {
               <Link to="/create_listing">creating one</Link> now!
             </div>
           )}
-        </Col>
-        <Col xs={2} />
-      </Row>
+        </div>
+      </div>
     </>
   )
 }

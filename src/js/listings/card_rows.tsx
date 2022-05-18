@@ -11,10 +11,10 @@ export default function CardRow(props: CardRowProps) {
   const { cards, handleClick } = props
 
   return (
-    <div className="card-row">
-      <div className={`row-fluid ${cards.length > 4 ? "scrollable" : ""}`}>
+    <div className="card-row-outer">
+      <div className="card-row-inner">
         {cards.map((prop: ListingProps) => (
-          <div className="col-lg-3" key={prop.id}>
+          <div key={prop.id} className="card-container">
             <Card {...prop} handleClick={handleClick} itemId={prop.id} />
           </div>
         ))}

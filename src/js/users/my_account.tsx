@@ -184,9 +184,8 @@ export default function MyAccount(props: MyAccountProps) {
         onSuccess={fetchUser}
         initialImageURL={user?.image || ""}
       />
-      <Row className="user-profile">
-        <Col xs={3} />
-        <Col xs={6}>
+      <div className="user-profile-container">
+        <div className="user-profile-inner">
           <div className="text-centered">
             <div className="edit-icon">
               <FontAwesomeIcon icon="pen-to-square" size="2x" onClick={onIconClick} />
@@ -249,9 +248,8 @@ export default function MyAccount(props: MyAccountProps) {
               </Row>
             </Form>
           </div>
-        </Col>
-        <Col xs={3} />
-      </Row>
+        </div>
+      </div>
       <div className="footer" />
     </>
   )
