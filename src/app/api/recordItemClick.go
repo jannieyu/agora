@@ -5,6 +5,7 @@ import (
 	"agora/src/app/user"
 	"encoding/json"
 	log "github.com/sirupsen/logrus"
+	"gorm.io/gorm"
 	"net/http"
 )
 
@@ -28,5 +29,11 @@ func (h Handle) RecordItemClick(w http.ResponseWriter, r *http.Request) {
 		ViewerID: viewerID,
 	}).Error; err != nil {
 		log.WithError(err).Error("Failed to query info info.")
+	}
+
+	if err = h.Db.Table("items").Where(
+		"id = ?", payload.ItemId).Update(
+		"num_views", gorm.Expr("num_views + 1")).Error; err != nil {
+		log.WithError(err).Error("Failed to update num views for item.")
 	}
 }

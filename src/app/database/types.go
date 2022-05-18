@@ -72,6 +72,7 @@ type Item struct {
 	Notifications []Notification  `json:"notifications" gorm:"foreignkey:ItemID"`
 	Clicks        []ItemClick     `json:"clicks" gorm:"foreignkey:ItemID"`
 	HighestBid    decimal.Decimal `json:"highestBid"  gorm:"type:decimal(6,2);"`
+	NumViews      uint32          `json:"numClicks"`
 	NumBids       uint32          `json:"numBids"`
 	Active        bool            `json:"active"`
 	CreatedAt     time.Time       `json:"createdAt,omitempty" gorm:"autoCreateTime"`
