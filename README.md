@@ -2,7 +2,7 @@
 
 ## Installation and usage for macOS
 
-1. Install Node.js >= 12.13.0 (16.x.x or later preferred)
+1. Install Node.js >= 14.15.0 (16.x.x or later preferred)
 2. Install Go 1.18
 3. Install homebrew
 4. Run `brew install just`

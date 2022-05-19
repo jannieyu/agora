@@ -33,6 +33,7 @@ function LineItem(props: LineItemProps) {
     name,
     highestBid,
     numBids,
+    numClicks,
     active,
     setSearchParams,
     setDeleteId,
@@ -84,20 +85,22 @@ function LineItem(props: LineItemProps) {
       <Col xs={3} align="center">
         <img src={`/${image}`} alt="Listing Preview" />
       </Col>
-      <Col xs={5}>
-        <div style={{ display: "flex", justifyContent: "space-between" }}>
-          <b>
-            <span>{name}</span>
-            {active ? null : (
-              <span className="red">
-                &nbsp;({auctionState === AuctionState.COMPLETE ? "Auction Closed" : "delisted"})
-              </span>
-            )}
-          </b>
-          <strong>{`${numBids} bid${numBids === 1 ? "" : "s"}`}</strong>
-        </div>
+      <Col xs={3}>
+        <b>
+          <span>{name}</span>
+          {active ? null : (
+            <span className="red">
+              &nbsp;({auctionState === AuctionState.COMPLETE ? "Auction Closed" : "delisted"})
+            </span>
+          )}
+        </b>
       </Col>
-      <Col xs={1} />
+      <Col xs={1}>
+        <strong>{`${numBids} bid${numBids === 1 ? "" : "s"}`}</strong>
+      </Col>
+      <Col xs={1}>
+        <strong>{`${numClicks} click${numClicks === 1 ? "" : "s"}`}</strong>
+      </Col>
       <Col xs={3}>
         <div>{numBids === 0 ? "No Bids" : "Highest Bid:"}</div>
         <div>

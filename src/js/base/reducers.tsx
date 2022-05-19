@@ -69,6 +69,7 @@ export interface SearchItem {
   condition: string
   description: string
   numBids: number
+  numClicks: number
   highestBid: string
   id: number
   image: string

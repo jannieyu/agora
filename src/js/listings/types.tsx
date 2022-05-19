@@ -13,6 +13,7 @@ export interface ListingProps {
   seller: User
   id: number
   active: boolean
+  numClicks: number
   sellerId?: number
   createdAt?: string
   defaultShowHistory?: boolean
