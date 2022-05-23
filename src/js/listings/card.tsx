@@ -57,33 +57,31 @@ export default function Card(props: CardProps) {
       role="button"
       tabIndex={0}
     >
-      <div>
+      <div className="card-image-container">
         <img src={`/${image}`} alt="Listing Preview" className="card-image" />
       </div>
       <div className="card-metadata">
-        <div>
+        <div style={{ display: "flex", justifyContent: "space-between" }}>
           <div className="major-metadata">
+            <strong>{name}</strong>
+          </div>
+          {sellerId === activeUser?.id ? (
             <div>
-              <strong>{name}</strong>
+              <Icon name="edit" className="card-edit" onClick={onEdit} />
+              <Icon name="trash" className="card-trash" onClick={onDelete} />
             </div>
-          </div>
-          <div className="category-and-condition">
-            {category}
-            {"\u00A0"}&#183;{"\u00A0"}
-            {condition}
-          </div>
-          <span>
-            <b>{`$${safeParseFloat(highestBid)?.toFixed(2)}`}</b>
-          </span>
+          ) : (
+            <div>{`${numBids}\u00A0bid${numBids === 1 ? "" : "s"}`}</div>
+          )}
         </div>
-        {sellerId === activeUser?.id ? (
-          <div>
-            <Icon name="edit" className="card-edit" onClick={onEdit} />
-            <Icon name="trash" className="card-trash" onClick={onDelete} />
-          </div>
-        ) : (
-          <div>{`${numBids}\u00A0bid${numBids === 1 ? "" : "s"}`}</div>
-        )}
+        <div className="category-and-condition">
+          {category}
+          {"\u00A0"}&#183;{"\u00A0"}
+          {condition}
+        </div>
+        <span>
+          <b>{`$${safeParseFloat(highestBid)?.toFixed(2)}`}</b>
+        </span>
       </div>
     </div>
   )

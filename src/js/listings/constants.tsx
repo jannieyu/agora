@@ -26,14 +26,29 @@ export const categories = [
     text: "Books",
   },
   {
-    key: "Furniture",
-    value: "Furniture",
-    text: "Furniture",
-  },
-  {
     key: "Electronics",
     value: "Electronics",
     text: "Electronics",
+  },
+  {
+    key: "Home and Kitchen",
+    value: "Home and Kitchen",
+    text: "Home and Kitchen",
+  },
+  {
+    key: "Luggage and Backpack",
+    value: "Luggage and Backpack",
+    text: "Luggage and Backpack",
+  },
+  {
+    key: "Office Supplies",
+    value: "Office Supplies",
+    text: "Office Supplies",
+  },
+  {
+    key: "Toys and Games",
+    value: "Toys and Games",
+    text: "Toys and Games",
   },
 ]
 

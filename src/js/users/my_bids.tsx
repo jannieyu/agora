@@ -50,7 +50,9 @@ function AutomaticBid(props: AutomaticBidProps) {
       tabIndex={0}
     >
       <div className="width-2">
-        <img src={`/${itemImage}`} alt="Listing Preview" />
+        <div className="image-container">
+          <img src={`/${itemImage}`} className="my-bids-image" alt="Listing Preview" />
+        </div>
       </div>
       <div className="width-2">
         <b>{itemName}</b>
@@ -108,7 +110,7 @@ function ManualBid(props: ManualBidProps) {
 
   return (
     <div
-      className={`my_bids ${
+      className={`my-bids ${
         activeItem || auctionState === AuctionState.COMPLETE ? "active-item" : "delisted"
       }`}
       onClick={onClick}
@@ -117,7 +119,9 @@ function ManualBid(props: ManualBidProps) {
       tabIndex={0}
     >
       <div className="width-3 text-centered">
-        <img src={`/${itemImage}`} alt="Listing Preview" />
+        <div className="image-container">
+          <img src={`/${itemImage}`} className="my-bids-image" alt="Listing Preview" />
+        </div>
       </div>
       <div className="width-3">
         <b>{itemName}</b>

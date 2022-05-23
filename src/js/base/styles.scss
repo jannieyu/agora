@@ -32,20 +32,14 @@
     padding: 4%;
 }
 
-.card,
-.listing {
-    width: 95%;
-    padding: 3%;
-    margin-top: 0%;
-    margin-right: 0%;
-    margin-bottom: 0%;
-}
-
 .listing{
+    padding: 3%;
+
     .grid {
         display: grid;
         gap: 1rem;
         grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
+        margin-top: 0.5rem;
     }
 
     .bid-button {
@@ -89,8 +83,8 @@
     }
 }
 
-.my_bids,
-.my_listing {
+.my-bids,
+.my-listing {
     display: flex;
     align-items: center;
     text-align: center;
@@ -102,11 +96,8 @@
     position: relative;
     overflow-x: hidden;
 
-    img {
-        max-height: 8rem;
-        max-width: 100%;
-        padding-top: 1rem;
-        padding-bottom: 1rem;
+    .image-container {
+        padding: 1rem;
     }
 
     b {
@@ -144,7 +135,7 @@
     background-color: #d4d4d4;
 }
 
-.my_listing, .my_bids, .card {
+.my-listing, .my-bids {
     border-width: 1px;
     border-radius: 10px;
     border-color: #ccc;
@@ -152,29 +143,18 @@
 }
 
 .card {
-    display: grid;
-    height: 100%;
+    /* card is a bootstrap class too, so must override border width */
+    border-width: 0;
 
-    grid-template-rows: auto 1fr auto;
-    grid-template-columns: 100%;
+    width: 95%;
 
     .card-metadata {
-        display: flex;
-        justify-content: space-between;
+        padding-top: 0.5rem;
 
         .major-metadata {
             font-size: 16px;
             white-space: break-spaces;
         }
-    }
-
-    .card-image {
-        width: 100%;
-        position: relative;
-        top: 50%;
-        transform: translateY(-50%);
-        max-height: 25vh;
-        float: left;
     }
 
     .category-and-condition {
@@ -187,10 +167,16 @@
     cursor: pointer;
 }
 
+.my-bids-image,
+.my-listings-image,
 .card-image,
 .listing-image {
-    padding-bottom: 5px;
+    max-width: 100%;
+    max-height: 100%;
     object-fit: contain;
+    display:block;
+    margin:auto;
+    border-radius: 1rem;
 }
 
 .card-edit:hover {
@@ -379,8 +365,8 @@ body {
 
 .gallery-grid {
     display: grid;
-    gap: 1rem;
-    grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+    gap: 1rem 0rem;
+    grid-template-columns: repeat(auto-fit, minmax(22rem, 1fr));
 }
 
 .search-container {
