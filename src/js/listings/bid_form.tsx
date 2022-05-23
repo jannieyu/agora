@@ -125,7 +125,9 @@ export function ManualBidForm(props: RefinedBidFormProps) {
         setSubmitting(false)
 
         handleSuccess(
-          `Bid of $${bidPrice} successfully created! You will be notified if you are outbid or
+          `Bid of $${safeParseFloat(bidPrice).toFixed(
+            2,
+          )} successfully created! You will be notified if you are outbid or
           if the auction ends and you win the item.`,
         )
       },
