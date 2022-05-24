@@ -66,7 +66,7 @@ function LineItem(props: LineItemProps) {
 
   return (
     <div
-      className={`my_listing ${
+      className={`my-listing ${
         active || auctionState === AuctionState.COMPLETE ? "active-item" : "delisted"
       }`}
       onClick={onClick}
@@ -83,7 +83,9 @@ function LineItem(props: LineItemProps) {
         </div>
       ) : null}
       <Col xs={3} align="center">
-        <img src={`/${image}`} alt="Listing Preview" />
+        <div className="image-container">
+          <img className="my-listings-image" src={`/${image}`} alt="Listing Preview" />
+        </div>
       </Col>
       <Col xs={3}>
         <b>

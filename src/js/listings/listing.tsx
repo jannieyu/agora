@@ -2,7 +2,7 @@ import * as React from "react"
 import { Accordion, Button, Message, Icon, Transition } from "semantic-ui-react"
 import { DateTime } from "luxon"
 import { Link } from "react-router-dom"
-import { useCallback, useDispatch, useSelector, useState } from "../base/react_base"
+import { useCallback, useDispatch, useEffect, useSelector, useState } from "../base/react_base"
 import { AppState, BidHistory as BidHistoryT } from "../base/reducers"
 import { setData } from "../base/actions"
 import { safeParseFloat } from "../base/util"
@@ -122,6 +122,10 @@ export default function Listing(props: ListingProps) {
 
     dispatch(setData({ isSignUp: true }))
   }, [dispatch])
+
+  useEffect(() => {
+    setSuccessMessage("")
+  }, [id])
 
   const imageSrc = isLocal ? image : `/${image}`
 
