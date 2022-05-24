@@ -91,7 +91,7 @@ function Base(props: BaseProps) {
             auction: { ...data.auction, state: determineAuctionState(data.auction) },
           }),
         )
-        setWs(new WebSocket("ws://localhost:8000/api/ws"))
+        setWs(new WebSocket(`ws://${window.location.hostname}:8000/api/ws`))
       },
       () => {},
     )
