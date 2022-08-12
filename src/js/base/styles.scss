@@ -3,417 +3,407 @@
 }
 
 .login-form {
-    padding: 3% 5% 5% 5%;
+  padding: 3% 5% 5%;
 }
 
 .text-centered {
-    text-align: center;
+  text-align: center;
 }
 
 .droparea-user,
 .droparea-listing {
-    border-width: 2px;
-    border-radius: 10px;
-    border-color: #ccc;
-    border-style: dashed;
-    text-align: center;
+  border-width: 2px;
+  border-radius: 10px;
+  border-color: #ccc;
+  border-style: dashed;
+  text-align: center;
 
-    .droparea-error,
-    .droparea-text {
-        font-size: 20px;
-    }
+  .droparea-error,
+  .droparea-text {
+    font-size: 20px;
+  }
 }
 
 .droparea-listing {
-    padding: 11%;
+  padding: 11%;
 }
 
 .droparea-user {
-    padding: 4%;
+  padding: 4%;
 }
 
-.listing{
-    padding: 3%;
+.listing {
+  padding: 3%;
 
-    .grid {
-        display: grid;
-        gap: 1rem;
-        grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
-        margin-top: 0.5rem;
+  .grid {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
+    margin-top: 0.5rem;
+  }
+
+  .bid-button {
+    margin-top: 2.5vh !important;
+    min-height: 5vh !important;
+    margin-right: 0;
+    margin-left: 0;
+    width: 100%;
+  }
+
+  .listing-information {
+    display: block;
+    overflow: auto;
+    padding-bottom: 2vh;
+  }
+
+  .listing-history-table,
+  .listing-metadata-table {
+    margin-left: calc(1.25em + 0.25rem); /* Explicit width + margin of dropdown icon. */
+    width: calc(100% - (1.25em + 0.25rem));
+
+    .name-cell {
+      padding-right: 15px;
+      vertical-align: top;
     }
 
-    .bid-button {
-        margin-top: 2.5vh !important;
-        min-height: 5vh !important;
-        margin-right: 0;
-        margin-left: 0;
-        width: 100%;
+    th {
+      background-color: #ccc;
     }
+  }
 
-    .listing-information {
-        display: block;
-        overflow: auto;
-        padding-bottom: 2vh;
-    }
+  .listing-history-table {
+    text-align: center;
+  }
+}
 
-    .listing-history-table,
-    .listing-metadata-table {
-        margin-left: calc(1.25em + 0.25rem); /* Explicit width + margin of dropdown icon. */
-        width: calc(100% - (1.25em + 0.25rem));
-        .name-cell {
-            padding-right: 15px;
-            vertical-align: top;
-        }
-
-        th {
-            background-color: #ccc;
-        }
-    }
-
-    .listing-history-table {
-        text-align: center;
-    }
-
-    .listing-image {
-        max-height: 50vh;
-        max-width: 100%;
-
-        margin: auto;    
-        display: block;
-    }
+.listing-image {
+  max-height: 50vh;
+  max-width: 100%;
+  margin: auto;
+  display: block;
 }
 
 .my-bids,
 .my-listing {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  padding-left: 1rem;
+  position: relative;
+  overflow-x: hidden;
+  border-width: 1px;
+  border-radius: 10px;
+  border-color: #ccc;
+  border-style: solid;
+
+  .image-container {
+    padding: 1rem;
+  }
+
+  b {
+    font-size: large;
+  }
+
+  .icon-bar {
     display: flex;
-    align-items: center;
-    text-align: center;
+    justify-content: right;
+    position: absolute;
+    right: 1rem;
+    top: 1rem;
+  }
 
-    margin-top: 1rem;
-    margin-bottom: 1rem;
-    padding-left: 1rem;
+  .winning {
+    color: green;
+  }
 
-    position: relative;
-    overflow-x: hidden;
+  .losing {
+    color: red;
+  }
 
-    .image-container {
-        padding: 1rem;
-    }
-
-    b {
-        font-size: large;
-    }
-
-    .icon-bar {
-        display: flex;
-        justify-content: right;
-        position: absolute;
-        right: 1rem;
-        top: 1rem;
-    }
-
-    .winning {
-        color: green;
-    }
-
-    .losing {
-        color: red;
-    }
-
-    cursor: pointer;
+  cursor: pointer;
 }
 
 .active-item:hover {
-    background-color: #f4f4f4;
+  background-color: #f4f4f4;
 }
 
 .delisted {
-    background-color: #ccc;
+  background-color: #ccc;
 }
 
 .delisted:hover {
-    background-color: #d4d4d4;
-}
-
-.my-listing, .my-bids {
-    border-width: 1px;
-    border-radius: 10px;
-    border-color: #ccc;
-    border-style: solid;
+  background-color: #d4d4d4;
 }
 
 .card {
-    /* card is a bootstrap class too, so must override border width */
-    border-width: 0;
+  /* card is a bootstrap class too, so must override border width */
+  border-width: 0;
+  width: 95%;
+  max-width: 40rem;
 
-    width: 95%;
-    max-width: 40rem;
+  .card-metadata {
+    padding-top: 0.5rem;
 
-    .card-metadata {
-        padding-top: 0.5rem;
-
-        .major-metadata {
-            font-size: 16px;
-            white-space: break-spaces;
-        }
+    .major-metadata {
+      font-size: 16px;
+      white-space: break-spaces;
     }
+  }
 
-    .category-and-condition {
-        color: rgb(112,112,112);
-    }
+  .category-and-condition {
+    color: rgb(112 112 112);
+  }
 }
 
-
 .card:hover {
-    cursor: pointer;
+  cursor: pointer;
 }
 
 .my-bids-image,
 .my-listings-image,
 .card-image,
 .listing-image {
-    max-width: 100%;
-    max-height: 100%;
-    object-fit: contain;
-    display:block;
-    margin:auto;
-    border-radius: 1rem;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  display: block;
+  margin: auto;
+  border-radius: 1rem;
 }
 
 .card-edit:hover {
-    color: blue;
+  color: blue;
 }
 
 .card-trash:hover {
-    color: red;
+  color: red;
 }
 
 .results-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding-right: 1%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-right: 1%;
 }
 
 .softly-rounded {
-    border-radius: .28571429rem !important;
+  border-radius: 0.2857rem !important;
 }
 
 .footer {
-    padding-top: 50px;
+  padding-top: 50px;
 }
 
 .unstyled-link {
-    color: inherit;
+  color: inherit;
 }
 
 .notif-dropdown {
-    display: flex;
-    align-items: center;
+  display: flex;
+  align-items: center;
 }
 
 .res-circle {
-    /* (A) PERCENTAGE WIDTH & BORDER RADIUS */
-    border-radius: 50%;
-  
-    /* (B) BACKGROUND COLOR */ 
-    background: red;
-    color: white;
-   
-    /* (C) NECESSARY TO POSITION TEXT BLOCK */
-    line-height: 0;
-    position: absolute;
-    margin-left: 0.5rem;
-    right: 0.5rem;
+  /* (A) PERCENTAGE WIDTH & BORDER RADIUS */
+  border-radius: 50%;
+
+  /* (B) BACKGROUND COLOR */
+  background: red;
+  color: white;
+
+  /* (C) NECESSARY TO POSITION TEXT BLOCK */
+  line-height: 0;
+  position: absolute;
+  margin-left: 0.5rem;
+  right: 0.5rem;
 }
-   
+
 /* (D) MATCH HEIGHT */
 .res-circle::after {
-    content: "";
-    display: block;
-    padding-bottom: 100%;
+  content: "";
+  display: block;
+  padding-bottom: 100%;
 }
-   
+
 /* (E) TEXT BLOCK */
 .circle-txt {
-    /* (E1) CENTER TEXT IN CIRCLE */
-    position: absolute;
-    bottom: 50%;
-    width: 100%;
-    text-align: center;
-   
-    /* (E2) THE FONT - NOT REALLY IMPORTANT */
-    font-family: arial, sans-serif;
-    font-weight: bold;
+  /* (E1) CENTER TEXT IN CIRCLE */
+  position: absolute;
+  bottom: 50%;
+  width: 100%;
+  text-align: center;
+
+  /* (E2) THE FONT - NOT REALLY IMPORTANT */
+  font-family: arial, sans-serif;
+  font-weight: bold;
 }
 
-
 .name-trigger > .res-circle {
-    font-size: 7pt;
-    top: 0.2rem;
+  font-size: 7pt;
+  top: 0.2rem;
 }
 
 .notification {
-    .notification-box {
-        padding: 16px 12px 16px 12px;
+  .notification-box {
+    padding: 16px 12px;
+    display: flex;
+    align-items: center;
 
-        display: flex;
-        align-items: center;
-
-        .width-1 {
-            width: 8.333%;
-            min-width: 3rem;
-        }
-        
-        .width-2 {
-            width: 16.667%;
-            min-width: 6rem;
-        }
-
-        .width-8 {
-            width: 66.667%;
-        }
-
-        .notification-text {
-            cursor: pointer;
-        }
+    .width-1 {
+      width: 8.333%;
+      min-width: 3rem;
     }
 
-    .unseen {
-        background-color: rgba(112, 181, 249, 0.2);
+    .width-2 {
+      width: 16.667%;
+      min-width: 6rem;
     }
 
-    border-top: 1px solid rgba(0, 0, 0, 0.2);
+    .width-8 {
+      width: 66.667%;
+    }
+
+    .notification-text {
+      cursor: pointer;
+    }
+  }
+
+  .unseen {
+    background-color: rgba(112 181 249 / 20%);
+  }
+
+  border-top: 1px solid rgba(0 0 0 / 20%);
 }
 
 .fake-link {
-    color: #4183c4;
+  color: #4183c4;
 }
 
 .red {
-    color: red;
-}
-
-.user-profile-container {
-
-    display: flex;
-    justify-content: center;
-
-    .user-profile-inner {
-        width: 90%;
-        max-width: 50rem;
-
-        .edit-icon {
-            display: flex;
-            justify-content: right;
-            position: relative;
-            right: 35%;
-            top: 1em;
-            height: 0;
-        }
-
-        .edit-icon > svg {
-            background-color: white;
-            border-radius: 0.1875em;
-            border: solid 0.1875em white;
-            cursor: pointer;
-        }
-
-        img {
-            max-width: 25%;
-            border-radius: 50%;
-        }
-    }
-}
-
-.card-row-outer {
-    .card-row-inner {
-        display: grid;
-        grid-gap: 1rem;
-        padding: 0.5rem;
-        grid-template-columns: repeat(auto-fill,minmax(16rem,1fr));
-        grid-auto-flow: column;
-        grid-auto-columns: minmax(16rem,1fr);
-
-    }
-    white-space: nowrap;
-    overflow-x: auto;
-}
-
-.nav-countdown {
-    span {
-        /* color: #8A001A; */
-        color: black;
-        padding-right: 0.5rem;
-    }
-
-    .clock-icon {
-        padding-right: 0.5rem;
-    }
+  color: red;
 }
 
 .site-navbar {
-    border-bottom: solid #eee 1px;
+  border-bottom: solid #eee 1px;
+
+  img {
+    height: 2.5rem;
+  }
+}
+
+.user-profile-container {
+  display: flex;
+  justify-content: center;
+
+  .user-profile-inner {
+    width: 90%;
+    max-width: 50rem;
+
+    .edit-icon {
+      display: flex;
+      justify-content: right;
+      position: relative;
+      right: 35%;
+      top: 1em;
+      height: 0;
+    }
+
+    .edit-icon > svg {
+      background-color: white;
+      border-radius: 0.1875em;
+      border: solid 0.1875em white;
+      cursor: pointer;
+    }
 
     img {
-        height: 2.5rem;
+      max-width: 25%;
+      border-radius: 50%;
     }
+  }
+}
+
+.card-row-outer {
+  .card-row-inner {
+    display: grid;
+    grid-gap: 1rem;
+    padding: 0.5rem;
+    grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(16rem, 1fr);
+  }
+
+  white-space: nowrap;
+  overflow-x: auto;
+}
+
+.nav-countdown {
+  span {
+    /* color: #8A001A; */
+    color: black;
+    padding-right: 0.5rem;
+  }
+
+  .clock-icon {
+    padding-right: 0.5rem;
+  }
 }
 
 body {
-  color: rgb(34, 34, 34);
+  color: rgb(34 34 34);
 }
 
 .gallery-grid {
-    display: grid;
-    gap: 1rem 0rem;
-    grid-template-columns: repeat(auto-fit, minmax(22rem, 1fr));
+  display: grid;
+  gap: 1rem 0;
+  grid-template-columns: repeat(auto-fit, minmax(22rem, 1fr));
 }
 
 .search-container {
-    display: flex;
-    justify-content: center;
+  display: flex;
+  justify-content: center;
 
-    .block {
-        display: block;
-        width: 100%;
-        max-width: 60rem;
-    }
+  .block {
+    display: block;
+    width: 100%;
+    max-width: 60rem;
+  }
 }
 
 .my-bids-outer,
 .my-listings-outer,
 .notification-page-outer {
-    display: flex;
-    justify-content: center;
+  display: flex;
+  justify-content: center;
 
-    .my-listings-inner,
-    .my-bids-inner,
-    .notification-page-inner {
-        display: block;
-        width: 100%;
-        max-width: 60rem;
+  .my-listings-inner,
+  .my-bids-inner,
+  .notification-page-inner {
+    display: block;
+    width: 100%;
+    max-width: 60rem;
+  }
+
+  .my-bids-inner {
+    .width-2 {
+      width: 16.667%;
     }
 
-    .my-bids-inner {
-        .width-2 {
-            width: 16.667%;
-        }
-
-        .width-3 {
-            width: 25%;
-        }
+    .width-3 {
+      width: 25%;
     }
+  }
 }
 
 .new-listing {
-    .grid {
-        display: grid;
-        gap: 1rem;
-        grid-template-columns: repeat(auto-fit, minmax(32rem, 1fr));
-    }
+  .grid {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(32rem, 1fr));
+  }
 }
 
 .recommendations {
-    padding: 1rem;
+  padding: 1rem;
 }
