@@ -1,0 +1,32 @@
+openapi: "3.0.3"
+info:
+  version: 0.0.1
+  title: AuctionHouse
+servers:
+  - http://localhost:8080/api
+paths:
+  /bid:
+    post:
+      summary: Add a bid to an item.
+      operationId: addBid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddBidRequest'
+      responses:
+        "201":
+          description: Added bid.
+components:
+  schemas:
+    AddBidRequest:
+      properties:
+        itemId:
+          type: number
+          format: int64
+        bidPrice:
+          type: string
+      required:
+        - itemId
+        - bidPrice
