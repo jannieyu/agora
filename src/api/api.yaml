@@ -29,6 +29,30 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+  /login:
+    post:
+      summary: Log in to the website.
+      operationId: login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        "200":
+          description: Successfully logged in.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoginStatus"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+      
 components:
   schemas:
     AddBidRequest:
@@ -51,3 +75,60 @@ components:
           format: int32
         message:
           type: string
+
+    Auction:
+      properties:
+        id:
+          type: number
+          format: int64
+        startTime:
+          type: string
+        endTime:
+          type: string
+        state:
+          $ref: '#/components/schemas/AuctionState'
+      required:
+        - startTime
+        - endTime
+    
+    AuctionState:
+      type: string
+      enum:
+        - NO_AUCTION
+        - NOT_STARTED
+        - ACTIVE
+        - COMPLETE
+
+    LoginRequest:
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+        isSignUp:
+          type: boolean
+        firstName:
+          type: string
+        lastName:
+          type: string
+      required:
+        - email
+        - password
+        - isSignUp
+
+    LoginStatus:
+      properties:
+        email:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        id:
+          type: number
+          format: int64
+        newNotificationCount:
+          type: number
+          format: int64
+        auction:
+          $ref: "#/components/schemas/Auction"

@@ -3,15 +3,13 @@
 import * as React from "react"
 import { OverlayTrigger, Popover } from "react-bootstrap"
 import { Button, Tab, Form, Message } from "semantic-ui-react"
-import { useCallback, useState } from "../base/react_base"
+import { useCallback, useSelector, useState } from "../base/react_base"
 import { safeParseFloat } from "../base/util"
 import { isValidPrice, calculateIncrement } from "./util"
 import DollarInput from "./dollar_input"
-import * as Generated from "../generated"
+import * as API from "../generated/openapi"
 import { apiCall as addBidBotCall } from "../api/add_bid_bot"
-
-const configuration = Generated.createConfiguration()
-const apiInstance = new Generated.DefaultApi(configuration)
+import { AppState } from "../base/reducers"
 
 export interface RefinedBidFormProps {
   price: number
@@ -106,6 +104,7 @@ export function AutomaticBidForm(props: RefinedBidFormProps) {
 }
 
 export function ManualBidForm(props: RefinedBidFormProps) {
+  const { apiInstance } = useSelector((state: AppState) => state)
   const { price, minIncrement, itemId, handleSuccess } = props
 
   const [bidPrice, setBidPrice] = useState<string>("")
@@ -122,12 +121,11 @@ export function ManualBidForm(props: RefinedBidFormProps) {
 
   const handleSubmit = useCallback(() => {
     setSubmitting(true)
-    const body: Generated.AddBidRequest = { itemId, bidPrice }
+    const body: API.AddBidRequest = { itemId, bidPrice }
 
     apiInstance
       .addBid(body)
-      .then((data: any) => {
-        console.log(`API called successfully. Returned data: ${data}`)
+      .then(() => {
         setSubmitting(false)
 
         handleSuccess(
@@ -137,26 +135,11 @@ export function ManualBidForm(props: RefinedBidFormProps) {
           if the auction ends and you win the item.`,
         )
       })
-      .catch((err: any) => console.error(err))
-
-    // addBidCall(
-    //   { itemId, bidPrice },
-    //   () => {
-    //     setSubmitting(false)
-
-    //     handleSuccess(
-    //       `Bid of $${safeParseFloat(bidPrice).toFixed(
-    //         2,
-    //       )} successfully created! You will be notified if you are outbid or
-    //       if the auction ends and you win the item.`,
-    //     )
-    //   },
-    //   (err) => {
-    //     setSubmitting(false)
-    //     setError(err.body as string)
-    //   },
-    // )
-  }, [itemId, bidPrice, handleSuccess])
+      .catch((err: any) => {
+        setSubmitting(false)
+        setError(err.body as string)
+      })
+  }, [apiInstance, itemId, bidPrice, handleSuccess])
 
   const minBid = price + minIncrement
 

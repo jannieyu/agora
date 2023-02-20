@@ -1,5 +1,6 @@
 import { Auction } from "./types"
 import { determineAuctionState } from "./util"
+import * as API from "../generated/openapi"
 
 export interface BidHistory {
   id?: number
@@ -86,6 +87,8 @@ export interface Broadcast {
   data?: BidHistory | SearchItem
 }
 
+const apiConfig = API.createConfiguration()
+
 const initialState = {
   numClicks: 0 as number,
   user: null as User | null,
@@ -95,6 +98,8 @@ const initialState = {
   listingState: {} as ListingState,
   numUnseenNotifs: 0 as number,
   auction: null as Auction | null,
+  configuration: apiConfig as API.Configuration,
+  apiInstance: new API.DefaultApi(apiConfig) as API.DefaultApi,
 }
 
 export type AppState = typeof initialState
