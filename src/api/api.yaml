@@ -3,7 +3,7 @@ info:
   version: 0.0.1
   title: AuctionHouse
 servers:
-  - http://localhost:8080/api
+  - url: http://localhost/api
 paths:
   /bid:
     post:

@@ -22,6 +22,7 @@
     "project": "./tsconfig.json"
   },
   "plugins": ["react", "@typescript-eslint", "import", "prettier"],
+  "ignorePatterns": ["**/generated/**"],
   "rules": {
     "prettier/prettier": [
       "error",

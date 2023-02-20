@@ -1,5 +1,5 @@
 import * as React from "react"
-import * as ReactDOM from "react-dom"
+import * as ReactDOM from "react-dom/client"
 import { BrowserRouter as Router, Route, Routes, useLocation, Link } from "react-router-dom"
 import { library } from "@fortawesome/fontawesome-svg-core"
 import { fas } from "@fortawesome/free-solid-svg-icons"
@@ -145,7 +145,12 @@ const store = configureStore({ reducer: rootReducer })
 
 library.add(fas, far)
 
-ReactDOM.render(
+const container = document.getElementById("root")
+
+// Create a root.
+const root = ReactDOM.createRoot(container)
+
+root.render(
   <Provider store={store}>
     <Router>
       <Base>
@@ -162,5 +167,4 @@ ReactDOM.render(
       </Base>
     </Router>
   </Provider>,
-  document.getElementById("root"),
 )

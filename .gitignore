@@ -5,7 +5,7 @@ static/bundles
 npm-debug.log
 .env
 .DS_Store
-src/js/generated
+**/generated
 
 # Go / Goland
 src/app/images

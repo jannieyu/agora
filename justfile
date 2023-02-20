@@ -2,7 +2,7 @@ setup-frontend:
   npm i
 
 build-api:
-  npx openapi-generator-cli generate -i src/js/api/api.yaml -g typescript -o src/js/generated/
+  npx openapi-generator-cli generate -i src/api/api.yaml -g typescript -o src/js/generated/
 
 run-frontend:
   cd config/webpack && npx webpack serve
