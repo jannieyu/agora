@@ -7,8 +7,11 @@ import { useCallback, useState } from "../base/react_base"
 import { safeParseFloat } from "../base/util"
 import { isValidPrice, calculateIncrement } from "./util"
 import DollarInput from "./dollar_input"
-import { apiCall as addBidCall } from "../api/add_bid"
+import * as Generated from "../generated"
 import { apiCall as addBidBotCall } from "../api/add_bid_bot"
+
+const configuration = Generated.createConfiguration()
+const apiInstance = new Generated.DefaultApi(configuration)
 
 export interface RefinedBidFormProps {
   price: number
@@ -119,9 +122,12 @@ export function ManualBidForm(props: RefinedBidFormProps) {
 
   const handleSubmit = useCallback(() => {
     setSubmitting(true)
-    addBidCall(
-      { itemId, bidPrice },
-      () => {
+    const body: Generated.AddBidRequest = { itemId, bidPrice }
+
+    apiInstance
+      .addBid(body)
+      .then((data: any) => {
+        console.log(`API called successfully. Returned data: ${data}`)
         setSubmitting(false)
 
         handleSuccess(
@@ -130,12 +136,26 @@ export function ManualBidForm(props: RefinedBidFormProps) {
           )} successfully created! You will be notified if you are outbid or
           if the auction ends and you win the item.`,
         )
-      },
-      (err) => {
-        setSubmitting(false)
-        setError(err.body as string)
-      },
-    )
+      })
+      .catch((err: any) => console.error(err))
+
+    // addBidCall(
+    //   { itemId, bidPrice },
+    //   () => {
+    //     setSubmitting(false)
+
+    //     handleSuccess(
+    //       `Bid of $${safeParseFloat(bidPrice).toFixed(
+    //         2,
+    //       )} successfully created! You will be notified if you are outbid or
+    //       if the auction ends and you win the item.`,
+    //     )
+    //   },
+    //   (err) => {
+    //     setSubmitting(false)
+    //     setError(err.body as string)
+    //   },
+    // )
   }, [itemId, bidPrice, handleSuccess])
 
   const minBid = price + minIncrement

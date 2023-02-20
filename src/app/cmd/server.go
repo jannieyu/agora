@@ -65,7 +65,7 @@ func main() {
 	r.HandleFunc("/api/delist_item", h.DelistItem)
 	r.HandleFunc("/api/get_search_items", h.GetSearchItems)
 
-	r.HandleFunc("/api/add_bid", h.AddBid)
+	r.HandleFunc("/api/bid", h.AddBid)
 	r.HandleFunc("/api/get_bids", h.GetBids)
 
 	r.HandleFunc("/api/add_bid_bot", h.AddOrUpdateBidBot)

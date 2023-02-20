@@ -3,7 +3,12 @@ info:
   version: 0.0.1
   title: AuctionHouse
 servers:
-  - url: http://localhost/api
+  - url: http://localhost:{port}/api
+    variables:
+      port:
+        enum:
+          - '8000'
+        default: '8000'
 paths:
   /bid:
     post:
@@ -18,6 +23,12 @@ paths:
       responses:
         "201":
           description: Added bid.
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
 components:
   schemas:
     AddBidRequest:
@@ -30,3 +41,13 @@ components:
       required:
         - itemId
         - bidPrice
+    Error:
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: integer
+          format: int32
+        message:
+          type: string

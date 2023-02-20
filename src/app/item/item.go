@@ -7,9 +7,10 @@ import (
 	"agora/src/app/ws"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"mime/multipart"
 	"net/http"
+	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -36,7 +37,7 @@ func ProcessImage(r *http.Request, folder imageFolder) (string, error) {
 		return "", err
 	}
 
-	data, err := ioutil.ReadAll(file)
+	data, err := io.ReadAll(file)
 	if err != nil {
 		log.WithError(err).Error("Failed to read image file.")
 		return "", err
@@ -52,7 +53,7 @@ func ProcessImage(r *http.Request, folder imageFolder) (string, error) {
 	filename := "images/" + string(folder) + t + "-" + header.Filename
 	diskLocation := "../../static/" + filename
 
-	if err := ioutil.WriteFile(diskLocation, data, 0777); err != nil {
+	if err := os.WriteFile(diskLocation, data, 0777); err != nil {
 		log.WithError(err).Error("Failed to write to disk.")
 		return "", err
 	}

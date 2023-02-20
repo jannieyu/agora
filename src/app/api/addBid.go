@@ -7,6 +7,7 @@ import (
 	"agora/src/app/item"
 	"agora/src/app/notification"
 	"encoding/json"
+	"io"
 	"net/http"
 
 	log "github.com/sirupsen/logrus"
@@ -29,10 +30,14 @@ func (h Handle) AddBid(w http.ResponseWriter, r *http.Request) {
 		log.WithError(err).Error("Failed to get cookie session at logout.")
 	}
 	bidderID := session.Values["id"].(uint32)
+	// var bidderID uint32
+	// bidderID = 1
 
-	urlParams := r.URL.Query()["data"][0]
+	defer r.Body.Close()
+	requestBody, _ := io.ReadAll(r.Body)
+
 	var bidAPI bid.BidAPI
-	if err := json.Unmarshal([]byte(urlParams), &bidAPI); err != nil {
+	if err := json.Unmarshal(requestBody, &bidAPI); err != nil {
 		log.WithError(err).Error("Failed to unmarshal bid information.")
 		w.WriteHeader(http.StatusBadRequest)
 		return
